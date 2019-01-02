@@ -8,11 +8,11 @@ OBJ = alpha.o belief.o cmd-line.o common.o cross-sum.o enumeration.o finite-grid
 
 SUBDIRS = mdp lp-solve laspack
 
-default: pomdp-solve install
+default: install
 
 all: default
 
-install:
+install: pomdp-solve
 	mkdir -p ../inst/
 	rm -f ../inst/pomdp-solve
 	rm -f ../inst/pomdp-solve.exe

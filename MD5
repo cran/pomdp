@@ -1,5 +1,6 @@
-e5696de6e5dbec1adce8bca2561f74ef *DESCRIPTION
-c34ccca93ccc93e334155330963be40c *NAMESPACE
+801946a0ba6f2ccf8f82d7b7805ae5a2 *DESCRIPTION
+68fb060151905a5d942d05e23d3db424 *NAMESPACE
+0763dfb8feaa4542f6c5c8a8d1aca6b3 *NEWS.md
 bd29fb5320f1da3b181a69ba823df2ee *R/POMDP_model.R
 c1169c4313bc33e157a503b37bd2722e *R/igraph_fix.R
 93453d32a61fae5a8d644132c384a86b *R/model.R
@@ -7,13 +8,14 @@ c1169c4313bc33e157a503b37bd2722e *R/igraph_fix.R
 714c1ea086ab874a92df28d9f98d37ae *R/solution.R
 ec0a1f039c17df332d8b22fa8e1c1879 *R/solve_POMDP.R
 75ec77c6afc2ddb949101fb16df577b0 *R/solver_output.R
+01abe78c605f6bcaec79ae89dca8acc1 *R/transitions.R
 e36cca84d51c00ae613070dd5685f988 *R/write_POMDP.R
 aa9d7c06ef90cf48f5a2be8b9cef5fcb *README.md
 a1c963d8dc515d303d01b2654615538b *build/vignette.rds
 af496de12ece7deeb9c43685624d31a5 *data/TigerProblem.rda
 1c075a23a4a742f7c21c736272e9a31a *inst/doc/POMDP.R
 edca715850864a805f5aa4b722306ba4 *inst/doc/POMDP.Rmd
-8d8d973d7150ed3eb09903f115e6b3f1 *inst/doc/POMDP.pdf
+2057753e4834d09ac8441380e460c35f *inst/doc/POMDP.pdf
 318f6f1007a973ebfe708bc0f4504676 *man/POMDP.Rd
 c8e5eb76b6ed1caed2283d790a8f76e4 *man/TigerProblem.Rd
 b0bef651d9f8f6688900993e7a5a32f8 *man/model.Rd
@@ -22,8 +24,9 @@ d063c137df53ef0e7c096086b514e8f8 *man/policy_graph.Rd
 0bb35e56d1127ae1e984c6072b76897c *man/solution.Rd
 082b8b64abebdc779c553a2a69ce5981 *man/solve_POMDP.Rd
 4181f76ae7f526f31ee3e2a3a71110ef *man/solver_output.Rd
+c01abb0756f5d7950e375323ee9b3460 *man/transitions.Rd
 fa601ed317cc9eb68df21510cbe0729d *man/write_POMDP.Rd
-e0828775fecf3d3f42b0f6f39faa6af9 *src/Makevars
+27477165fbc41191a928b0da51b7a559 *src/Makevars
 aae02e985138dbae99dbff1e5b30c605 *src/Makevars.win
 6eda227cf9419c7688afa4d7026a9330 *src/alpha.c
 ce813e10c54e06f7d16631653e8d09f1 *src/alpha.h
@@ -47,7 +50,7 @@ ef674c239943badcb1d32c8afa5cd1cd *src/cross-sum.h
 41c03ec6018e10a6f38c6db97fbbb72d *src/double-vector.h
 379152bd15fac16617f4f156587c72e9 *src/enumeration.c
 c1cf9548938bd77ea05e2c21c24574d5 *src/enumeration.h
-7685e8b901af6eb8c940380c59c3b432 *src/fg-params.c
+c09309cb829ea34c45e09cbf86525911 *src/fg-params.c
 eb17fd77b2bb906ab7810a9f10ad56a0 *src/fg-params.h
 fbe1f5a97d06d7149f400ef33dd210bb *src/finite-grid.c
 ca10c9c2c1378d01de62dfd1098951ee *src/finite-grid.h
