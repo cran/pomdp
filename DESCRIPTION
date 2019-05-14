@@ -1,8 +1,8 @@
 Package: pomdp
 Title: Solver for Partially Observable Markov Decision Processes
         (POMDP)
-Version: 0.9.1
-Date: 2019-01-02
+Version: 0.9.1-1
+Date: 2019-05-14
 Authors@R: c(person("Hossein", "Kamalzadeh", email = "hkamalzadeh@smu.edu",
                   role = c("aut", "cph","cre")),
              person("Michael", "Hahsler", email = "mhahsler@lyle.smu.edu",
@@ -22,10 +22,10 @@ Copyright: pomdp-solve is Copyright (C) Anthony R. Cassandra; LASPack
         Michel Berkelaar, Kjell Eikland, Peter Notebaert; all other
         code is Copyright (C) Hossein Kamalzadeh and Michael Hahsler.
 NeedsCompilation: yes
-Packaged: 2019-01-02 19:43:12 UTC; 47148755
+Packaged: 2019-05-14 21:12:15 UTC; 47148755
 Author: Hossein Kamalzadeh [aut, cph, cre],
   Michael Hahsler [aut, cph],
   Anthony R. Cassandra [ctb, cph]
 Maintainer: Hossein Kamalzadeh <hkamalzadeh@smu.edu>
 Repository: CRAN
-Date/Publication: 2019-01-03 00:50:03 UTC
+Date/Publication: 2019-05-14 21:40:08 UTC

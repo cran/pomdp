@@ -1,6 +1,6 @@
-801946a0ba6f2ccf8f82d7b7805ae5a2 *DESCRIPTION
+6929eaeccd5e7e9467f1ce6f930ac54b *DESCRIPTION
 68fb060151905a5d942d05e23d3db424 *NAMESPACE
-0763dfb8feaa4542f6c5c8a8d1aca6b3 *NEWS.md
+c60e344a767d401ee0b14dccefb6983a *NEWS.md
 bd29fb5320f1da3b181a69ba823df2ee *R/POMDP_model.R
 c1169c4313bc33e157a503b37bd2722e *R/igraph_fix.R
 93453d32a61fae5a8d644132c384a86b *R/model.R
@@ -15,7 +15,7 @@ a1c963d8dc515d303d01b2654615538b *build/vignette.rds
 af496de12ece7deeb9c43685624d31a5 *data/TigerProblem.rda
 1c075a23a4a742f7c21c736272e9a31a *inst/doc/POMDP.R
 edca715850864a805f5aa4b722306ba4 *inst/doc/POMDP.Rmd
-2057753e4834d09ac8441380e460c35f *inst/doc/POMDP.pdf
+c392ab23d5f6e470a9ae24c5f9c7ae9f *inst/doc/POMDP.pdf
 318f6f1007a973ebfe708bc0f4504676 *man/POMDP.Rd
 c8e5eb76b6ed1caed2283d790a8f76e4 *man/TigerProblem.Rd
 b0bef651d9f8f6688900993e7a5a32f8 *man/model.Rd
@@ -119,7 +119,7 @@ ae6f7fc54557045ce6fe5fea73ae3826 *src/main.c
 d17b152bf2646ff8355409c11badb4c5 *src/mdp/imm-reward.c
 e28587133f5d402f5f966e66c6beda9e *src/mdp/imm-reward.h
 534f9fffd9cf7e0d43d2b707ee7e8b97 *src/mdp/mdp-common.h
-9087493f9165e2ede2f843f4c758bf48 *src/mdp/mdp.c
+307252dff3961afc813d6def47cd884a *src/mdp/mdp.c
 0dc5eaa2622cfe8e41c4e3610b36fade *src/mdp/mdp.h
 ddaba38fdb045933188f49e750fd15b3 *src/mdp/parse_constant.h
 3eb7eeb75267cd8d6ceded6f182bd04f *src/mdp/parse_err.c
