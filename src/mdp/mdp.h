@@ -108,5 +108,10 @@ extern void allocateIntermediateMDP();
 extern int writeMDP( char *filename );
 extern void displayMDPSlice( int state );
 
+/* MFH: variables shared between parser.c and mdp.c moved here */
+extern I_Matrix *IP;    /* For transition matrices. */
+extern I_Matrix *IR;   /* For observation matrices. */
+
+
 #endif
 #endif

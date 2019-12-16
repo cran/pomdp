@@ -1,7 +1,9 @@
 
 ## write a model in POMDP format for pomdp-solve
 write_POMDP <- function(model, file) {
-  if(!inherits(model, "POMDP_model")) stop("model needs to be a POMDP model use POMDP()!")
+  if(!inherits(model, "POMDP")) stop("model needs to be a POMDP model use POMDP()!")
+  
+  model <- model$model
   
   discount    <- model$discount 
   states      <- model$states 
@@ -11,14 +13,14 @@ write_POMDP <- function(model, file) {
   transition_prob <- model$transition_prob
   observation_prob <- model$observation_prob 
   reward      <- model$reward
-  values      <- model$values
+  max         <- model$max
   
   ### POMDP file
   code <- character()
   code <-  paste(c("discount:", discount, "\n") , collapse = " ")
   
   # deal with rewards or costs
-  values <- match.arg(values, choices = c("reward", "cost"))
+  values <- ifelse(max, "reward", "cost")
   code <- paste(c(code,"values:", values, "\n"), collapse = " ")
   
   # counting the number of states
@@ -37,32 +39,33 @@ write_POMDP <- function(model, file) {
   code <- paste(c(code,"observations:", observations, "\n"), collapse = " ")
   
   ### starting beliefs
-  
-  ## if the starting beliefs are given by enumerating the probabilities for each state
-  if (!is.character(start)) {
-    if (sum(start)==1) {
-      code <- paste(c(code,"start:", start, "\n"), collapse = " ")
-    }
-  }
-  ## if the starting beliefs are given by a uniform distribution over all states
-  if (start == "uniform") {
-    code <- paste(c(code,"start:", start, "\n"), collapse = " ")
-  } else if (start[1] != "-") {  ## if the starting beliefs include a specific subset of states
-    # if the starting beliefs are given by a uniform distribution over a subset of states (using their names)
-    if (!any(is.na(match(start, states)))) {
-      code <- paste(c(code, "start include:", start, "\n"), collapse = " ")
-    }
-    # if the starting beliefs are given by a uniform distribution over a subset of states (using their numbers)
-    if (is.numeric(start)) { 
-      start <- as.integer(start) -1L ### pomdp-solve starts with index 0
-      if (all(start >= 0 & start < number_of_states) && length(start) <= number_of_states) {
-        code <- paste(c(code, "start include:", start, "\n"), collapse = " ")
+ 
+  if(!is.null(start)) { 
+    ## if the starting beliefs are given by enumerating the probabilities for each state
+    if (!is.character(start)) {
+      if (length(start) == length(states) && sum(start)==1) {
+        code <- paste(c(code,"start:", start, "\n"), collapse = " ")
       }
     }
-  } else if (start[1] == "-") { ## if the starting beliefs exclude a specific subset of states
-    code <- paste(c(code, "start exclude:", start[-1], "\n"), collapse = " ")
+    ## if the starting beliefs are given by a uniform distribution over all states
+    if (length(start) == 0 && start[1] == "uniform") {
+      code <- paste(c(code,"start:", start, "\n"), collapse = " ")
+    } else if (start[1] != "-") {  ## if the starting beliefs include a specific subset of states
+      # if the starting beliefs are given by a uniform distribution over a subset of states (using their names)
+      if (!any(is.na(match(start, states)))) {
+        code <- paste(c(code, "start include:", start, "\n"), collapse = " ")
+      }
+      # if the starting beliefs are given by a uniform distribution over a subset of states (using their numbers)
+      if (is.numeric(start)) { 
+        start <- as.integer(start) -1L ### pomdp-solve starts with index 0
+        if (all(start >= 0 & start < number_of_states) && length(start) <= number_of_states) {
+          code <- paste(c(code, "start include:", start, "\n"), collapse = " ")
+        }
+      }
+    } else if (start[1] == "-") { ## if the starting beliefs exclude a specific subset of states
+      code <- paste(c(code, "start exclude:", start[-1], "\n"), collapse = " ")
+    }
   }
-  
   
   ### Transition Probabilities
   
@@ -117,7 +120,7 @@ write_POMDP <- function(model, file) {
     if (dim(observation_prob)[2] != 4) {
       stop("the given data frame for the observation probabilities needs to have 4 columns including 'action', 'end-state','observation','probability'")
     }
-    
+     
     ### pomdp-solve starts with index 0
     for(i in 1:3) if(is.numeric(observation_prob[[i]])) 
       observation_prob[[i]] <- as.integer(observation_prob[[i]]) - 1L 

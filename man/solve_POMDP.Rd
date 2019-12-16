@@ -13,7 +13,8 @@ solve_POMDP_parameter()
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{model}{ a POMDP problem specification created with \code{\link{POMDP}}.}
+  \item{model}{ a POMDP problem specification created with \code{\link{POMDP}}. Alternatively,
+  a POMDP file or the URL for a POMDP file can be specified.}
   \item{method}{ string; one of the following solution methods: 
   \code{"grid"},
   \code{"enum"},
@@ -28,6 +29,8 @@ logical, if set to \code{TRUE}, the function provides the output of the pomdp so
 }
 \details{
 \code{solve_POMDP_parameter()} displays available solver parameter options.
+
+Note: The parser for POMDP files is experimental. Please report problems here: \url{https://github.com/farzad/pomdp/issues}.
 }
 \value{
 The solver returns an object of class POMDP which is a list with 
@@ -52,6 +55,7 @@ Hossein Kamalzadeh, Michael Hahsler
 }
 \examples{
 data("TigerProblem")
+TigerProblem
 
 tiger_solved <- solve_POMDP(model = TigerProblem, parameter = list(fg_points = 10))
 tiger_solved
@@ -62,11 +66,19 @@ model(tiger_solved)
 ## look at the solution
 solution(tiger_solved)
 
+## look at solver output
+solver_output(tiger_solved)
+
 ## plot the policy graph
 plot(tiger_solved)
 
-## display solver options
+## display available solver options which can be passed on to the solver as parameter.
 solve_POMDP_parameter()
+
+## solve a POMDP from http://www.pomdp.org/examples
+sol <- solve_POMDP("http://www.pomdp.org/examples/cheese.95.POMDP")
+sol
+plot(sol)
 }
 
 

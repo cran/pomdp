@@ -1,6 +1,6 @@
 importFrom("grDevices", "rainbow")
 importFrom("graphics", "legend")
-importFrom("utils", "read.table")
+importFrom("utils", "read.table", "type.convert")
 importFrom("graphics", "plot")
 importFrom("stats", "ave")
 
@@ -13,9 +13,11 @@ export(
   "solver_output", 
   "model",
   "solution",
-  "transitions",
+  "reward",
   "policy_graph",
-  "write_POMDP")
+  "write_POMDP",
+  "O_", "R_", "T_"
+  )
 
 S3method("plot", "POMDP")
 S3method("print", "POMDP")
