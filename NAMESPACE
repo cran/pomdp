@@ -1,25 +1,42 @@
-importFrom("grDevices", "rainbow")
-importFrom("graphics", "legend")
-importFrom("utils", "read.table", "type.convert")
-importFrom("graphics", "plot")
-importFrom("stats", "ave")
+importFrom("graphics", "plot", "legend", "axis", "box", "lines", "points", "barplot", "mtext")
+importFrom("grDevices", "colorRamp", "colorRampPalette", "rgb", "rainbow")
+importFrom("utils", "read.table", "type.convert", "head", "tail")
+importFrom("stats", "ave", "aggregate", "runif")
+importFrom("Ternary", "TernaryPlot", "TernaryPoints")
 
 import("igraph")
 
 export(
   "POMDP", 
+  "MDP",
+  "O_", "R_", "T_",
+  "write_POMDP",
+  "read_POMDP",
+  "transition_matrix",
+  "observation_matrix",
+  "reward_matrix",
+  
   "solve_POMDP",
   "solve_POMDP_parameter",
-  "solver_output", 
-  "model",
-  "solution",
-  "reward",
+  "policy",
   "policy_graph",
-  "write_POMDP",
-  "O_", "R_", "T_"
+  "plot_policy_graph",
+  "plot_value_function",
+  
+  "reward",
+  "optimal_action",
+  
+  "simulate_POMDP",
+  "update_belief",
+  
+  "sample_belief_space",
+  "plot_belief_space",
+  
+  "round_stochastic"
   )
 
-S3method("plot", "POMDP")
 S3method("print", "POMDP")
+S3method("print", "MDP")
 S3method("print", "POMDP_model")
 S3method("print", "POMDP_solution")
+S3method("print", "text")
