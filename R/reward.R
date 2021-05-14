@@ -25,7 +25,7 @@
 #' # if no start is specified, a uniform belief is used.
 #' reward(sol)
 #' 
-#' # we have additional information that makes us belief that the tiger 
+#' # we have additional information that makes us believe that the tiger 
 #' # is more likely to the left.
 #' reward(sol, belief = c(0.85, 0.15))
 #' 
@@ -34,7 +34,7 @@
 #' 
 #' # Note that in this case, the total discounted expected reward is greater 
 #' # than 10 since the tiger problem resets and another game staring with 
-#' # a uniform belief is played which produces addional reward.
+#' # a uniform belief is played which produces additional reward.
 #' 
 #' @export
 reward <- function(x, belief = NULL, epoch = 1) {
@@ -56,7 +56,7 @@ reward <- function(x, belief = NULL, epoch = 1) {
     belief = belief,
     reward = vs$reward, 
     pg_node = vs$pg_node,
-    action = pg$action[vs$pg_node]
+    action = factor(pg$action[vs$pg_node], levels = x$model$actions)
   )
 }
 
@@ -69,6 +69,6 @@ reward <- function(x, belief = NULL, epoch = 1) {
   })
   r <- as.data.frame(t(r))
   colnames(r) <- c("reward", "pg_node")
-  r$pg_node <- factor(r$pg_node, levels = 1:nrow(alpha))
+  #r$pg_node <- factor(r$pg_node, levels = 1:nrow(alpha))
   r
 }

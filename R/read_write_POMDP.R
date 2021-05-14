@@ -1,13 +1,17 @@
 # FIXME: we should use pomdp:::round_stochastic here!
-format_fixed <- function(x, digits = 7) {
+# TODO: Improve read_POMDP to read probability matrices.
+
+format_fixed <- function(x, digits = 7, debug = "unknown") {
+  if(is.null(x)) stop("missing field ", debug)
+  
   if(is.vector(x)) paste(sprintf(paste0("%.",digits,"f"), x), collapse = " ")
   else if(is.matrix(x)) paste(apply(x, MARGIN = 1, format_fixed, digits = digits), collapse = "\n")
-  else stop("formating not implemented for ", class(x))
+  else stop("formating not implemented for ", class(x), " in field ", debug)
 }
 
 #' Read and write a POMDP Model to a File in POMDP Format
 #' 
-#' Reads and write a POMDP file suitable for the pomdp-solve program.
+#' Reads and write a POMDP file suitable for the pomdp-solve program. Note: read POMDP files are intended to be used in solve_POMDP() and do not support all auxiliary functions. Fields like the transition matrix, the observation matrix and the reward structure are not parsed.
 #' 
 #' 
 #' @aliases write_POMDP read_POMDP
@@ -58,7 +62,7 @@ write_POMDP <- function(model, file, digits = 7) {
     ## if the starting beliefs are given by enumerating the probabilities for each state
     if (is.numeric(start)) {
       if (length(start) == length(states) && sum(start)==1) {
-        code <- paste0(code,"start: ", format_fixed(start, digits), "\n")
+        code <- paste0(code,"start: ", format_fixed(start, digits, "start"), "\n")
       } else {
       ## this should be indices (pomdp_solve starts with 0)
       start_ids <- as.integer(abs(start)) - 1L
@@ -72,7 +76,7 @@ write_POMDP <- function(model, file, digits = 7) {
     } else if(is.character(start))
       ## if the starting beliefs are given by a uniform distribution over all states
       if (length(start) == 1 && start[1] == "uniform") {
-        code <- paste0(c(code,"start:", start, "\n"), collapse = " ")
+        code <- paste0(code,"start: ", paste(start, collapse = " "), "\n")
         
       } else if (start[1] != "-")  
         code <- paste0(code, "start include: ", paste(start, collapse = " "), "\n")
@@ -103,7 +107,7 @@ write_POMDP <- function(model, file, digits = 7) {
         transition_prob[i,1], " : ", 
         transition_prob[i,2], " : ", 
         transition_prob[i,3], " ",
-        format_fixed(transition_prob[i,4], digits = digits),  
+        format_fixed(transition_prob[i,4], digits = digits, "transition_prob"),  
         "\n")
     }
   }else{
@@ -118,7 +122,7 @@ write_POMDP <- function(model, file, digits = 7) {
       if (is.character(transition_prob[[a]]) && length(transition_prob[[a]]) == 1)
         code <- paste0(code, transition_prob[[a]], "\n")
       else 
-        code <- paste0(code, format_fixed(transition_prob[[a]], digits), "\n")
+        code <- paste0(code, format_fixed(transition_prob[[a]], digits, paste("transition_prob for action", a)), "\n")
     }
   }
   code <- paste0(code, "\n")
@@ -143,7 +147,7 @@ write_POMDP <- function(model, file, digits = 7) {
         observation_prob[i,1], " : ", 
         observation_prob[i,2], " : ", 
         observation_prob[i,3], " ", 
-        format_fixed(observation_prob[i,4], digits = digits), "\n")
+        format_fixed(observation_prob[i,4], digits = digits, "observation_prob"), "\n")
     }
   }else{
     ## if the observation probabilities are given in the form of action dependent matrices
@@ -160,7 +164,7 @@ write_POMDP <- function(model, file, digits = 7) {
       } else {
         if(any(dim(observation_prob[[a]]) != c(number_of_states, number_of_observations)))
           stop("Observation matrix for action '", actions[i], "' is not of size # of states times # of observations!")
-        code <- paste0(code, format_fixed(observation_prob[[a]], digits), "\n")
+        code <- paste0(code, format_fixed(observation_prob[[a]], digits, paste("transition_prob for action", a)), "\n")
       }
     }
   }
@@ -183,7 +187,7 @@ write_POMDP <- function(model, file, digits = 7) {
         reward[i,2], " : ", 
         reward[i,3], " : ", 
         reward[i,4], " ",
-        format_fixed(reward[i,5], digits),  "\n")
+        format_fixed(reward[i,5], digits, "reward"),  "\n")
     }
   }else{
     
@@ -206,7 +210,7 @@ write_POMDP <- function(model, file, digits = 7) {
           code <- paste0(code, reward[[actions[i]]][[states[j]]] , "\n")
         } 
         else {
-          code <- paste0(code, format_fixed(reward[[actions[i]]][[states[j]]], digits), "\n")
+          code <- paste0(code, format_fixed(reward[[actions[i]]][[states[j]]], digits, "reward"), "\n")
         }
       }
     }
@@ -228,7 +232,7 @@ read_POMDP <- function(file) {
       ind <- grep(paste0(var,":"), problem)
       if(length(ind) == 0) return(NULL)
       
-      vals <- strsplit(problem[[ind]], "\\s+")[[1]][-1]
+      vals <- strsplit(trimws(problem[[ind]]), "\\s+")[[1]][-1]
       
       # the data may be in the next line
       if(length(vals) == 0) vals <- strsplit(problem[[ind+1]], "\\s+")[[1]]
@@ -242,14 +246,15 @@ read_POMDP <- function(file) {
     vals
     }
     
-    structure(list(
+    model <- structure(list(
       name = file,
       states = get_vals("states", number = TRUE),
       observations = get_vals("observations", number = TRUE),
       actions = get_vals("actions", number = TRUE),
       start = get_vals("start"),
       discount = get_vals("discount"),
-      problem = structure(problem, class = "text")),
-      class = "POMDP_model"
-    )
+      problem = structure(problem, class = "text")
+    ), class = "POMDP_model")
+    
+    structure(list(model = model), class = "POMDP")
 }    

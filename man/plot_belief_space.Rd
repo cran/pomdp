@@ -33,7 +33,7 @@ specifying the \code{method} used for \code{sample_belief_space}.}
 
 \item{what}{what to plot.}
 
-\item{legend}{logical; add a legend? If the legend covers the plot then you
+\item{legend}{logical; add a legend? If the legend is covered by the plot then you
 need to increase the plotting region of the plotting device.}
 
 \item{pch}{plotting symbols.}
@@ -50,7 +50,7 @@ Returns invisibly the sampled points.
 Plots the optimal action, the node in the policy graph or the reward for a
 given set of belief points on a line (2D) or on a ternary plot (3D). If no
 points are given, points are sampled using a regular arrangement or randomly
-form the (projected) belief space.
+from the (projected) belief space.
 }
 \examples{
 

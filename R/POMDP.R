@@ -14,7 +14,7 @@
 #' observations; \eqn{O} are the conditional observation probabilities; and
 #' \eqn{\gamma} is the discount factor. We will use lower case letters to
 #' represent a member of a set, e.g., \eqn{s} is a specific state. To refer to
-#' the size of a set we will use carnality, e.g., the number of actions is
+#' the size of a set we will use cardinality, e.g., the number of actions is
 #' \eqn{|A|}.
 #' 
 #' \bold{Specification of transition probabilities}
@@ -25,7 +25,7 @@
 #' 
 #' \itemize{ 
 #' \item A data frame with 4 columns, where the columns specify
-#' action \eqn{a}, start-state \eqn{s}, end-state \eqn{s'} and the transition
+#' action \eqn{a}, start.state \eqn{s}, end.state \eqn{s'} and the transition
 #' probability \eqn{T(s' | s, a)}, respectively. The first 3 columns can be
 #' either character (the name of the action or state) or integer indices.  You
 #' can use \code{rbind()} with helper function \code{T_()} to create this data
@@ -44,7 +44,7 @@
 #' following ways:
 #' 
 #' \itemize{ \item A data frame with 4 columns, where the columns specify the
-#' action \eqn{a}, the end-state \eqn{s'}, the observation \eqn{o} and the
+#' action \eqn{a}, the end.state \eqn{s'}, the observation \eqn{o} and the
 #' probability \eqn{O(o | s', a)}, respectively. The first 3 columns could be
 #' either character (the name of the action, state, or observation), integer
 #' indices, or they can be \code{"*"} to indicate that the observation
@@ -54,7 +54,7 @@
 #' \item A named list of \eqn{|A|} matrices. Each matrix is of size \eqn{|S|
 #' \times |\Omega|}{|S| x |\Omega|}.  The name of each matrix is the action it
 #' applies to.  Instead of a matrix, also the string \code{"uniform"} can be
-#' specified.  }
+#' specified.}
 #' 
 #' \bold{Specification of the reward function}
 #' 
@@ -202,7 +202,7 @@ POMDP <- function(
   
   ### FIXME: Check the values!
   
-  # discount shuold be a number in [0,1]
+  # discount should be a number in [0,1]
   # states should be a vector of strings
   # actions should be a vector of strings
   # observations should be a vector of strings
@@ -236,9 +236,9 @@ POMDP <- function(
       name = name,
       discount = discount, 
       horizon = horizon,
-      states = factor(states), 
-      actions = factor(actions), 
-      observations = factor(observations),  
+      states = as.character(states), 
+      actions = as.character(actions), 
+      observations = as.character(observations),  
       transition_prob = transition_prob,
       observation_prob = observation_prob, 
       reward = reward,
@@ -249,6 +249,7 @@ POMDP <- function(
   ), class = "POMDP")
 }
 
+#' @export
 print.POMDP <- function(x, ...) {
   if(is.null(x$solution)) cat(
     "Unsolved POMDP model:", x$model$name, "\n",
@@ -266,6 +267,7 @@ print.POMDP <- function(x, ...) {
   )
 }
 
+#' @export
 print.POMDP_model <- function(x, ...) {
  cat("POMDP model:", x$name, "\n\n")
  if(!is.null(x$problem)) { 
@@ -320,15 +322,15 @@ print.POMDP_model <- function(x, ...) {
 #' @rdname POMDP
 #' @export
 O_ <- function(action = "*", end.state = "*", observation = "*", probability) 
-  data.frame(action = action, end.state = end.state, observation = observation, probability = probability)
+  data.frame(action = action, end.state = end.state, observation = observation, probability = probability, stringsAsFactors = FALSE)
 
 #' @rdname POMDP
 #' @export
 T_ <- function(action = "*", start.state = "*", end.state = "*", probability) 
-  data.frame(action = action, start.state = start.state, end.state= end.state, probability = probability)
+  data.frame(action = action, start.state = start.state, end.state= end.state, probability = probability, stringsAsFactors = FALSE)
 
 #' @rdname POMDP
 #' @export
 R_ <- function(action = "*", start.state = "*", end.state = "*", observation = "*", value) 
   data.frame(action = action, start.state = start.state, end.state = end.state, 
-    observation = observation, value = value)
+    observation = observation, value = value, stringsAsFactors = FALSE)

@@ -1,11 +1,10 @@
 # R package pomdp: Partially Observable Markov Decision Processes
 
 [![CRAN version](https://www.r-pkg.org/badges/version/pomdp)](https://cran.r-project.org/package=pomdp)
-[![Rdoc](https://www.rdocumentation.org/badges/version/pomdp)](https://www.rdocumentation.org/packages/pomdp)
-[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/grand-total/pomdp)](https://cran.r-project.org/package=pomdp)
+[![R build status](https://github.com/mhahsler/pomdp/workflows/R-CMD-check/badge.svg)](https://github.com/mhahsler/pomdp/actions)
 [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/pomdp)](https://cran.r-project.org/package=pomdp)
 
-Provides the infrastructure to define and analyze the solutions of Partially Observable Markov Decision Processes (POMDP) models. The package includes [pomdp-solve](http://www.pomdp.org/code) (Cassandra, 2015) to solve POMDPs using
+Provides the infrastructure to define and analyze the solutions of Partially Observable Markov Decision Processes (POMDP) models. The package includes [pomdp-solve](http://www.pomdp.org/code/) (Cassandra, 2015) to solve POMDPs using
 a variety of algorithms.
 
 The package provides the following algorithms:
@@ -18,6 +17,7 @@ The package provides the following algorithms:
 
 * Approximate value iteration
   - __Finite grid algorithm__ (Cassandra 2015), a variation of point-based value iteration to solve larger POMDPs (__PBVI__; see Pineau 2003) without dynamic belief set expansion.
+  - __SARSOP__ (Kurniawati, Hsu and Lee 2008), point-based algorithm that approximates optimally reachable belief spaces for infinite-horizon problems (via package sarsop).
 
 ## Installation
 
@@ -28,7 +28,7 @@ install.packages("pomdp")
 __Current development version:__ install from GitHub (needs devtools).
 ```R 
 library("devtools")
-install_github("farzad/pomdp")
+install_github("mhahsler/pomdp")
 ```
 
 ## Usage
@@ -80,7 +80,8 @@ Solved POMDP model: Tiger Problem
 * Monahan, G. E. (1982). A survey of partially observable Markov decision processes: Theory, models, and algorithms. Management Science 28(1):1-16.
 * Littman, M. L.; Cassandra, A. R.; and Kaelbling, L. P. (1996). Efficient dynamic-programming updates in partially observable Markov decision processes. Technical Report CS-95-19, Brown University, Providence, RI.
 * Zhang, N. L., and Liu, W. (1996). Planning in stochastic domains: Problem characteristics and approximation. Technical Report HKUST-CS96-31, Department of Computer Science, Hong Kong University of Science and Technology.
-* Pineau J., Geoffrey J Gordon G.J., Thrun S.B. (2003). Point-based value iteration: an anytime algorithm for POMDPs. IJCAI'03: Proceedings of the 18th international joint conference on Artificial Intelligence. Pages 1025-1030.
+* Pineau, J., Gordon, G.J., Thrun, S.B. (2003). Point-based value iteration: an anytime algorithm for POMDPs. IJCAI'03: Proceedings of the 18th international joint conference on Artificial Intelligence. Pages 1025-1030.
+* Kurniawati, H., Hsu, D., and Lee, W.S. (2008). SARSOP: Efficient point-based POMDP planning by approximating optimally reachable belief spaces. In Proc. Robotics: Science and Systems.
 
 ## Acknowledgments
 

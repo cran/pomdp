@@ -1,7 +1,6 @@
 # Updating the belief state: update for a single belief vector, one action, and one observation.
 # $$b'(s') = \eta O(o | s',a) \sum_{s \in S} T(s' | s,a) b(s)$$
 # $$\eta = 1/ \sum_{s' \in S}[ O(o | s',a) \sum_{s \in S} T(s' | s,a) b(s)]$$
-
 .update_belief <- function(belief, action, observation, Tr, Ob, digits = 7) {
     belief <- Ob[[action]][, observation, drop = FALSE] * crossprod(Tr[[action]], cbind(belief))
     belief <- belief/sum(belief)
@@ -15,10 +14,19 @@
 #' 
 #' Update the belief given a taken action and observation.
 #' 
+#' @details 
+#' Update the belief state \eqn{b} (\code{belief}) with an action \eqn{a} and observation \eqn{o}. The new 
+#' belief state \eqn{b'} is:
 #' 
-#' @param model a POMDP model. Defaults to the start belief state specified in
-#' the model or "uniform".
+#' \deqn{b'(s') = \eta O(o | s',a) \sum_{s \in S} T(s' | s,a) b(s)}
+#' 
+#' where \eqn{\eta = 1/ \sum_{s' \in S}[ O(o | s',a) \sum_{s \in S} T(s' | s,a) b(s)]} normalizes the new belief state so the probabilities add up to one.
+#' 
+#' 
+#' @param model a POMDP model. 
 #' @param belief the current belief state.
+#' Defaults to the start belief state specified in
+#' the model or "uniform".
 #' @param action the taken action.
 #' @param observation the received observation.
 #' @param episode Use transition and observation matrices for the given episode
@@ -27,7 +35,8 @@
 #' @param drop logical; drop the result to a vector if only a single belief
 #' state is returned.
 #' @author Michael Hahsler
-#' @seealso \code{\link{POMDP}}
+#' @seealso [POMDP()], [simulate_POMDP()]
+#' @md
 #' @examples
 #' 
 #' data(Tiger)
@@ -62,11 +71,6 @@ update_belief <- function(model, belief = NULL, action = NULL, observation = NUL
   b
 }
 
-#' # Simulate belief points
-#' 
-#' If we have a solution, the policy is followed. Otherwise, a random action is chosen. 
-
-
 
 #' Simulate Trajectories in a POMDP
 #' 
@@ -80,6 +84,8 @@ update_belief <- function(model, belief = NULL, action = NULL, observation = NUL
 #' @param n number of trajectories.
 #' @param belief probability distribution over the states for choosing the
 #' starting states for the trajectories.
+#' Defaults to the start belief state specified in
+#' the model or "uniform".
 #' @param horizon number of epochs for the simulation. If \code{NULL} then the
 #' horizon for the model is used.
 #' @param visited_beliefs logical; Should all belief points visited on the
@@ -93,7 +99,8 @@ update_belief <- function(model, belief = NULL, action = NULL, observation = NUL
 #' @return A matrix with belief points as rows. Attributes containing action
 #' counts, and rewards may be available.
 #' @author Michael Hahsler
-#' @seealso \code{\link{POMDP}}
+#' @seealso [POMDP()]
+#' @md
 #' @examples
 #' 
 #' data(Tiger)
@@ -129,6 +136,7 @@ update_belief <- function(model, belief = NULL, action = NULL, observation = NUL
 #' plot_belief_space(sol, sample = sim, ylim = c(0,6))
 #' lines(density(sim[,1], bw = .05)); axis(2); title(ylab = "Density")
 #' 
+#' @export
 simulate_POMDP <- function(model, n = 100, belief = NULL, horizon = NULL, 
   visited_beliefs = FALSE, random_actions = FALSE, digits = 7, verbose = FALSE) {
   

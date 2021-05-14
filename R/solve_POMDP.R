@@ -6,7 +6,9 @@ find_pomdpsolve <- function() {
   if(exec == "") stop("pomdp-solve executable not found. Reinstall package pomdp.")
   exec
 }
-  
+
+#' @rdname solve_POMDP
+#' @export  
 solve_POMDP_parameter <- function() {
   solver_output <- system2(find_pomdpsolve(), 
     args = c("-h"),
@@ -20,7 +22,7 @@ solve_POMDP_parameter <- function() {
 }
 
 
-#' Solve a POMDP Problem
+#' Solve a POMDP Problem using pomdp-solver
 #' 
 #' This function utilizes the C implementation of 'pomdp-solve' by Cassandra
 #' (2015) to solve problems that are formulated as partially observable Markov
@@ -81,7 +83,7 @@ solve_POMDP_parameter <- function() {
 #' 
 #' To guarantee convergence in point-based (finite grid) value iteration, the
 #' initial value function must be a lower bound on the optimal value function.
-#' If all rewards are strictly non-negative, a initial value function with an
+#' If all rewards are strictly non-negative, an initial value function with an
 #' all zero vector can be used and results will be similar to other methods.
 #' However, if there are negative rewards, lower bounds can be guaranteed by
 #' setting a single vector with the values \eqn{min(reward)/(1 - discount)}.
@@ -93,12 +95,12 @@ solve_POMDP_parameter <- function() {
 #' observation probabilities and reward structure can be modeled by considering
 #' a set of episodes representing epoch with the same settings. In the scared
 #' tiger example (see Examples section), the tiger has the normal behavior for
-#' the first three epochs (episode 1) and then become scared with different
+#' the first three epochs (episode 1) and then becomes scared with different
 #' transition probabilities for the next three epochs (episode 2). The episodes
 #' can be solved in reverse order where the value function is used as the
 #' terminal values of the preceding episode. This can be done by specifying a
 #' vector of horizons (one horizon for each episode) and then lists with
-#' transitions matrices, observation matrices, and rewards. If the horizon
+#' transition matrices, observation matrices, and rewards. If the horizon
 #' vector has names, then the lists also need to be named, otherwise they have
 #' to be in the same order (the numeric index is used). Only the time-varying
 #' matrices need to be specified. An example can be found in Example 4 in the
@@ -106,7 +108,7 @@ solve_POMDP_parameter <- function() {
 #' multiple times (see Example 5).
 #' 
 #' \bold{Note:} The parser for POMDP files is experimental. Please report
-#' problems here: \url{https://github.com/farzad/pomdp/issues}.
+#' problems here: \url{https://github.com/mhahsler/pomdp/issues}.
 #' 
 #' @aliases solve_POMDP solve_POMDP_parameter
 #' @param model a POMDP problem specification created with \code{\link{POMDP}}.
@@ -191,7 +193,7 @@ solve_POMDP_parameter <- function() {
 #' # value function
 #' plot_value_function(sol, ylim = c(0,20))
 #' 
-#' # display available solver options which can be passed on to the solver as parameter.
+#' # display available solver options which can be passed on to the solver as parameters.
 #' solve_POMDP_parameter()
 #' 
 #' ################################################################
@@ -202,7 +204,6 @@ solve_POMDP_parameter <- function() {
 #' sol
 #' 
 #' policy(sol)
-#' plot_policy_graph(sol)
 #' 
 #' # Example 3: Solving a finite-horizon POMDP using the incremental 
 #' #            pruning method (without discounting)
@@ -220,7 +221,7 @@ solve_POMDP_parameter <- function() {
 #' reward(sol, belief = c(.95,.05), epoch = 3) # just open the right door (95% chance)
 #' 
 #' ################################################################
-#' # Example 4: Using terminal values 
+#' # Example 3: Using terminal values 
 #' #
 #' # Specify 1000 if the tiger is right after 3 (horizon) epochs
 #' sol <- solve_POMDP(model = Tiger, 
@@ -291,15 +292,19 @@ solve_POMDP_parameter <- function() {
 #' # extremely sure in the first epoch, then opening a door is optimal.
 #' 
 #' ################################################################
-#' # Example 5: PBVI with a custom grid
+#' # Example 6: PBVI with a custom grid
+#'
+#' # Create a search grid by sampling from the belief space in 
+#' #   10 regular intervals
 #' custom_grid <- sample_belief_space(Tiger, n = 10, method = "regular")
 #' custom_grid
-#' 
+#'
+#' # Visualize the search grid
+#' plot_belief_space(sol, sample = custom_grid)
+#'
+#' # Solve the POMDP using the grid for approximation 
 #' sol <- solve_POMDP(Tiger, method = "grid", parameter = list(grid = custom_grid))
 #' sol
-#' 
-#' # visualize used grid
-#' plot_belief_space(sol, sample = custom_grid)
 #' 
 #' @export
 solve_POMDP <- function(
@@ -320,7 +325,7 @@ solve_POMDP <- function(
   
   # do we have a model POMDP file?
   if(is.character(model)) 
-    model <- structure(list(model = read_POMDP(model)), class = "POMDP")
+    model <- read_POMDP(model)
   
   if(is.null(horizon)) horizon <- model$model$horizon
   
@@ -389,7 +394,7 @@ solve_POMDP <- function(
     ifelse(is.finite(horizon), paste("-horizon", horizon, "-save_all true"), ""),
     ifelse(!is.null(discount), paste("-discount", discount), ""),
     ifelse(!is.null(terminal_values), paste("-terminal_values", terminal_values_filename), ""),
-    paras, 
+    paras,
     "-fg_save true")
  
   if(verbose) cat("Calling pomdp-solve with the following arguments:", 
@@ -449,7 +454,7 @@ solve_POMDP <- function(
     if(method == "grid" && 
         !converged && 
         any(unlist(reward_matrix(model))<0)) 
-      warning("The grid method for finite horizon did not converge. The value function and the calculated reward values may not be valid with negative reward in the reward matrix.")
+      warning("The grid method for finite horizon did not converge. The value function and the calculated reward values may not be valid with negative reward in the reward matrix. Use method 'incprune' instead.")
     
     alpha <- rev(alpha)
     pg <- rev(pg)
@@ -493,17 +498,17 @@ print.POMDP_solution <- function(x, ...) {
 }
 
 
-# is a field time dependent? For time-dependence we have a list of 
+# is a field time-dependent? For time-dependence we have a list of 
 # matrices/data.frames or for observation_prob we have a list of a list
 .is_timedependent <- function(x, field) {
   m <- x$model[[field]]
   
   if(is.null(m)) stop("Field ", field, " does not exist.")
   
-  # for observation_prob
-  if(field == "observation_prob") m <- m[[1]]
-  
   if(!is.list(m) || is.data.frame(m)) return(FALSE)
+  
+  # it is a list. time dependent is a list (episodes) of lists
+  if(!is.list(m[[1]])) return(FALSE)
   
   if(length(m) != length(x$model$horizon))
     stop("Inconsistent POMDP specification. Field ", field,
@@ -523,7 +528,7 @@ print.POMDP_solution <- function(x, ...) {
   if(n < 2) return(solve_POMDP(model, horizon, ..., 
     terminal_values = terminal_values, verbose = verbose))
   
-  # check what is time dependent
+  # check what is time-dependent
   do_trans <- .is_timedependent(model, "transition_prob")
   do_obs <- .is_timedependent(model, "observation_prob")
   do_reward <- .is_timedependent(model, "reward")

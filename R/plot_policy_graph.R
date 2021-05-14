@@ -23,8 +23,7 @@
 #' 
 #' @aliases plot_policy_graph plot
 #' @param x object of class POMDP containing a solved POMDP problem.
-#' @param belief logical; display belief proportions as a pie chart in each
-#' node.
+#' @param belief logical; display belief proportions as a pie chart in each node. This requires belief space sampling and may be slow.
 #' @param legend logical; display a legend for colors used belief proportions?
 #' @param engine The plotting engine to be used.
 #' @param col colors used for the states.
@@ -84,6 +83,7 @@
 #' 
 #' ## add smooth edges and a layout (note, engine can be abbreviated)
 #' plot_policy_graph(sol, engine = "vis", layout = "layout_in_circle", smooth = TRUE)
+#' @import igraph
 #' @export
 plot_policy_graph <- function(x, belief = TRUE, legend = TRUE, 
   engine = c("igraph", "visNetwork"), col = NULL, ...) {
@@ -120,7 +120,7 @@ plot_policy_graph <- function(x, belief = TRUE, legend = TRUE,
    el <-  as_edgelist(graph, names = FALSE)
    o <- apply(el, 1, order)[1,]
    el <- apply(el, 1, FUN = function(x) paste(sort(x), collapse = ":"))
-   cu <- ave(rep(NA, length(el)), el, FUN = function(x) {
+   cu <- stats::ave(rep(NA, length(el)), el, FUN = function(x) {
      if (length(x) == 1) {
        return(0)
      }
