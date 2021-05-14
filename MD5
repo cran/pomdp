@@ -1,6 +1,6 @@
-ce484e670902d4cfe92ba3a68e299d7b *DESCRIPTION
+21f8e163bd964dd42b0085ade46e5764 *DESCRIPTION
 73a452b7adeffa1fece80701134805a3 *NAMESPACE
-d95f13629ac14dc26f4f8dc4fcde220f *NEWS.md
+dd9807e645ab313649486a20e5e18c19 *NEWS.md
 b0b4e2bbaa2068e99a8f5968ea4aff43 *R/AAAdatasets.R
 c8a6154dfc3a66d346b2cfbdca7fdf3a *R/AAAimports.R
 dbc7305e8c0e2dfee7e6de74eaa89a14 *R/AAAinstalled.R
@@ -30,7 +30,7 @@ ba6119da4e733e2a846ec19748ad459f *README.md
 04448545d71ccdc48ab483d8d003f8cf *data/Tiger.rda
 571d9e06f33f416e206894f41764e0aa *inst/doc/POMDP.R
 07c09533a2d0de2cd2fcd4fa022187f2 *inst/doc/POMDP.Rmd
-61544a378cf5ae819d8cbba132a0c619 *inst/doc/POMDP.html
+6c6c11d2970ce1e5f3b1a340c2e0b0cc *inst/doc/POMDP.html
 cc33f19cea418162745b739c848321e5 *man/MDP.Rd
 24feb72f18a29a810535bb9814c13cff *man/POMDP.Rd
 95b2f88b9a1280f2aae7057dca8f0f05 *man/Tiger.Rd
@@ -51,7 +51,7 @@ e7c9087aba3574f67f15330d458a93cc *man/update_belief.Rd
 bcedb855a716b0c0388bdfcdde76df25 *man/write_POMDP.Rd
 e3b53ff45d31a7d119e24ea36376c32c *src/Makevars
 90a54dd692ae082de7ad5403ac81de81 *src/install.libs.R
-16ece7db446c82eea5c43707a38b503e *src/pomdp-solve/Makefile
+bce0c0d5970bd6a4575c39fef24e0379 *src/pomdp-solve/Makefile
 0346b476692ba375e71967ccb56dfc47 *src/pomdp-solve/alpha.c
 ce813e10c54e06f7d16631653e8d09f1 *src/pomdp-solve/alpha.h
 a2297df52300da6d516f9a4342a06b7e *src/pomdp-solve/associative-array.c
@@ -86,7 +86,7 @@ ca10c9c2c1378d01de62dfd1098951ee *src/pomdp-solve/finite-grid.h
 350db7d5689900bb7357d9bb9a534715 *src/pomdp-solve/index-list.h
 5737ec76014676db44d8075559f28948 *src/pomdp-solve/laspack-util.c
 727bd524b839daa4e5369ed6b7bbff14 *src/pomdp-solve/laspack-util.h
-80c02cbf7b2b7004a068accc0284a491 *src/pomdp-solve/laspack/Makefile
+7276e514465c0923c83fd3f16532e315 *src/pomdp-solve/laspack/Makefile
 11ab0d3f6f1d5074720bfe162e4ae679 *src/pomdp-solve/laspack/README
 5146b6c0220769e01cce35ecff72ff3d *src/pomdp-solve/laspack/copyrght.h
 e8a015e8f1a8cb1e575d737c2eaf036d *src/pomdp-solve/laspack/eigenval.c
@@ -118,7 +118,7 @@ c8118ecec615c6e3ee3a2c3c0a23944c *src/pomdp-solve/laspack/vector.h
 78487fd378f0f9886b9c33fb158efcec *src/pomdp-solve/linear-support.h
 e8b26ebad5e4b71beb71a97deda568c1 *src/pomdp-solve/lp-interface.c
 0f6cd4b1ca7c657644857ec64ef9b8ee *src/pomdp-solve/lp-interface.h
-ceb7464fbfa6b931a7d4a7d175a6979b *src/pomdp-solve/lp-solve/Makefile
+afa958aad711c4babce573a2a3a3dbcf *src/pomdp-solve/lp-solve/Makefile
 af56fd9c8ff8506a1bafbc487a3ebbf0 *src/pomdp-solve/lp-solve/debug.c
 9359b996158454f72747ecff2badc856 *src/pomdp-solve/lp-solve/debug.h
 6971fd84207c9d334ed9a94d60cd08df *src/pomdp-solve/lp-solve/hash.c
@@ -138,7 +138,7 @@ b49decd24398dfaa3f34481e3887a334 *src/pomdp-solve/lp-solve/y.tab.c
 ae6f7fc54557045ce6fe5fea73ae3826 *src/pomdp-solve/main.c
 74e66ca3eb7552436979e6b0302e3bf9 *src/pomdp-solve/mcgs.c
 51ebe690ef035421851c1e755bced4b8 *src/pomdp-solve/mcgs.h
-5b8874d733f42c98a3d710b9428e7410 *src/pomdp-solve/mdp/Makefile
+65f93ee91e1e02e06021964fcd7b6609 *src/pomdp-solve/mdp/Makefile
 d17b152bf2646ff8355409c11badb4c5 *src/pomdp-solve/mdp/imm-reward.c
 e28587133f5d402f5f966e66c6beda9e *src/pomdp-solve/mdp/imm-reward.h
 534f9fffd9cf7e0d43d2b707ee7e8b97 *src/pomdp-solve/mdp/mdp-common.h
