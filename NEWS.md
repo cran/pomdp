@@ -1,3 +1,8 @@
+# pomdp 0.99.3 (08/05/2021)
+
+* moved Ternary and visNetwork to SUGGESTED.
+* removed clang warning for lex scanners.
+
 # pomdp 0.99.2 (05/14/2021)
 
 ## Bugfix
@@ -32,7 +37,7 @@
 * write_POMDP and solve_POMDP gained parameter digits.
 * added read_POMDP to read POMDP files. 
 * plot for POMDP is now replaced by plot_policy_graph.
-* added policy graph visualization with vizNetwork.
+* added policy graph visualization with visNetwork.
 * added plot_value_function.
 * added function sample_belief_space to sample from the belief space.
 * added function plot_belief_space.
