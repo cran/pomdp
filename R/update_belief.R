@@ -15,37 +15,40 @@
     drop(belief)
   }
 
-
+.update_belief_vec <- Vectorize(
+  .update_belief,
+  vectorize.args = c("action", "observation"),
+  SIMPLIFY = TRUE
+)
+  
 
 #' Belief Update
 #'
 #' Update the belief given a taken action and observation.
 #'
 #' @details
-#' Update the belief state \eqn{b} (\code{belief}) with an action \eqn{a} and observation \eqn{o}. The new
+#' Update the belief state \eqn{b} (`belief`) with an action \eqn{a} and observation \eqn{o}. The new
 #' belief state \eqn{b'} is:
 #'
 #' \deqn{b'(s') = \eta O(o | s',a) \sum_{s \in S} T(s' | s,a) b(s)}
 #'
 #' where \eqn{\eta = 1/ \sum_{s' \in S}[ O(o | s',a) \sum_{s \in S} T(s' | s,a) b(s)]} normalizes the new belief state so the probabilities add up to one.
 #'
+#' @family POMDP
 #'
-#' @param model a POMDP model.
+#' @param model a [POMDP] object.
 #' @param belief the current belief state.
 #' Defaults to the start belief state specified in
 #' the model or "uniform".
 #' @param action the taken action.
 #' @param observation the received observation.
 #' @param episode Use transition and observation matrices for the given episode
-#' for time-dependent POMDPs (see \code{\link{POMDP}}).
+#' for time-dependent POMDPs (see [POMDP]).
 #' @param digits round decimals.
 #' @param drop logical; drop the result to a vector if only a single belief
 #' state is returned.
 #' @author Michael Hahsler
-#' @seealso [POMDP()], [simulate_POMDP()]
-#' @md
 #' @examples
-#'
 #' data(Tiger)
 #'
 #' update_belief(c(.5,.5), model = Tiger)
@@ -70,22 +73,15 @@ update_belief <-
     Tr <- transition_matrix(model, episode = episode)
     
     if (is.null(action))
-      action <- as.character(model$model$actions)
+      action <- as.character(model$actions)
     if (is.null(observation))
-      observation <- as.character(model$model$observations)
-    
-    .update_vec <-
-      Vectorize(
-        .update_belief,
-        vectorize.args = c("action", "observation"),
-        SIMPLIFY = TRUE
-      )
+      observation <- as.character(model$observations)
     
     g <- expand.grid(action, observation, stringsAsFactors = FALSE)
     
-    b <- t(.update_vec(belief, g[, 1], g[, 2], Tr, Ob, digits))
+    b <- t(.update_belief_vec(belief, g[, 1], g[, 2], Tr, Ob, digits))
     rownames(b) <- apply(g, MARGIN = 1, paste, collapse = "+")
-    colnames(b) <- as.character(model$model$states)
+    colnames(b) <- as.character(model$states)
     
     if (drop)
       b <- drop(b)
@@ -100,6 +96,7 @@ update_belief <-
 #' the optimal actions will be chosen, for unsolved POMDPs random actions will
 #' be used.
 #'
+#' @family POMDP
 #'
 #' @param model a POMDP model.
 #' @param n number of trajectories.
@@ -107,10 +104,10 @@ update_belief <-
 #' starting states for the trajectories.
 #' Defaults to the start belief state specified in
 #' the model or "uniform".
-#' @param horizon number of epochs for the simulation. If \code{NULL} then the
+#' @param horizon number of epochs for the simulation. If `NULL` then the
 #' horizon for the model is used.
 #' @param visited_beliefs logical; Should all belief points visited on the
-#' trajectories be returned? If \code{FALSE} then only the belief at the final
+#' trajectories be returned? If `FALSE` then only the belief at the final
 #' epoch is returned.
 #' @param random_actions logical; should randomized actions be used instead of
 #' the policy of the solved POMDP? Randomized actions can be used for unsolved
@@ -120,10 +117,8 @@ update_belief <-
 #' @return A matrix with belief points as rows. Attributes containing action
 #' counts, and rewards may be available.
 #' @author Michael Hahsler
-#' @seealso [POMDP()]
 #' @md
 #' @examples
-#'
 #' data(Tiger)
 #'
 #' # solve the POMDP for 5 epochs and no discounting
@@ -149,14 +144,14 @@ update_belief <-
 #'
 #' # plot with added density
 #' plot_belief_space(sol, sample = sim, ylim = c(0,3))
-#' lines(density(sim[,1], bw = .05)); axis(2); title(ylab = "Density")
+#' lines(density(sim[, 1], bw = .05)); axis(2); title(ylab = "Density")
 #'
 #'
 #' ## Example 3: simulate trajectories for an unsolved POMDP using randomized actions
-#' sim <- simulate_POMDP(Tiger, n = 100, horizon = 5, random_actions = TRUE, visited_beliefs = TRUE)
+#' sim <- simulate_POMDP(Tiger, n = 100, horizon = 5, 
+#'   random_actions = TRUE, visited_beliefs = TRUE)
 #' plot_belief_space(sol, sample = sim, ylim = c(0,6))
-#' lines(density(sim[,1], bw = .05)); axis(2); title(ylab = "Density")
-#'
+#' lines(density(sim[, 1], bw = .05)); axis(2); title(ylab = "Density")
 #' @export
 simulate_POMDP <-
   function(model,
@@ -173,7 +168,7 @@ simulate_POMDP <-
     if (is.null(horizon))
       horizon <- model$solution$horizon
     if (is.null(horizon))
-      horizon <- model$model$horizon
+      horizon <- model$horizon
     if (is.null(horizon))
       stop("The horizon (number of epochs) has to be specified!")
     if (is.infinite(horizon))
@@ -191,15 +186,15 @@ simulate_POMDP <-
       if (solved)
         model$solution$discount
     else
-      model$model$discount
+      model$discount
     if (is.null(disc))
       disc <- 1
     
-    states <- as.character(model$model$states)
+    states <- as.character(model$states)
     n_states <- length(states)
-    obs <- as.character(model$model$observations)
+    obs <- as.character(model$observations)
     n_obs <- length(obs)
-    actions <- as.character(model$model$actions)
+    actions <- as.character(model$actions)
     
     trans_m <- transition_matrix(model)
     obs_m <- observation_matrix(model)
@@ -208,8 +203,8 @@ simulate_POMDP <-
     # precompute matrix lists for time-dependent POMDPs
     dt <- .timedependent_POMDP(model)
     if (dt) {
-      dt_horizon <- model$model$horizon
-      dt_episodes <- cumsum(c(1, head(model$model$horizon,-1)))
+      dt_horizon <- model$horizon
+      dt_episodes <- cumsum(c(1, head(model$horizon, -1)))
       dt_trans_m <-
         lapply(
           1:length(dt_horizon),
@@ -294,8 +289,8 @@ simulate_POMDP <-
         state_cnt[s] <- state_cnt[s] + 1L
         
         s_prev <- s
-        s <- sample(states, 1, prob = trans_m[[a]][s, ])
-        o <- sample(obs, 1, prob = obs_m[[a]][s, ])
+        s <- sample(states, 1, prob = trans_m[[a]][s,])
+        o <- sample(obs, 1, prob = obs_m[[a]][s,])
         
         rew <- rew + rew_m[[a]][[s_prev]][s, o] * disc ^ (j - 1L)
         
@@ -305,7 +300,7 @@ simulate_POMDP <-
         # update belief
         b <- .update_belief(b, a, o, trans_m, obs_m, digits)
         if (visited_beliefs)
-          b_all[j,] <- b
+          b_all[j, ] <- b
       }
       
       if (!visited_beliefs)

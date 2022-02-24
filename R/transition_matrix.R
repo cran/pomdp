@@ -1,29 +1,36 @@
-#' Extract the Transition, Observation or Reward Matrices from a POMDP
+#' Extract the Transition, Observation or Reward Information from a POMDP
 #'
 #' Converts the description of transition probabilities and observation
-#' probabilities in a POMDP into a list of matrices, one for each action.
-#' Rewards are converted into a list (actions) of lists (start states) of
-#' matrices.
+#' probabilities in a POMDP into a list of matrices or a function.
 #'
-#' @aliases transition_matrix observation_matrix reward_matrix
-#' @param x A POMDP object.
-#' @param episode Episode used for time-dependent POMDPs (see
-#' \code{\link{POMDP}}).
+#' See Details section in [POMDP] for details.
+#'
+#' @family POMDP
+#' 
+#' @param x A [POMDP] object.
+#' @param episode Episode used for time-dependent POMDPs ([POMDP]).
+#' @param type `'matrix'` or `'function'` to get a list of matrices or a function.
 #' @return A list or a list of lists of matrices.
 #' @author Michael Hahsler
-#' @seealso \code{\link{POMDP}}
 #' @examples
-#'
 #' data("Tiger")
 #'
-#' # transition matrices for each action in the from states x states
+#' # List of |A| transition matrices. One per action in the from states x states
+#' Tiger$transition_prob
 #' transition_matrix(Tiger)
 #'
-#' # observation matrices for each action in the from states x observations
+#' f <- transition_matrix(Tiger, type = "function")
+#' args(f)
+#' ## listening does not change the tiger's position.
+#' f("listen", "tiger-left", "tiger-left")
+#'
+#' # List of |A| observation matrices. One per action in the from states x observations
+#' Tiger$observation_prob
 #' observation_matrix(Tiger)
 #'
-#' # reward matrices for each matrix and (start) state in
-#' # the form (end) state x observation
+#' # List of list of reward matrices. 1st level is action and second level is the
+#' #  start state in the form end state x observation
+#' Tiger$reward
 #' reward_matrix(Tiger)
 #'
 #' # Visualize transition matrix for action 'open-left'
@@ -34,40 +41,109 @@
 #' igraph.options("edge.curved" = TRUE)
 #' plot(g, layout = layout_on_grid, main = "Transitions for action 'open=left'")
 #'
+#' ## Use a function for the Tiger transition model
+#' trans <- function(end.state, start.state, action) {
+#'   ## listen has an identity matrix
+#'   if(action == 'listen')
+#'     if(end.state == start.state) return(1)
+#'     else return(0)
+#'
+#'   # other actions have a uniform distribution
+#'   return(1/2)
+#' }
+#'
+#' Tiger$transition_prob <- trans
+#' transition_matrix(Tiger)
 #' @export
-transition_matrix <- function(x, episode = 1)
-  .translate_probabilities(
+transition_matrix <- function(x, episode = 1, type = "matrix") {
+  type <- match.arg(type, c("matrix", "function"))
+  
+  m <- .translate_probabilities(
     x,
     field = "transition_prob",
     from = "states",
     to = "states",
     episode = episode
   )
+  
+  switch(type,
+    matrix = m,
+    `function` = {
+      m
+      function(action, start.state, end.state)
+        m[[action]][start.state, end.state]
+    }
+  )
+}  
+
 
 #' @rdname transition_matrix
 #' @export
-observation_matrix <- function(x, episode = 1)
-  .translate_probabilities(
+observation_matrix <- function(x, episode = 1, type = "matrix") {
+  type <- match.arg(type, c("matrix", "function"))
+  
+  if(is.null(x$observation_prob))
+    stop("model is not a complete POMDP, no observation probabilities specified!")
+  
+  ## action list of s' x o matrices
+  m <- .translate_probabilities(
     x,
     field = "observation_prob",
     from = "states",
     to = "observations",
     episode = episode
   )
+  
+  switch(type,
+    matrix = m,
+    `function` = {
+      m
+      function(action, observation, end.state)
+        m[[action]][end.state, observation]
+    })
+}
 
+  
 #' @rdname transition_matrix
 #' @export
-reward_matrix <- function(x, episode = 1)
-  .translate_reward(x, episode = episode)
-
+reward_matrix <- function(x, episode = 1, type = "matrix") {
+  type <- match.arg(type, c("matrix", "function"))
+  
+  ## action list of s' x o matrices
+  ## action list of s list of s' x o matrices
+  ## if not observations are available then it is a s' vector
+  m <- .translate_reward(x, episode = episode)
+  
+  ## MDP has no observations!
+  if (inherits(x, "POMDP")) {
+    switch(type,
+      matrix = m,
+      `function` = {
+        m
+        function(action,
+          start.state,
+          end.state,
+          observation)
+          m[[action]][[start.state]][end.state, observation]
+      })
+  } else{
+    switch(type,
+      matrix = m,
+      `function` = {
+        m
+        function(action, start.state, end.state)
+          m[[action]][[start.state]][end.state]
+      })
+  }
+}
 # translate different specifications of transitions, observations and rewards
 # into a list of matrices
 
 # df needs to have 3 columns: from, to, and val
 .df2matrix <-
   function(model, df, from = "states", to = "observations") {
-    from <- as.character(model$model[[from]])
-    to <- as.character(model$model[[to]])
+    from <- as.character(model[[from]])
+    to <- as.character(model[[to]])
     
     ### make sure we have character in from/to (pre R 4.0)
     
@@ -87,7 +163,7 @@ reward_matrix <- function(x, episode = 1)
       else if (df[i, 1] == "*")
         m[, df[i, 2]] <- df[i, 3]
       else if (df[i, 2] == "*")
-        m[df[i, 1], ] <- df[i, 3]
+        m[df[i, 1],] <- df[i, 3]
       else
         m[df[i, 1], df[i, 2]] <- df[i, 3]
     }
@@ -95,7 +171,28 @@ reward_matrix <- function(x, episode = 1)
     m
   }
 
-### helpers
+# df needs to have 2 columns: to and val
+.df2vector <-
+  function(model, df, from = "states") {
+    from <- as.character(model[[from]])
+    
+    df[, 1] <- .get_names(df[, 1], from)
+    
+    v <- numeric(length(from))
+    names(v) <- from
+    
+    for (i in 1:nrow(df)) {
+      if (df[i, 1] == "*")
+        v[] <- df[i, 2]
+      else
+        v[df[i, 1]] <- df[i, 2]
+    }
+    
+    v
+  }
+
+
+### translate ids to names
 .get_names <- function(x, names) {
   if (!is.numeric(x))
     as.character(x)
@@ -107,18 +204,19 @@ reward_matrix <- function(x, episode = 1)
   field = "transition_prob",
   from = "states",
   to = "states",
-  episode = 1) {
-  actions <- as.character(model$model$actions)
+  episode = 1,
+  sparse = TRUE) {
+  actions <- model$actions
   
   ## episodes are for time-dependent POMDPs
   if (.timedependent_POMDP(model)) {
     episode <- as.integer(episode)
     if (episode < 1L ||
-        episode > length(model$model$horizon))
+        episode > length(model$horizon))
       stop("Requested episode does not exit in horizon specification.")
     
     if (.is_timedependent(model, field)) {
-      prob <- model$model[[field]][[episode]]
+      prob <- model[[field]][[episode]]
       if (is.null(prob))
         stop(
           "Inconsistent POMDP definition. Requested episode does not exit in field ",
@@ -126,18 +224,20 @@ reward_matrix <- function(x, episode = 1)
           "."
         )
     } else
-      prob <-  model$model[[field]]
+      prob <-  model[[field]]
   } else
-    prob <-  model$model[[field]]
+    prob <-  model[[field]]
   
   if (is.null(prob))
     stop(
       "Field ",
       field,
-      " is not available. Parsing some fields is not implemented for models read with read_POMDP!"
+      " is not available. ",
+      "Note: Parsing some fields is not implemented for models read with read_POMDP!"
     )
   
-  ## translate dataframes
+  
+  ## translate from dataframes
   if (is.data.frame(prob)) {
     prob <- sapply(actions, function(a) {
       .df2matrix(model,
@@ -145,14 +245,31 @@ reward_matrix <- function(x, episode = 1)
         from = from, to = to)
     }, simplify = FALSE, USE.NAMES = TRUE)
     
+    ## translate from function
+  } else if (is.function(prob)) {
+    prob <- Vectorize(prob)
+    prob <- sapply(actions, function(a) {
+      p <- outer(
+        model[[from]],
+        model[[to]],
+        FUN = function(from, to)
+          prob(a,
+            from,
+            to)
+      )
+      dimnames(p) <- list(model[[from]], model[[to]])
+      p
+    }, simplify = FALSE, USE.NAMES = TRUE)
+    
+    ## translate from list of matrices (fix names, and deal with "identity", et al)
   } else if (is.list(prob)) {
     if (is.null(names(prob)))
       names(prob) <- actions
     else
       prob <- prob[actions]
     
-    from <- as.character(model$model[[from]])
-    to <- as.character(model$model[[to]])
+    from <- as.character(model[[from]])
+    to <- as.character(model[[to]])
     
     prob <- lapply(
       prob,
@@ -191,39 +308,41 @@ reward_matrix <- function(x, episode = 1)
   prob
 }
 
+
+## reward is action -> start.state -> end.state x observation
 .translate_reward <- function(model, episode = 1) {
-  actions <- as.character(model$model$actions)
-  states <- as.character(model$model$states)
-  observations <- as.character(model$model$observations)
+  actions <- model$actions
+  states <- model$states
+  
+  ## note: observations does not exist for MDPs
+  observations <- model$observations
   
   field <- "reward"
   ## episodes are for time-dependent POMDPs
   if (.timedependent_POMDP(model)) {
     episode <- as.integer(episode)
     if (episode < 1L ||
-        episode > length(model$model$horizon))
+        episode > length(model$horizon))
       stop("Requested episode does not exit.")
     
     if (.is_timedependent(model, field))
-      prob <- model$model[[field]][[episode]]
+      reward <- model[[field]][[episode]]
     else
-      prob <-  model$model[[field]]
+      reward <-  model[[field]]
     
   } else {
     if (episode != 1)
       stop("POMDP is not time-dependent. There is only a single episode.")
     
-    prob <-  model$model[[field]]
+    reward <-  model[[field]]
   }
   
-  if (is.null(prob))
+  if (is.null(reward))
     stop(
       "Field ",
       field,
       " is not available. Parsing some fields is not implemented for models read with read_POMDP!"
     )
-  
-  reward <- prob
   
   # no reward available (e.g., for reading POMDP files)
   if (is.null(reward)) {
@@ -233,23 +352,61 @@ reward_matrix <- function(x, episode = 1)
     return (NULL)
   }
   
-  reward[[1]] <- .get_names(reward[[1]], actions)
-  reward[[2]] <- .get_names(reward[[2]], states)
-  reward[[3]] <- .get_names(reward[[3]], states)
-  reward[[4]] <- .get_names(reward[[4]], observations)
   
   if (is.data.frame(reward)) {
+    reward[[1]] <- .get_names(reward[[1]], actions)
+    reward[[2]] <- .get_names(reward[[2]], states)
+    reward[[3]] <- .get_names(reward[[3]], states)
+    reward[[4]] <- .get_names(reward[[4]], observations)
     reward <- sapply(
       actions,
       FUN = function(a)
         sapply(
           states,
           FUN = function(s) {
-            .df2matrix(model,
-              reward[(reward$action == a | reward$action == "*") &
-                  (reward$start.state == s |
-                      reward$start.state == "*"), 3:5],
-              from = "states", to = "observations")
+            if(!is.null(observations)) {
+              .df2matrix(model,
+                reward[(reward$action == a | reward$action == "*") &
+                    (reward$start.state == s |
+                        reward$start.state == "*"), 3:5],
+                from = "states", to = "observations")
+            }else{
+              ## MDPs have no observations
+              .df2vector(model,
+                reward[(reward$action == a | reward$action == "*") &
+                    (reward$start.state == s |
+                        reward$start.state == "*"), c(3,5)],
+                from = "states")
+            }
+          },
+          simplify = FALSE,
+          USE.NAMES = TRUE
+        ),
+      simplify = FALSE,
+      USE.NAMES = TRUE
+    )
+    ## translate from function
+  } else if (is.function(reward)) {
+    reward <- Vectorize(reward)
+    reward <- sapply(
+      actions,
+      FUN = function(a)
+        sapply(
+          states,
+          FUN = function(s) {
+            p <- outer(
+              states,
+              observations,
+              FUN = function(end, o)
+                reward(
+                  action = a,
+                  start.state = s,
+                  end.state = end,
+                  observation = o
+                )
+            )
+            dimnames(p) <- list(states, observations)
+            p
           },
           simplify = FALSE,
           USE.NAMES = TRUE
@@ -259,5 +416,10 @@ reward_matrix <- function(x, episode = 1)
     )
   }
   
+  ### FIXME: missing. Also version without observations!
+  ## translate from list of matrices (fix names, and deal with "identity", et al)
+  ##} else if (is.list(reward)) {
+  ##}
+   
   reward
 }

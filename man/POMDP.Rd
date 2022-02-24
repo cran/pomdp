@@ -3,8 +3,8 @@
 \name{POMDP}
 \alias{POMDP}
 \alias{O_}
-\alias{R_}
 \alias{T_}
+\alias{R_}
 \title{Define a POMDP Problem}
 \usage{
 POMDP(
@@ -16,9 +16,8 @@ POMDP(
   reward,
   discount = 0.9,
   horizon = Inf,
-  terminal_values = 0,
+  terminal_values = NULL,
   start = "uniform",
-  max = TRUE,
   name = NA
 )
 
@@ -29,13 +28,14 @@ T_(action = "*", start.state = "*", end.state = "*", probability)
 R_(action = "*", start.state = "*", end.state = "*", observation = "*", value)
 }
 \arguments{
-\item{states}{a character vector specifying the names of the states.}
+\item{states}{a character vector specifying the names of the states. Note that
+state names have to start with a letter.}
 
-\item{actions}{a character vector specifying the names of the available
-actions.}
+\item{actions}{a character vector specifying the names of the available actions.
+Note that action names have to start with a letter.}
 
 \item{observations}{a character vector specifying the names of the
-observations.}
+observations. Note that observation names have to start with a letter.}
 
 \item{transition_prob}{Specifies action-dependent transition probabilities
 between states.  See Details section.}
@@ -57,27 +57,23 @@ the alpha component produced by solve_POMDP).  A single 0 specifies that all
 terminal values are zero.}
 
 \item{start}{Specifies the initial probabilities for each state (i.e., the
-initial belief), typically as a vector or the string \code{"uniform"}
+initial belief), typically as a vector or the string \code{'uniform'}
 (default).  This belief is used to calculate the total expected cumulative
 reward. It is also used by some solvers. See Details section for more
 information.}
-
-\item{max}{logical; is this a maximization problem (maximize reward) or a
-minimization (minimize cost specified in \code{reward})?}
 
 \item{name}{a string to identify the POMDP problem.}
 
 \item{action, start.state, end.state, observation, probability, value}{Values
 used in the helper functions \code{O_()}, \code{R_()}, and \code{T_()} to
 create an entry for \code{observation_prob}, \code{reward}, or
-\code{transistion_prob} above, respectively. The default value \code{"*"}
+\code{transistion_prob} above, respectively. The default value \code{'*"'}
 matches any action/state/observation.}
 }
 \value{
-The function returns an object of class POMDP which is list with an
-element called \code{model} containing a list with the model specification.
-\code{solve_POMDP} reads the object and adds a list element called
-\code{solution}.
+The function returns an object of class POMDP which is list of the model specification.
+\code{\link[=solve_POMDP]{solve_POMDP()}} reads the object and adds a list element named
+\code{'solution'}.
 }
 \description{
 Defines all the elements of a POMDP problem including the discount rate, the
@@ -85,11 +81,11 @@ set of states, the set of actions, the set of observations, the transition
 probabilities, the observation probabilities, and rewards.
 }
 \details{
-POMDP problems can be solved using \code{\link{solve_POMDP}}.  More details
-about the available specifications can be found in [1].
+In the following we use the following notation. The POMDP is a 7-duple:
 
-In the following we use the following notation. The POMDP is a 7-duple
-\eqn{(S,A,T,R, \Omega ,O, \gamma)}.  \eqn{S} is the set of states; \eqn{A}
+\eqn{(S,A,T,R, \Omega ,O, \gamma)}.
+
+\eqn{S} is the set of states; \eqn{A}
 is the set of actions; \eqn{T} are the conditional transition probabilities
 between states; \eqn{R} is the reward function; \eqn{\Omega} is the set of
 observations; \eqn{O} are the conditional observation probabilities; and
@@ -98,69 +94,73 @@ represent a member of a set, e.g., \eqn{s} is a specific state. To refer to
 the size of a set we will use cardinality, e.g., the number of actions is
 \eqn{|A|}.
 
-\bold{Specification of transition probabilities}
-
-Transition probability to transition to state \eqn{s'} from \eqn{s} given
-action \eqn{a} is \eqn{T(s' | s, a)}. The transition probabilities can be
-specified in the following ways:
-
+\strong{Names used for mathematical symbols in code}
 \itemize{
-\item A data frame with 4 columns, where the columns specify
-action \eqn{a}, start.state \eqn{s}, end.state \eqn{s'} and the transition
-probability \eqn{T(s' | s, a)}, respectively. The first 3 columns can be
-either character (the name of the action or state) or integer indices.  You
-can use \code{rbind()} with helper function \code{T_()} to create this data
-frame.
-
-\item A named list of \eqn{|A|} matrices.  Each matrix is square of size
-\eqn{|S| \times |S|}{|S| x |S|}. Instead of a matrix, also the strings
-\code{"identity"} or \code{"uniform"} can be specified.
+\item \eqn{S, s, s'}: \verb{'states', start.state', 'end.state'}
+\item \eqn{A, a}: \verb{'actions', 'action'}
+\item \eqn{\Omega, o}: \verb{'observations', 'observation'}
 }
 
-\bold{Specification of observation probabilities}
+State names, actions and observations can be specified as strings or index numbers
+(e.g., \code{start.state} can be specified as the index of the state in \code{states}).
+For the specification as data.frames below, \code{'*'} can be used to mean
+any  \code{start.state}, \code{end.state}, \code{action} or \code{observation}.
+
+The specification below map to the format used by pomdp-solve
+(see \url{http://www.pomdp.org}).
+
+\strong{Specification of transition probabilities: \eqn{T(s' | s, a)}}
+
+Transition probability to transition to state \eqn{s'} from given state \eqn{s}
+and action \eqn{a}. The transition probabilities can be
+specified in the following ways:
+\itemize{
+\item A data.frame with columns exactly like the arguments of \code{T_()}.
+You can use \code{rbind()} with helper function \code{T_()} to create this data
+frame.
+\item A named list of matrices, one for each action. Each matrix is square with
+rows representing start states \eqn{s} and columns representing end states \eqn{s'}.
+Instead of a matrix, also the strings \code{'identity'} or \code{'uniform'} can be specified.
+\item A function with the same arguments are \code{T_()}, but no default values
+that returns the transition probability.
+}
+
+\strong{Specification of observation probabilities: \eqn{O(o | s', a)}}
 
 The POMDP specifies the probability for each observation \eqn{o} given an
-action \eqn{a} and that the system transitioned to a specific state
-\eqn{s'}, \eqn{O(o | s', a)}. These probabilities can be specified in the
+action \eqn{a} and that the system transitioned to the end state
+\eqn{s'}. These probabilities can be specified in the
 following ways:
-
-\itemize{ \item A data frame with 4 columns, where the columns specify the
-action \eqn{a}, the end.state \eqn{s'}, the observation \eqn{o} and the
-probability \eqn{O(o | s', a)}, respectively. The first 3 columns could be
-either character (the name of the action, state, or observation), integer
-indices, or they can be \code{"*"} to indicate that the observation
-probability applies to all actions or states.  You can use \code{rbind()}
-with helper function \code{O_()} to create this data frame.
-
-\item A named list of \eqn{|A|} matrices. Each matrix is of size \eqn{|S|
-\times |\Omega|}{|S| x |\Omega|}.  The name of each matrix is the action it
-applies to.  Instead of a matrix, also the string \code{"uniform"} can be
-specified.}
-
-\bold{Specification of the reward function}
-
-The reward function \eqn{R(s, s', o, a)} can be specified in the following
-ways:
-
 \itemize{
-\item a data frame with 5 columns, where the columns specify
-action \eqn{a}, start.state \eqn{s}, end.state \eqn{s'}, observation \eqn{o}
-and the associated reward \eqn{R(s, s', a)}, respectively. The first 4
-columns could be either character (names of the action, states, or
-observation), integer indices, or they can be \code{"*"} to indicate that
-the reward applies to all transitions.  Use \code{rbind()} with helper
-function \code{R_()} to create this data frame.
-
-\item a named list of \eqn{|A|} lists. Each list contains \eqn{|S|} named
-matrices representing the start states \eqn{s}. Each matrix is of size
-\eqn{|S| \times |\Omega|}{|S| x |\Omega|}, representing the end states
-\eqn{s'} and observations.
+\item A data frame with columns named exactly like the arguments of \code{O_()}.
+You can use \code{rbind()}
+with helper function \code{O_()} to create this data frame.
+\item A named list of matrices, one for each action. Each matrix has
+rows representing end states \eqn{s'} and columns representing an observation \eqn{o}.
+Instead of a matrix, also the strings \code{'identity'} or \code{'uniform'} can be specified.
+\item A function with the same arguments are \code{O_()}, but no default values
+that returns the observation probability.
 }
 
-\bold{Start Belief}
+\strong{Specification of the reward function: \eqn{R(s, s', o, a)}}
+
+The reward function can be specified in the following
+ways:
+\itemize{
+\item A data frame with columns named exactly like the arguments of \code{R_()}.
+You can use \code{rbind()}
+with helper function \code{R_()} to create this data frame.
+\item A list of lists. The list levels are \code{'action'} and \code{'start.state'}. The list elements
+are matrices with
+rows representing end states \eqn{s'} and columns representing an observation \eqn{o}.
+\item A function with the same arguments are \code{R_()}, but no default values
+that returns the reward.
+}
+
+\strong{Start Belief}
 
 This belief is used to calculate the total expected cumulative reward
-printed with the solved model.  The function \code{\link{reward}} can be
+printed with the solved model.  The function \code{\link[=reward]{reward()}} can be
 used to calculate rewards for any belief.
 
 Some methods use this belief to decide which belief states to explore (e.g.,
@@ -168,14 +168,17 @@ the finite grid method).  The default initial belief is a uniform
 distribution over all states. No initial belief state can be used by setting
 \code{start = NULL}.
 
-Options to specify the start belief state are: \itemize{ \item a probability
-distribution over the states. That is, a vector of \eqn{|S|} probabilities,
-that add up to \eqn{1}.  \item the string \code{"uniform"} for a uniform
-distribution over all states.  \item an integer in the range \eqn{1} to
-\eqn{n} to specify the index of a single starting state.  \item a string
-specifying the name of a single starting state.  }
+Options to specify the start belief state are:
+\itemize{
+\item A probability distribution over the states. That is, a vector
+of \eqn{|S|} probabilities, that add up to \eqn{1}.
+\item The string \code{"uniform"} for a uniform
+distribution over all states.
+\item An integer in the range \eqn{1} to \eqn{n} to specify the index of a single starting state.
+\item a string specifying the name of a single starting state.
+}
 
-\bold{Time-dependent POMDPs}
+\strong{Time-dependent POMDPs}
 
 Time dependence of transition probabilities, observation probabilities and
 reward structure can be modeled by considering a set of episodes
@@ -183,36 +186,35 @@ representing epoch with the same settings. The length of each episode is
 specified as a vector for \code{horizon}, where the length is the number of
 episodes and each value is the length of the episode in epochs. Transition
 probabilities, observation probabilities and/or reward structure can contain
-a list with the values for each episode. See \code{\link{solve_POMDP}} for
+a list with the values for each episode. See \code{\link[=solve_POMDP]{solve_POMDP()}} for
 more details and an example.
 }
 \examples{
-
-## The Tiger Problem
+## Defining the Tiger Problem (it is also available via data(Tiger), see ? Tiger)
 
 Tiger <- POMDP(
   name = "Tiger Problem",
-
   discount = 0.75,
-
   states = c("tiger-left" , "tiger-right"),
   actions = c("listen", "open-left", "open-right"),
   observations = c("tiger-left", "tiger-right"),
-
   start = "uniform",
 
   transition_prob = list(
     "listen" =     "identity",
     "open-left" =  "uniform",
-    "open-right" = "uniform"),
+    "open-right" = "uniform"
+  ),
 
   observation_prob = list(
     "listen" = rbind(c(0.85, 0.15),
                      c(0.15, 0.85)),
     "open-left" =  "uniform",
-    "open-right" = "uniform"),
+    "open-right" = "uniform"
+  ),
 
   # the reward helper expects: action, start.state, end.state, observation, value
+  # missing arguments default to '*' matching any value.
   reward = rbind(
     R_("listen",                    v =   -1),
     R_("open-left",  "tiger-left",  v = -100),
@@ -224,16 +226,62 @@ Tiger <- POMDP(
 
 Tiger
 
-Tiger$model
+# Defining the Tiger problem using functions
 
+trans_f <- function(action, start.state, end.state) {
+  if(action == 'listen')
+    if(end.state == start.state) return(1)
+    else return(0)
+
+  return(1/2) ### all other actions have a uniform distribution
+}
+
+obs_f <- function(action, end.state, observation) {
+  if(action == 'listen')
+    if(end.state == observation) return(0.85)
+  else return(0.15)
+
+  return(1/2)
+}
+
+rew_f <- function(action, start.state, end.state, observation) {
+  if(action == 'listen') return(-1)
+  if(action == 'open-left' && start.state == 'tiger-left') return(-100)
+  if(action == 'open-left' && start.state == 'tiger-right') return(10)
+  if(action == 'open-right' && start.state == 'tiger-left') return(10)
+  if(action == 'open-right' && start.state == 'tiger-right') return(-100)
+  stop('Not possible')
+}
+
+Tiger_func <- POMDP(
+  name = "Tiger Problem",
+  discount = 0.75,
+  states = c("tiger-left" , "tiger-right"),
+  actions = c("listen", "open-left", "open-right"),
+  observations = c("tiger-left", "tiger-right"),
+  start = "uniform",
+  transition_prob = trans_f,
+  observation_prob = obs_f,
+  reward = rew_f
+)
+
+Tiger_func
 }
 \references{
-[1] For further details on how the POMDP solver utilized in this
-R package works check the following website: \url{http://www.pomdp.org}
+pomdp-solve website: \url{http://www.pomdp.org}
 }
 \seealso{
-\code{\link{solve_POMDP}}
+Other POMDP: 
+\code{\link{plot_belief_space}()},
+\code{\link{sample_belief_space}()},
+\code{\link{simulate_POMDP}()},
+\code{\link{solve_POMDP}()},
+\code{\link{solve_SARSOP}()},
+\code{\link{transition_matrix}()},
+\code{\link{update_belief}()},
+\code{\link{write_POMDP}()}
 }
 \author{
 Hossein Kamalzadeh, Michael Hahsler
 }
+\concept{POMDP}

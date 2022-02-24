@@ -7,7 +7,7 @@
 optimal_action(model, belief, epoch = 1)
 }
 \arguments{
-\item{model}{a solved POMDP model.}
+\item{model}{a solved \link{POMDP}.}
 
 \item{belief}{The belief (probability distribution over the states) as a
 vector or a matrix with multiple belief states as rows.}
@@ -22,14 +22,13 @@ Determines the optimal action for a policy (solved POMDP) for a given belief
 at a given epoch.
 }
 \examples{
-
 data("Tiger")
 Tiger
 
 sol <- solve_POMDP(model = Tiger)
 
 # these are the states
-sol$model$states
+sol$states
 
 # belief that tiger is to the left
 optimal_action(sol, c(1, 0))
@@ -48,8 +47,16 @@ optimal_action(sol, "tiger-right", epoch = 10)
 
 }
 \seealso{
-\code{\link{POMDP}}
+Other policy: 
+\code{\link{plot_policy_graph}()},
+\code{\link{plot_value_function}()},
+\code{\link{policy_graph}()},
+\code{\link{policy}()},
+\code{\link{reward}()},
+\code{\link{solve_POMDP}()},
+\code{\link{solve_SARSOP}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{policy}

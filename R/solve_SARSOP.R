@@ -7,25 +7,28 @@
 #' decision processes (POMDPs). The result is an optimal or approximately
 #' optimal policy.
 #'
-#' @param model a POMDP problem specification created with \code{\link{POMDP}}.
+#' @family policy
+#' @family solver
+#' @family POMDP
+#'
+#' @param model a POMDP problem specification created with [POMDP()].
 #' Alternatively, a POMDP file or the URL for a POMDP file can be specified.
-#' @param method string; there is only one method available called \code{"sarsop"}.
-#' @param horizon need to be \code{Inf}.
-#' @param discount discount factor in range [0, 1]. If \code{NULL}, then the
-#' discount factor specified in \code{model} will be used.
-#' @param terminal_values needs to be \code{NULL}. SARSOP does not use terminal values.
+#' @param method string; there is only one method available called `"sarsop"`.
+#' @param horizon need to be `Inf`.
+#' @param discount discount factor in range \eqn{[0, 1]}. If `NULL`, then the
+#' discount factor specified in `model` will be used.
+#' @param terminal_values needs to be `NULL`. SARSOP does not use terminal values.
 #' @param digits precision used when writing POMDP files (see
-#' \code{\link{write_POMDP}}).
+#' [write_POMDP()]).
 #' @param parameter a list with parameters passed on to
-#' the function \code{sarsop} in package \pkg{sarsop}.
-#' @param verbose logical, if set to \code{TRUE}, the function provides the
+#' the function `sarsop` in package \pkg{sarsop}.
+#' @param verbose logical, if set to `TRUE`, the function provides the
 #' output of the solver in the R console.
 #' @return The solver returns an object of class POMDP which is a list with the
-#' model specifications (\code{model}), the solution (\code{solution}), and the
-#' solver output (\code{solver_output}).
+#' model specifications (`'model'`), the solution (`'solution'`), and the
+#' solver output (`'solver_output'`).
 #' @author Michael Hahsler
 #' @references
-#'
 #' Carl Boettiger, Jeroen Ooms and Milad Memarzadeh (2020). sarsop:
 #' Approximate POMDP Planning Software. R package version 0.6.6.
 #' https://CRAN.R-project.org/package=sarsop
@@ -71,7 +74,6 @@ solve_SARSOP <- function(model,
   digits = 7,
   parameter = NULL,
   verbose = FALSE) {
-  
   check_installed("sarsop")
   
   #if (!requireNamespace("sarsop", quietly = TRUE)) {
@@ -83,35 +85,35 @@ solve_SARSOP <- function(model,
     stop("Only available method: 'sarsop'")
   
   # check parameters
-  if (!is.null(terminal_values))
+if (!is.null(terminal_values))
     stop("the SARSOP solver does not support terminal values.")
   
   # do we have a model POMDP file?
   if (is.character(model))
     model <- read_POMDP(model)
   
-  if (!is.null(model$model$horizon) &&
-      !is.infinite(model$model$horizon))
+  if (!is.null(model$horizon) &&
+      !is.infinite(model$horizon))
     warning(
       "Replacing the horizon specified in the model (",
-      model$model$horizon,
+      model$horizon,
       ") with infinity. SARSOP only solves infinite-horizon problems."
     )
   
-  model$model$horizon <- horizon
+  model$horizon <- horizon
   
-  if (!is.infinite(model$model$horizon))
+  if (!is.infinite(model$horizon))
     stop("SARSOP only solves infinite-horizon problems.")
   
   if (!is.null(horizon))
-    model$model$horizon <- horizon
+    model$horizon <- horizon
   
   
-  if (!is.infinite(model$model$horizon))
+  if (!is.infinite(model$horizon))
     stop("the SARSOP solver only supports infinite time horizon problems.")
   
   if (!is.null(discount))
-    model$model$discount <- discount
+    model$discount <- discount
   
   if (.timedependent_POMDP(model))
     stop("the SARSOP solver does not support time dependent models.")
@@ -123,8 +125,8 @@ solve_SARSOP <- function(model,
   log_file <- paste0(tmpf, '.log')
   
   # write model POMDP file
-  if (!is.null(model$model$problem))
-    writeLines(model$model$problem, con = model_file)
+  if (!is.null(model$problem))
+    writeLines(model$problem, con = model_file)
   else
     write_POMDP(model, model_file, digits = digits)
   
@@ -148,16 +150,18 @@ solve_SARSOP <- function(model,
   # package solution
   policy <- sarsop::read_policyx(policy_file)
   pg <- data.frame(node = 1:length(policy$action),
-    action = model$model$actions[policy$action])
+    action = model$actions[policy$action])
   alpha <- t(policy$vectors)
-  colnames(alpha) = model$model$states
+  colnames(alpha) = model$states
+  
+  policy <- data.frame(alpha, action = pg$action)
   
   model$solution <- structure(
     list(
       method = "sarsop",
       parameter = parameter,
-      horizon = model$model$horizon,
-      discount = model$model$discount,
+      horizon = model$horizon,
+      discount = model$discount,
       converged = length(grep("precision reached", res$end_condition)) == 1,
       total_expected_reward = NA,
       initial_belief = NA,
@@ -165,12 +169,13 @@ solve_SARSOP <- function(model,
       #  terminal_values = if(!is.null(terminal_values)) terminal_values else 0,
       #belief_states = belief,
       pg = list(pg),
-      alpha = list(alpha)
+      alpha = list(alpha),
+      policy = list(policy)
     ),
     class = "POMDP_solution"
   )
   
-  model$solution$total_expected_reward = reward(model, model$model$start)$reward
+  model$solution$total_expected_reward = reward(model, model$start)$reward
   
   model
 }

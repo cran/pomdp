@@ -51,7 +51,6 @@ the optimal actions will be chosen, for unsolved POMDPs random actions will
 be used.
 }
 \examples{
-
 data(Tiger)
 
 # solve the POMDP for 5 epochs and no discounting
@@ -77,18 +76,27 @@ sim <- simulate_POMDP(sol, n = 100, belief = c(.5, .5), visited_beliefs = TRUE)
 
 # plot with added density
 plot_belief_space(sol, sample = sim, ylim = c(0,3))
-lines(density(sim[,1], bw = .05)); axis(2); title(ylab = "Density")
+lines(density(sim[, 1], bw = .05)); axis(2); title(ylab = "Density")
 
 
 ## Example 3: simulate trajectories for an unsolved POMDP using randomized actions
-sim <- simulate_POMDP(Tiger, n = 100, horizon = 5, random_actions = TRUE, visited_beliefs = TRUE)
+sim <- simulate_POMDP(Tiger, n = 100, horizon = 5, 
+  random_actions = TRUE, visited_beliefs = TRUE)
 plot_belief_space(sol, sample = sim, ylim = c(0,6))
-lines(density(sim[,1], bw = .05)); axis(2); title(ylab = "Density")
-
+lines(density(sim[, 1], bw = .05)); axis(2); title(ylab = "Density")
 }
 \seealso{
-\code{\link[=POMDP]{POMDP()}}
+Other POMDP: 
+\code{\link{POMDP}()},
+\code{\link{plot_belief_space}()},
+\code{\link{sample_belief_space}()},
+\code{\link{solve_POMDP}()},
+\code{\link{solve_SARSOP}()},
+\code{\link{transition_matrix}()},
+\code{\link{update_belief}()},
+\code{\link{write_POMDP}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{POMDP}

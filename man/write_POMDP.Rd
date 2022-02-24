@@ -5,12 +5,12 @@
 \alias{read_POMDP}
 \title{Read and write a POMDP Model to a File in POMDP Format}
 \usage{
-write_POMDP(model, file, digits = 7)
+write_POMDP(x, file, digits = 7)
 
 read_POMDP(file)
 }
 \arguments{
-\item{model}{an object of class POMDP_model.}
+\item{x}{an object of class \link{POMDP}.}
 
 \item{file}{a file name.}
 
@@ -18,18 +18,33 @@ read_POMDP(file)
 point).}
 }
 \value{
-\code{read_POMDP} returns a POMDP object.
+\code{read_POMDP()} returns a \link{POMDP} object.
 }
 \description{
-Reads and write a POMDP file suitable for the pomdp-solve program. Note: read POMDP files are intended to be used in solve_POMDP() and do not support all auxiliary functions. Fields like the transition matrix, the observation matrix and the reward structure are not parsed.
+Reads and write a POMDP file suitable for the \code{pomdp-solve} program. \emph{Note:} read POMDP files are intended to be used in \code{\link[=solve_POMDP]{solve_POMDP()}} and do not support all auxiliary functions. Fields like the transition matrix, the observation matrix and the reward structure are not parsed.
+}
+\examples{
+data(Tiger)
+
+## show the POMDP file that would be written.
+write_POMDP(Tiger, file = stdout())
 }
 \references{
-POMDP solver website: \url{http://www.pomdp.org}
+POMDP solver website: http://www.pomdp.org
 }
 \seealso{
-\code{\link{POMDP}}
+Other POMDP: 
+\code{\link{POMDP}()},
+\code{\link{plot_belief_space}()},
+\code{\link{sample_belief_space}()},
+\code{\link{simulate_POMDP}()},
+\code{\link{solve_POMDP}()},
+\code{\link{solve_SARSOP}()},
+\code{\link{transition_matrix}()},
+\code{\link{update_belief}()}
 }
 \author{
 Hossein Kamalzadeh, Michael Hahsler
 }
+\concept{POMDP}
 \keyword{IO}

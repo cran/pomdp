@@ -2,7 +2,6 @@
 % Please edit documentation in R/plot_policy_graph.R
 \name{plot_policy_graph}
 \alias{plot_policy_graph}
-\alias{plot}
 \title{Visualize a POMDP Policy Graph}
 \usage{
 plot_policy_graph(
@@ -15,7 +14,7 @@ plot_policy_graph(
 )
 }
 \arguments{
-\item{x}{object of class POMDP containing a solved POMDP problem.}
+\item{x}{object of class \link{POMDP} containing a solved POMDP problem.}
 
 \item{belief}{logical; display belief proportions as a pie chart in each node. This requires belief space sampling and may be slow.}
 
@@ -43,16 +42,14 @@ belonging to the node/segment.
 The built in plotting engines are \pkg{igraph} and \pkg{visNetwork}. The
 additional arguments specified in \code{...} are passed on to the engine
 plotting function.  For \pkg{igraph} this is
-\code{\link[igraph]{plot.igraph}} (see \code{\link[igraph]{plot.common}} for
-available options). For \pkg{visNetwork} this is
-\code{\link[visNetwork]{visIgraph}}.
+\code{\link[igraph:plot.igraph]{igraph::plot.igraph()}}. For \pkg{visNetwork} this is
+\code{\link[visNetwork:visNetwork-igraph]{visNetwork::visIgraph()}}.
 
 Other plotting libraries can be used by creating a policy graph (as an
-igraph object) using \code{\link{policy_graph}} and converting it into a
+igraph object) using \code{\link[=policy_graph]{policy_graph()}} and converting it into a
 suitable representation for that library.
 }
 \examples{
-
 data("Tiger")
 sol <- solve_POMDP(model = Tiger)
 sol
@@ -72,7 +69,7 @@ plot_policy_graph(sol, layout = rbind(c(1,1), c(1,-1), c(0,0), c(-1,-1), c(-1,1)
 plot_policy_graph(sol, edge.label = NA, vertex.label = NA, legend = FALSE)
 
 ## add a plot title
-plot_policy_graph(sol, main = sol$model$name)
+plot_policy_graph(sol, main = sol$name)
 
 ## custom larger vertex labels (A, B, ...)
 plot_policy_graph(sol,
@@ -100,11 +97,14 @@ plot_policy_graph(sol, engine = "visNetwork")
 plot_policy_graph(sol, engine = "vis", layout = "layout_in_circle", smooth = TRUE)
 }
 \seealso{
-\code{\link{solve_POMDP}}, \code{\link{policy_graph}}.
-
-From: \pkg{igraph} \code{\link[igraph]{plot.igraph}},
-\code{\link[igraph]{igraph_options}}, \code{\link[igraph]{plot.common}}.
-
-From \pkg{visNetwork}: \code{\link[visNetwork]{visIgraph}}.
+Other policy: 
+\code{\link{optimal_action}()},
+\code{\link{plot_value_function}()},
+\code{\link{policy_graph}()},
+\code{\link{policy}()},
+\code{\link{reward}()},
+\code{\link{solve_POMDP}()},
+\code{\link{solve_SARSOP}()}
 }
+\concept{policy}
 \keyword{hplot}

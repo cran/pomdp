@@ -4,41 +4,50 @@
 \alias{transition_matrix}
 \alias{observation_matrix}
 \alias{reward_matrix}
-\title{Extract the Transition, Observation or Reward Matrices from a POMDP}
+\title{Extract the Transition, Observation or Reward Information from a POMDP}
 \usage{
-transition_matrix(x, episode = 1)
+transition_matrix(x, episode = 1, type = "matrix")
 
-observation_matrix(x, episode = 1)
+observation_matrix(x, episode = 1, type = "matrix")
 
-reward_matrix(x, episode = 1)
+reward_matrix(x, episode = 1, type = "matrix")
 }
 \arguments{
-\item{x}{A POMDP object.}
+\item{x}{A \link{POMDP} object.}
 
-\item{episode}{Episode used for time-dependent POMDPs (see
-\code{\link{POMDP}}).}
+\item{episode}{Episode used for time-dependent POMDPs (\link{POMDP}).}
+
+\item{type}{\code{'matrix'} or \code{'function'} to get a list of matrices or a function.}
 }
 \value{
 A list or a list of lists of matrices.
 }
 \description{
 Converts the description of transition probabilities and observation
-probabilities in a POMDP into a list of matrices, one for each action.
-Rewards are converted into a list (actions) of lists (start states) of
-matrices.
+probabilities in a POMDP into a list of matrices or a function.
+}
+\details{
+See Details section in \link{POMDP} for details.
 }
 \examples{
-
 data("Tiger")
 
-# transition matrices for each action in the from states x states
+# List of |A| transition matrices. One per action in the from states x states
+Tiger$transition_prob
 transition_matrix(Tiger)
 
-# observation matrices for each action in the from states x observations
+f <- transition_matrix(Tiger, type = "function")
+args(f)
+## listening does not change the tiger's position.
+f("listen", "tiger-left", "tiger-left")
+
+# List of |A| observation matrices. One per action in the from states x observations
+Tiger$observation_prob
 observation_matrix(Tiger)
 
-# reward matrices for each matrix and (start) state in
-# the form (end) state x observation
+# List of list of reward matrices. 1st level is action and second level is the
+#  start state in the form end state x observation
+Tiger$reward
 reward_matrix(Tiger)
 
 # Visualize transition matrix for action 'open-left'
@@ -49,10 +58,32 @@ edge_attr(g, "label") <- edge_attr(g, "weight")
 igraph.options("edge.curved" = TRUE)
 plot(g, layout = layout_on_grid, main = "Transitions for action 'open=left'")
 
+## Use a function for the Tiger transition model
+trans <- function(end.state, start.state, action) {
+  ## listen has an identity matrix
+  if(action == 'listen')
+    if(end.state == start.state) return(1)
+    else return(0)
+
+  # other actions have a uniform distribution
+  return(1/2)
+}
+
+Tiger$transition_prob <- trans
+transition_matrix(Tiger)
 }
 \seealso{
-\code{\link{POMDP}}
+Other POMDP: 
+\code{\link{POMDP}()},
+\code{\link{plot_belief_space}()},
+\code{\link{sample_belief_space}()},
+\code{\link{simulate_POMDP}()},
+\code{\link{solve_POMDP}()},
+\code{\link{solve_SARSOP}()},
+\code{\link{update_belief}()},
+\code{\link{write_POMDP}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{POMDP}

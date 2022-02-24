@@ -2,6 +2,7 @@
 % Please edit documentation in R/MDP.R
 \name{MDP}
 \alias{MDP}
+\alias{MDP2POMDP}
 \title{Define an MDP Problem}
 \usage{
 MDP(
@@ -11,11 +12,11 @@ MDP(
   reward,
   discount = 0.9,
   horizon = Inf,
-  terminal_values = 0,
   start = "uniform",
-  max = TRUE,
   name = NA
 )
+
+MDP2POMDP(x)
 }
 \arguments{
 \item{states}{a character vector specifying the names of the states.}
@@ -34,51 +35,53 @@ observations.}
 \item{horizon}{numeric; Number of epochs. \code{Inf} specifies an infinite
 horizon.}
 
-\item{terminal_values}{a vector with the terminal values for each state.}
-
 \item{start}{Specifies in which state the MDP starts.}
 
-\item{max}{logical; is this a maximization problem (maximize reward) or a
-minimization (minimize cost specified in \code{reward})?}
-
 \item{name}{a string to identify the MDP problem.}
+
+\item{x}{a \code{MDP} object.}
 }
 \value{
-The function returns an object of class POMDP which is list with an
-element called \code{model} containing a list with the model specification.
-\code{solve_POMDP} reads the object and adds a list element called
-\code{solution}.
+The function returns an object of class MDP which is list with
+the model specification. \code{\link[=solve_MDP]{solve_MDP()}} reads the object and adds a list element called
+\code{'solution'}.
 }
 \description{
-Defines all the elements of a MDP problem and formulates them as a POMDP
-where all states are observable.
+Defines all the elements of a MDP problem.
 }
 \details{
-The MDP is formulated as a POMDP where all states are completely observable.
-This is achieved by defining one observation per state with identity
+MDPs are similar to POMDPs, however, states are completely observable and
+observations are not necessary. The model is defined similar to \link{POMDP}
+models, but observations are not specified and the \code{'observations'} column in
+the the reward specification is always \code{'*'}.
+
+\code{MDP2POMDP()} reformulates a MDP as a POMDP with one observation per state
+that reveals the current state. This is achieved by defining identity
 observation probability matrices.
 
-More details on specifying the parameters can be found in the documentation
-for \code{\link{POMDP}}.
+More details on specifying the model components can be found in the documentation
+for \link{POMDP}.
 }
 \examples{
+# Michael's Sleepy Tiger Problem is like the POMDP Tiger problem, but
+# has completely observable states because the tiger is sleeping in front
+# of the door. This makes the problem an MDP.
 
-## Michael's Sleepy Tiger Problem is an MDP with perfect observability
-
-Tiger_MDP <- MDP(
+STiger <- MDP(
   name = "Michael's Sleepy Tiger Problem",
-  discount = 1,
+  discount = .9,
 
   states = c("tiger-left" , "tiger-right"),
   actions = c("open-left", "open-right", "do-nothing"),
-  start = "tiger-left",
+  start = "uniform",
 
+  # opening a door resets the problem
   transition_prob = list(
     "open-left" =  "uniform",
     "open-right" = "uniform",
     "do-nothing" = "identity"),
 
-  # the rew helper expects: action, start.state, end.state, observation, value
+  # the reward helper R_() expects: action, start.state, end.state, observation, value
   reward = rbind(
     R_("open-left",  "tiger-left",  v = -100),
     R_("open-left",  "tiger-right", v =   10),
@@ -88,19 +91,21 @@ Tiger_MDP <- MDP(
   )
 )
 
-Tiger_MDP
+STiger
 
-# do 5 epochs with no discounting
-s <- solve_POMDP(Tiger_MDP, method = "enum", horizon = 5)
-s
+sol <- solve_MDP(STiger, eps = 1e-7)
+sol
 
-# value function and policy
-plot_value_function(s)
-policy(s)
+policy(sol)
+plot_value_function(sol)
 
-}
-\seealso{
-\code{\link{POMDP}}, \code{\link{solve_POMDP}}.
+# convert the MDP into a POMDP and solve
+STiger_POMDP <- MDP2POMDP(STiger)
+sol2 <- solve_POMDP(STiger_POMDP)
+sol2 
+
+policy(sol2)
+plot_value_function(sol2)
 }
 \author{
 Michael Hahsler

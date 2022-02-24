@@ -17,7 +17,7 @@ plot_value_function(
 )
 }
 \arguments{
-\item{model}{a solved POMDP.}
+\item{model}{a solved \link{POMDP}.}
 
 \item{projection}{index or name of two states for the projection.}
 
@@ -34,7 +34,7 @@ for infinite-horizon solutions.}
 
 \item{lty}{line type.}
 
-\item{...}{additional arguments are passed on to \code{line}.}
+\item{...}{additional arguments are passed on to \code{\link[stats:line]{stats::line()}}`.}
 }
 \description{
 Plots the value function of a POMDP solution as a line plot. The solution is
@@ -42,7 +42,6 @@ projected on two states (i.e., the belief for the other states is held
 constant at zero).
 }
 \examples{
-
 data("Tiger")
 sol <- solve_POMDP(model = Tiger)
 sol
@@ -54,12 +53,22 @@ sol <- solve_POMDP(model = Tiger, horizon = 3, discount = 1,
   method = "enum")
 sol
 
-plot_value_function(sol, epoch =1, ylim = c(-5, 25))
-plot_value_function(sol, epoch =2, ylim = c(-5, 25))
-plot_value_function(sol, epoch =3, ylim = c(-5, 25))
-
+plot_value_function(sol, epoch = 1, ylim = c(-5, 25))
+plot_value_function(sol, epoch = 2, ylim = c(-5, 25))
+plot_value_function(sol, epoch = 3, ylim = c(-5, 25))
+}
+\seealso{
+Other policy: 
+\code{\link{optimal_action}()},
+\code{\link{plot_policy_graph}()},
+\code{\link{policy_graph}()},
+\code{\link{policy}()},
+\code{\link{reward}()},
+\code{\link{solve_POMDP}()},
+\code{\link{solve_SARSOP}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{policy}
 \keyword{hplot}

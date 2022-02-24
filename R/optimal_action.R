@@ -3,23 +3,22 @@
 #' Determines the optimal action for a policy (solved POMDP) for a given belief
 #' at a given epoch.
 #'
-#'
-#' @param model a solved POMDP model.
+#' @family policy
+
+#' @param model a solved [POMDP].
 #' @param belief The belief (probability distribution over the states) as a
 #' vector or a matrix with multiple belief states as rows.
 #' @param epoch what epoch of the policy should be used.
 #' @return The name of the optimal action.
 #' @author Michael Hahsler
-#' @seealso \code{\link{POMDP}}
 #' @examples
-#'
 #' data("Tiger")
 #' Tiger
 #'
 #' sol <- solve_POMDP(model = Tiger)
 #'
 #' # these are the states
-#' sol$model$states
+#' sol$states
 #'
 #' # belief that tiger is to the left
 #' optimal_action(sol, c(1, 0))

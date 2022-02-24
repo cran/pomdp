@@ -1,3 +1,13 @@
+# pomdp 1.0.0 (02/23/2022)
+
+* POMDP objects now have no list element model, but are the model list directly.
+* moved pomdp-solve to package pomdpSolve.
+* added solve_MDP().
+* transition probability, observation probabilities and rewards can now
+  be specified as a function.
+* transition_matrix et al now can also return a function.
+* Improved POMDP file writer.
+
 # pomdp 0.99.3 (08/05/2021)
 
 * moved Ternary and visNetwork to SUGGESTED.
