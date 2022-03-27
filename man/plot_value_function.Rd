@@ -21,8 +21,8 @@ plot_value_function(
 
 \item{projection}{index or name of two states for the projection.}
 
-\item{epoch}{the value function of what epoch should be plotted? Ignored
-for infinite-horizon solutions.}
+\item{epoch}{the value function of what epoch should be plotted? Use 1 for
+converged policies.}
 
 \item{ylim}{the y limits of the plot.}
 
@@ -35,6 +35,9 @@ for infinite-horizon solutions.}
 \item{lty}{line type.}
 
 \item{...}{additional arguments are passed on to \code{\link[stats:line]{stats::line()}}`.}
+}
+\value{
+the function has no return value.
 }
 \description{
 Plots the value function of a POMDP solution as a line plot. The solution is
@@ -56,12 +59,19 @@ sol
 plot_value_function(sol, epoch = 1, ylim = c(-5, 25))
 plot_value_function(sol, epoch = 2, ylim = c(-5, 25))
 plot_value_function(sol, epoch = 3, ylim = c(-5, 25))
+
+# using ggplot2
+# library(ggplot2)
+# pol <- policy(sol)[[3]]
+# ggplot(pol) + 
+#   geom_segment(aes(x = 0, y = `tiger-left`, xend=1, yend=`tiger-right`, color = action)) + 
+#   coord_cartesian(ylim = c(-5, 15)) + ylab("Reward") + xlab("Belief")
+
 }
 \seealso{
 Other policy: 
 \code{\link{optimal_action}()},
 \code{\link{plot_policy_graph}()},
-\code{\link{policy_graph}()},
 \code{\link{policy}()},
 \code{\link{reward}()},
 \code{\link{solve_POMDP}()},
