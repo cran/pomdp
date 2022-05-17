@@ -14,7 +14,7 @@ plot_belief_space(
   legend = TRUE,
   pch = 20,
   col = NULL,
-  jitter_factor = 0,
+  jitter = 0,
   ...
 )
 }
@@ -23,12 +23,12 @@ plot_belief_space(
 
 \item{projection}{a vector with state IDs or names to project on. Allowed
 are projections on two or three states. \code{NULL} uses the first two or
-three states.}
+three states. All other states are held at a belief of 0 (see\code{\link[=sample_belief_space]{sample_belief_space()}})}
 
 \item{epoch}{display this epoch.}
 
 \item{sample}{a matrix with belief points as rows or a character string
-specifying the \code{method} used for \code{sample_belief_space}.}
+specifying the \code{method} used for \code{\link[=sample_belief_space]{sample_belief_space()}}.}
 
 \item{n}{number of points sampled.}
 
@@ -41,7 +41,7 @@ need to increase the plotting region of the plotting device.}
 
 \item{col}{plotting colors.}
 
-\item{jitter_factor}{y jitter for 2D belief spaces.}
+\item{jitter}{y jitter amount for 2D belief spaces (good values are between 0 and 4).}
 
 \item{...}{additional arguments are passed on to \code{plot} for 2D or
 \code{TerneryPlot} for 3D.}
@@ -85,9 +85,18 @@ plot_belief_space(sol, what = "reward", sample = "random", n = 1000)
 # plot the belief points used by the grid-based solver
 plot_belief_space(sol, sample = sol$solution$belief_states)
 
-# plot the belief points obtained using simulated trajectories (we use n = 50 to save time).
-plot_belief_space(sol, sample = simulate_POMDP(Three_doors, n = 50, horizon = 100,
-  random_actions = TRUE, visited_beliefs = TRUE))
+# plot the belief points obtained using simulated trajectories with an epsilon-greedy policy.
+# Note that we only use n = 50 to save time.
+plot_belief_space(sol, sample = simulate_POMDP(sol, n = 50, horizon = 100,
+  epsilon = 0.1, visited_beliefs = TRUE))
+  
+# plot a 3-state belief space using ggtern (ggplot2)
+# library(ggtern)
+# samp <- sample_belief_space(sol, n = 1000)
+# df <- cbind(as.data.frame(samp), reward = reward(sol, belief = samp))
+#
+# ggtern(df, aes(x = `tiger-left`, y = `tiger-center`, z = `tiger-right`)) + 
+#   geom_point(aes(color = reward))
 }
 \seealso{
 Other POMDP: 

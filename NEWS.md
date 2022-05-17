@@ -1,10 +1,20 @@
+# pomdp 1.0.2 (05/17/2022)
+
+* policy_graph() can now produce policy trees for finite-horizon problems and the initial belief can be specified.
+* simulate_POMDP(): fixed bug with not using horizon.
+* reward() and reward_node_action() have now been separated.
+* sample_belief_space() gained method 'trajectories'.
+* simulate_POMDP(): supports not epsilon-greedy policies.
+* added x_prob() and x_val() functions to access individual parts of the matrices.
+* fixed converged finite-horizon case. It now only returns the converged graph/alpha.
+* we use not internally NA to represent * in the POMDP definition.
+* actions, states and observations are now factors in most places.
+
 # pomdp 1.0.1 (03/25/2022)
 
 * Fixed rounding issue on some architectures.
 * Fixed bug in write_POMDP() (reported by emile-pelletier-gc).
 * estimate_belief_for_nodes() is now exposed and the code has been improved.
-
-
 
 # pomdp 1.0.0 (02/23/2022)
 

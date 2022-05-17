@@ -43,7 +43,6 @@
 #' # ggplot(pol) + 
 #' #   geom_segment(aes(x = 0, y = `tiger-left`, xend=1, yend=`tiger-right`, color = action)) + 
 #' #   coord_cartesian(ylim = c(-5, 15)) + ylab("Reward") + xlab("Belief")
-#' 
 #' @import graphics
 #' @export
 plot_value_function <-
@@ -57,7 +56,7 @@ plot_value_function <-
     lty = 1,
     ...) {
     if (inherits(model, "MDP")) {
-      .solved_MDP(model)
+      .solved_MDP(model, stop = TRUE)
       
       policy <- policy(model)[[epoch]]
       
@@ -82,7 +81,7 @@ plot_value_function <-
         at = 0
       )
     } else {
-      .solved_POMDP(model)
+      .solved_POMDP(model, stop = TRUE)
       
       if (is.character(projection))
         projection <- pmatch(projection, model$states)

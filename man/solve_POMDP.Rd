@@ -58,8 +58,9 @@ solver output (\code{solver_output}). The solution is a list with elements:
 \item \code{converged} did the solution converge?
 \item \code{initial_belief} used initial beliefs.
 \item \code{total_expected_reward} reward from the initial beliefs.
-\item \code{pg}, \code{initial_pg_node} a list representing the policy graph. A converged solution has
-only a single list elements.
+\item \code{pg}, \code{initial_pg_node} a list representing the policy graph. The epochs are
+the list entries. A converged infinite-horizon solution has
+only a single list elements. Finite-horizon solutions may converge early resulting in a shorter list.
 \item \code{belief_states} used belief states.
 \item \code{alpha} value function as hyperplanes representing the nodes in the policy graph.
 \item \code{policy} the policy.
@@ -134,7 +135,7 @@ produces a warning in this case.
 
 \strong{Time-dependent POMDPs:} Time dependence of transition probabilities,
 observation probabilities and reward structure can be modeled by considering
-a set of episodes representing epoch with the same settings. In the scared
+a set of episodes representing epochs with the same settings. In the scared
 tiger example (see Examples section), the tiger has the normal behavior for
 the first three epochs (episode 1) and then becomes scared with different
 transition probabilities for the next three epochs (episode 2). The episodes
@@ -329,8 +330,8 @@ iteration: an anytime algorithm for POMDPs. IJCAI'03: Proceedings of the
 \seealso{
 Other policy: 
 \code{\link{optimal_action}()},
-\code{\link{plot_policy_graph}()},
 \code{\link{plot_value_function}()},
+\code{\link{policy_graph}()},
 \code{\link{policy}()},
 \code{\link{reward}()},
 \code{\link{solve_SARSOP}()}
