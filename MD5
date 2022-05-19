@@ -1,6 +1,6 @@
-f22b6f4fc79d932adae63d345412e838 *DESCRIPTION
+ca7f7d2f52845428775b6bcf2dc17a7f *DESCRIPTION
 0a6faf3f1395d60b6740eaad41141b1a *NAMESPACE
-bb6f5a30bf8ffe5cb4471b2b66229487 *NEWS.md
+d77abedd17e9da5c7b176ff3e74a8b18 *NEWS.md
 e8488223eb244ac6fc647b85602bb676 *R/AAA_check_installed.R
 c8a6154dfc3a66d346b2cfbdca7fdf3a *R/AAA_imports.R
 ce417b117628a6913acb879a5aadc23d *R/AAA_pomdp-package.R
@@ -18,7 +18,7 @@ e203b6c500aa113846f9a2ad7959c143 *R/plot_belief_space.R
 782b37966865f1ac83c7242280b965fe *R/read_write_POMDP.R
 c95ad623789766087a92812006cf38a5 *R/read_write_pomdp_solve.R
 b5bbafb6b5a1f76c9d07f3d8d989b65f *R/reward.R
-a1b39b6a591571952c63821a27540bea *R/round_stochchastic.R
+54fec260445eda715205b9f8bdb28c8d *R/round_stochchastic.R
 096cb84a3e0a8000dcda58801b99f99f *R/sample_belief_space.R
 eb13ebfccc96b54250d87c11149ca3ba *R/simulate_MDP.R
 aaa8c8ed3ebf4821e62879daf2e15ac3 *R/simulate_POMDP.R
@@ -28,14 +28,16 @@ a7462966407b183e6d551fc037619d0c *R/solve_SARSOP.R
 8d513d0b1021a9cbf0362130e6099f47 *R/transition_matrix.R
 05a2a4a09f5fb407efec8676f7ad3c24 *R/update_belief.R
 f81dcfeebc172758c14d29e6f7c62f35 *R/visNetwork.R
-0b2f262eca6a3ef529d93ce3b00cb8e7 *README.md
+9e97ea06d36739b0c84ea42ce99d1c19 *README.md
 1c8ebbead181d73236f153afe55e1776 *build/vignette.rds
 638cee2f0e945f8983fb4dac00985a83 *data/Maze.rda
 672296515d4ceef18a9592e0a01fd50b *data/Three_doors.rda
 3da378d0d4520b331c322155fa2723af *data/Tiger.rda
+578579bd19ee812a2f06340572e42399 *inst/README_files/policy_graph-1.png
+b0bd0cc95df339e361544ee477ca9eca *inst/README_files/value_function-1.png
 9b3c9dd040e35d25fb023bc3c92e07b3 *inst/doc/POMDP.R
 140d44b7fbaaf95e60483b99ed610a1f *inst/doc/POMDP.Rmd
-5a0722cc2dd092bb67086a18db888dec *inst/doc/POMDP.html
+8f870d96f3c078b350ee3abb80d5e6fa *inst/doc/POMDP.html
 e5eef8804a3a330b50475eeca7f90883 *man/MDP.Rd
 7cb6aa2e743ed47099dba9b0db8caaea *man/Maze.Rd
 e29ac98efacf7bafc3684a952a144379 *man/POMDP.Rd
@@ -47,7 +49,7 @@ d2954168d42e4969c5058eabdcb63040 *man/plot_value_function.Rd
 68fda0a67003f98ec824e618f2e3e2c3 *man/policy_graph.Rd
 922a4b1bf39d95b407f85728f1247ace *man/pomdp-package.Rd
 e57f017a440d7ac1bd2ee1ffc86df944 *man/reward.Rd
-ea983b81006d42829c326db5ac336a1a *man/round_stochastic.Rd
+9b476a681795f10cd4b816c61b0d2572 *man/round_stochastic.Rd
 41b9c96df8429f5e51650e69a7773dc8 *man/sample_belief_space.Rd
 e994ed1cd2979525ce8a410ef42db9b1 *man/simulate_MDP.Rd
 6d3d42f24b7f23b210e2187443ea57fa *man/simulate_POMDP.Rd

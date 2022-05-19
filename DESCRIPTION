@@ -1,8 +1,8 @@
 Package: pomdp
 Title: Infrastructure for Partially Observable Markov Decision
         Processes (POMDP)
-Version: 1.0.2
-Date: 2022-05-17
+Version: 1.0.3
+Date: 2022-05-18
 Authors@R: 
       c(person(given = "Michael",
              family = "Hahsler",
@@ -10,7 +10,7 @@ Authors@R:
              email = "mhahsler@lyle.smu.edu"),
       person(given = "Hossein",
              family = "Kamalzadeh",
-             role = c("aut", "cph")))
+             role = c("ctb")))
 Description: Provides the infrastructure to define and analyze the solutions of Partially Observable Markov Decision Process (POMDP) models. Interfaces for various exact and approximate solution algorithms are available including value iteration, point-based value iteration and SARSOP. Smallwood and Sondik (1973) <doi:10.1287/opre.21.5.1071>.
 Classification/ACM: G.4, G.1.6, I.2.6
 URL: https://github.com/mhahsler/pomdp
@@ -33,9 +33,9 @@ Collate: 'AAA_check_installed.R' 'AAA_imports.R' 'AAA_pomdp-package.R'
         'solve_SARSOP.R' 'transition_matrix.R' 'update_belief.R'
         'visNetwork.R'
 NeedsCompilation: no
-Packaged: 2022-05-17 19:07:35 UTC; hahsler
+Packaged: 2022-05-18 15:04:54 UTC; hahsler
 Author: Michael Hahsler [aut, cph, cre],
-  Hossein Kamalzadeh [aut, cph]
+  Hossein Kamalzadeh [ctb]
 Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>
 Repository: CRAN
-Date/Publication: 2022-05-17 20:00:05 UTC
+Date/Publication: 2022-05-19 07:50:02 UTC
