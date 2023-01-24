@@ -1,26 +1,29 @@
 library("testthat")
 library("pomdp")
 
-context("read and write_POMDP")
+## context("read and write_POMDP")
 
 data(Tiger)
 
 on.exit(file.remove("Tiger.POMDP"))
 write_POMDP(Tiger, "Tiger.POMDP")
-Tiger2 <- read_POMDP("Tiger.POMDP")
+Tiger2 <- read_POMDP("Tiger.POMDP", parse = TRUE)
 
 fields <- c("states", "observations", "actions", "start", "discount")
 expect_equal(Tiger[fields], Tiger2[fields])
 
+fields <- c("transition_prob", "observation_prob", "reward")
+Tiger_norm <- normalize_POMDP(Tiger, sparse = FALSE)
+Tiger2_norm <- normalize_POMDP(Tiger2, sparse = FALSE)
+expect_equal(Tiger_norm[fields], Tiger2_norm[fields])
+
+
 # check that the solutions agree
 # Note: the POMDP format does not include horizon.
 sol <- solve_POMDP(Tiger)
-sol2 <- solve_POMDP(Tiger2, horizon = Inf)
+sol2 <- solve_POMDP(Tiger2)
+
+sol$solution$solver_output <- NULL
+sol2$solution$solver_output <- NULL
+
 expect_equal(sol$solution, sol2$solution)
-
-# TODO: These don't work since not all fields are parsed.
-#solve_POMDP(Tiger2, horizon = 3)
-#transition_matrix(Tiger2)
-
-# test functions
-

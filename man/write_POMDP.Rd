@@ -7,21 +7,33 @@
 \usage{
 write_POMDP(x, file, digits = 7)
 
-read_POMDP(file)
+read_POMDP(file, parse = TRUE)
 }
 \arguments{
 \item{x}{an object of class \link{POMDP}.}
 
-\item{file}{a file name.}
+\item{file}{a file name. \code{read_POMDP()} also accepts \link{connections} including URLs.}
 
 \item{digits}{precision for writing numbers (digits after the decimal
 point).}
+
+\item{parse}{logical; try to parse the model matrices.
+Solvers still work with unparsed matrices, but helpers for simulation are not available.}
 }
 \value{
 \code{read_POMDP()} returns a \link{POMDP} object.
 }
 \description{
-Reads and write a POMDP file suitable for the \code{pomdp-solve} program. \emph{Note:} read POMDP files are intended to be used in \code{\link[=solve_POMDP]{solve_POMDP()}} and do not support all auxiliary functions. Fields like the transition matrix, the observation matrix and the reward structure are not parsed.
+Reads and write a POMDP file suitable for the \code{pomdp-solve} program.
+}
+\details{
+\link{POMDP} objects read from a POMDP file have an extra element called \code{problem} which contains the original
+POMDP specification. \strong{The original specification is directly used by external solvers.} In addition, the file
+is parsed using an experimental POMDP file parser. The parsed information can be used with auxiliary functions
+in this package that use fields like the transition matrix, the observation matrix and the reward structure.
+
+\strong{Note:} The parser for POMDP files is experimental. Please report
+problems here: \url{https://github.com/mhahsler/pomdp/issues}.
 }
 \examples{
 data(Tiger)
@@ -30,17 +42,19 @@ data(Tiger)
 write_POMDP(Tiger, file = stdout())
 }
 \references{
-POMDP solver website: http://www.pomdp.org
+POMDP solver website: https://www.pomdp.org
 }
 \seealso{
 Other POMDP: 
+\code{\link{POMDP_accessors}},
 \code{\link{POMDP}()},
 \code{\link{plot_belief_space}()},
+\code{\link{plot_value_function}()},
+\code{\link{projection}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
 \code{\link{solve_POMDP}()},
 \code{\link{solve_SARSOP}()},
-\code{\link{transition_matrix}()},
 \code{\link{update_belief}()}
 }
 \author{

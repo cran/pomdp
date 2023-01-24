@@ -1,19 +1,19 @@
-R package pomdp: Partially Observable Markov Decision Processes
-================
+
+# <img src="man/figures/logo.svg" align="right" height="139" /> R package pomdp - Infrastructure for Partially Observable Markov Decision Processes (POMDP)
 
 [![CRAN
-version](https://www.r-pkg.org/badges/version/pomdp)](https://cran.r-project.org/package=pomdp)
-[![R build
-status](https://github.com/mhahsler/pomdp/workflows/R-CMD-check/badge.svg)](https://github.com/mhahsler/pomdp/actions)
+version](http://www.r-pkg.org/badges/version/pomdp)](https://CRAN.R-project.org/package=pomdp)
+[![stream r-universe
+status](https://mhahsler.r-universe.dev/badges/pomdp)](https://mhahsler.r-universe.dev/ui#package:pomdp)
 [![CRAN RStudio mirror
-downloads](https://cranlogs.r-pkg.org/badges/pomdp)](https://cran.r-project.org/package=pomdp)
+downloads](http://cranlogs.r-pkg.org/badges/pomdp)](https://CRAN.R-project.org/package=pomdp)
 
 Provides the infrastructure to define and analyze the solutions of
-Partially Observable Markov Decision Processes (POMDP) models. The
-package uses the solvers from [pomdp-solve](http://www.pomdp.org/code/)
-(Cassandra, 2015) available in the R package
-[**pomdpSolve**](https://github.com/mhahsler/pomdpSolve) to solve POMDPs
-using a variety of algorithms.
+optimal control problems formulated as Partially Observable Markov
+Decision Processes (POMDP). The package uses the solvers from
+[pomdp-solve](http://www.pomdp.org/code/) (Cassandra, 2015) available in
+the R package [**pomdpSolve**](https://github.com/mhahsler/pomdpSolve)
+to solve POMDPs using a variety of algorithms.
 
 The package provides the following algorithms:
 
@@ -34,16 +34,17 @@ The package provides the following algorithms:
 
 ## Installation
 
-**Stable CRAN version:** install from within R with
+**Stable CRAN version:** Install from within R with
 
 ``` r
 install.packages("pomdp")
 ```
 
-**Current development version:** install from GitHub (needs devtools).
+**Current development version:** Install from
+[r-universe.](https://mhahsler.r-universe.dev/ui#package:pomdp)
 
 ``` r
-devtools::install_github("mhahsler/pomdp")
+install.packages("pomdp", repos = "https://mhahsler.r-universe.dev")
 ```
 
 ## Usage

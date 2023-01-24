@@ -105,6 +105,7 @@ MDP <- function(states,
   check_and_fix_MDP(x)
 }
 
+
 #' @export
 print.MDP <- function(x, ...) {
   writeLines(paste(paste(class(x), collapse = ", "),
@@ -119,7 +120,10 @@ print.MDP <- function(x, ...) {
     writeLines(sprintf("  Horizon: %s epochs",
       paste(x$horizon, collapse = " + ")))
   
-  if (.solved_MDP(x))
+  writeLines(sprintf("  Size: %d states / %d actions\n",
+    length(x$states), length(x$actions)))
+  
+  if (is_solved_MDP(x))
     writeLines(c(
       "  Solved:",
       sprintf("    Solution converged: %s",
@@ -153,7 +157,10 @@ MDP2POMDP <- function(x) {
   x
 }
 
-.solved_MDP <- function(x, stop = FALSE) {
+#' @rdname MDP
+#' @param stop logical; stop with an error.
+#' @export
+is_solved_MDP <- function(x, stop = FALSE) {
   if (!inherits(x, "MDP"))
     stop("x needs to be a MDP object!")
   solved <- !is.null(x$solution)

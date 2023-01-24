@@ -6,7 +6,7 @@
 \usage{
 plot_value_function(
   model,
-  projection = 1:2,
+  projection = NULL,
   epoch = 1,
   ylim = NULL,
   legend = TRUE,
@@ -19,7 +19,7 @@ plot_value_function(
 \arguments{
 \item{model}{a solved \link{POMDP}.}
 
-\item{projection}{index or name of two states for the projection.}
+\item{projection}{Sample in a projected belief space. See \code{\link[=projection]{projection()}} for details.}
 
 \item{epoch}{the value function of what epoch should be plotted? Use 1 for
 converged policies.}
@@ -60,24 +60,42 @@ plot_value_function(sol, epoch = 1, ylim = c(-5, 25))
 plot_value_function(sol, epoch = 2, ylim = c(-5, 25))
 plot_value_function(sol, epoch = 3, ylim = c(-5, 25))
 
-# using ggplot2
-# library(ggplot2)
-# pol <- policy(sol)[[3]]
-# ggplot(pol) + 
-#   geom_segment(aes(x = 0, y = `tiger-left`, xend=1, yend=`tiger-right`, color = action)) + 
-#   coord_cartesian(ylim = c(-5, 15)) + ylab("Reward") + xlab("Belief")
+\dontrun{
+# using ggplot2 to plot the value function for epoch 3
+library(ggplot2)
+pol <- policy(sol)[[3]]
+ggplot(pol) + 
+ geom_segment(aes(x = 0, y = `tiger-left`, xend = 1, yend = `tiger-right`, color = action)) + 
+ coord_cartesian(ylim = c(-5, 15)) + ylab("Reward") + xlab("Belief")
+}
 }
 \seealso{
 Other policy: 
+\code{\link{estimate_belief_for_nodes}()},
 \code{\link{optimal_action}()},
-\code{\link{policy_graph}()},
+\code{\link{plot_belief_space}()},
+\code{\link{plot_policy_graph}()},
 \code{\link{policy}()},
+\code{\link{projection}()},
 \code{\link{reward}()},
 \code{\link{solve_POMDP}()},
 \code{\link{solve_SARSOP}()}
+
+Other POMDP: 
+\code{\link{POMDP_accessors}},
+\code{\link{POMDP}()},
+\code{\link{plot_belief_space}()},
+\code{\link{projection}()},
+\code{\link{sample_belief_space}()},
+\code{\link{simulate_POMDP}()},
+\code{\link{solve_POMDP}()},
+\code{\link{solve_SARSOP}()},
+\code{\link{update_belief}()},
+\code{\link{write_POMDP}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{POMDP}
 \concept{policy}
 \keyword{hplot}

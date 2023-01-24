@@ -1,60 +1,54 @@
 #' POMDP Policy Graphs
 #'
-#' The function creates and plots the POMDP policy graph in a converged POMDP solution and the 
+#' The function creates and plots the POMDP policy graph in a converged POMDP solution and the
 #' policy tree for a finite-horizon solution.
 #' uses `plot` in \pkg{igraph} with appropriate plotting options.
 #'
-#' Each policy graph node represent a segment (or part of a hyperplane) of the value function. 
-#' Each node represents one or more believe states. If available, a pie chart (or the color) in each node
-#' represent the central belief of the belief states
-#' belonging to the node (i.e., the center of the hyperplane segment). 
+#' Each policy graph node is represented by an alpha vector specifying a hyper plane segment. The convex hull of
+#' the set of hyperplanes represents the the value function.
+#' The policy specifies for each node an optimal action which is printed together with the node ID inside the node.
+#' The arcs are labeled with observations.
+#'
+#' If available, a pie chart (or the color) in each node
+#' represent an example of the belief that the agent has if it is in this node.
 #' This can help with interpreting the policy graph.
-#' 
-#' For converged POMDP solution a graph is produced, for finite-horizon solution a policy tree is produced. 
+#'
+#' For finite-horizon solution a policy tree is produced.
 #' The levels of the tree and the first number in the node label represent the epochs. Many algorithms produce
-#' unused policy graph nodes which are filtered to produce a clean tree structure. 
-#' Non-converged policies depend on the initial belief and if an initial belief is 
-#' specified, then different nodes will be filtered and the tree will look different. 
+#' unused policy graph nodes which are filtered to produce a clean tree structure.
+#' Non-converged policies depend on the initial belief and if an initial belief is
+#' specified, then different nodes will be filtered and the tree will look different.
 #'
 #' First, the policy in the solved POMDP is converted into an [igraph] object using `policy_graph()`.
-#' Average beliefs for the graph nodes are estimated using `estimate_belief_for_node()` and then the igraph
+#' Example beliefs for the graph nodes are estimated using [estimate_belief_for_nodes()].
+#' Finally, the igraph
 #' object is visualized using the plotting function [igraph::plot.igraph()] or,
 #' for interactive graphs, [visNetwork::visIgraph()].
-#'
-#' `estimate_belief_for_nodes()` estimated the central belief for each node/segment of the value function
-#' by generating/sampling a large set of possible belief points, assigning them to the segments and then averaging
-#' the belief over the points assigned to each segment. 
-#' Additional parameters like `method` and the sample size `n` are passed on to [sample_belief_space()].
-#' If no belief point is generated for a segment, then a
-#' warning is produced. In this case, the number of sampled points can be increased.
-#'
 #' @family policy
 #'
 #' @import igraph
 #'
 #' @param x object of class [POMDP] containing a solved and converged POMDP problem.
-#' @param belief the initial belief is used to mark the initial belief state in the 
+#' @param belief the initial belief is used to mark the initial belief state in the
 #' grave of a converged solution and to identify the root node in a policy graph for a finite-horizon solution.
 #' If `NULL` then the belief is taken from the model definition.
-#' @param show_belief logical; estimate belief proportions? If `TRUE` then `estimate_belief_for_nodes()` is used
-#'  and the belief is visualized as a pie chart in each node.
+#' @param show_belief logical; show estimated belief proportions as a pie chart in each node?
 #' @param legend logical; display a legend for colors used belief proportions?
 #' @param engine The plotting engine to be used. For `"visNetwork"`, `flip.y = FALSE` can be used
-#'   to show the root node on top. 
+#'   to show the root node on top.
 #' @param col colors used for the states.
-#' @param ... parameters are passed on to `policy_graph()`, `estimate_belief_for_nodes()` and the functions
+#' @param ... parameters are passed on to `policy_graph()`, [estimate_belief_for_nodes()] and the functions
 #'   they use. Also, plotting options are passed on to the plotting engine [igraph::plot.igraph()]
 #'   or [visNetwork::visIgraph()].
 #'
 #' @returns
 #' - `policy_graph()` returns the policy graph as an igraph object.
 #' - `plot_policy_graph()` returns invisibly what the plotting engine returns.
-#' - `estimate_belief_for_nodes()` returns a matrix with the central belief for each node.
 #'
 #' @keywords hplot graphs
 #' @examples
 #' data("Tiger")
-#' 
+#'
 #' ## policy graphs for converged solutions
 #' sol <- solve_POMDP(model = Tiger)
 #' sol
@@ -91,7 +85,7 @@
 #' ## changes labels
 #' plot(pg,
 #'   edge.label = abbreviate(E(pg)$label),
-#'   vertex.label = V(pg)$label,
+#'   vertex.label = vertex_attr(pg)$label,
 #'   vertex.size = 20)
 #'
 #' ## plot interactive graphs using the visNetwork library.
@@ -101,241 +95,22 @@
 #' ## add smooth edges and a layout (note, engine can be abbreviated)
 #' plot_policy_graph(sol, engine = "visNetwork", layout = "layout_in_circle", smooth = TRUE)
 #'
-#' ## estimate the central belief for the graph nodes. We use the default random sampling method with 
-#' ## a sample size of n = 100. 
-#' estimate_belief_for_nodes(sol, n = 100)
-#'
 #' ## policy trees for finite-horizon solutions
 #' sol <- solve_POMDP(model = Tiger, horizon = 4, method = "incprune")
 #'
 #' policy_graph(sol)
-#' 
+#'
 #' plot_policy_graph(sol)
 #' # Note: the first number in the node id is the epoch.
 #'
 #' # plot the policy tree for an initial belief of 90% that the tiger is to the left
 #' plot_policy_graph(sol, belief = c(0.9, 0.1))
-#' 
-#' @export
-policy_graph <- function(x, belief = NULL, show_belief = TRUE, col = NULL, ...) {
-  .solved_POMDP(x, stop = TRUE)
-  
-  if (!x$solution$converged || length(x$solution$pg) > 1)
-    policy_graph_unconverged(x, belief, show_belief = show_belief, col = col, ...)
-  else
-    policy_graph_converged(x, belief, show_belief = show_belief, col = col, ...)
-}
-  
-policy_graph_converged <- function(x, belief = NULL, show_belief = TRUE, col = NULL, ...) { 
-   
-  # create policy graph and belief proportions (average belief for each alpha vector)
-  pg <- x$solution$pg[[1]]
-  
-  if (show_belief) {
-    # FIXME: for pomdp-solve, we could seed with x$solution$belief_states
-    bp <- estimate_belief_for_nodes(x, ...)
-    
-    # missing belief points?
-    missing_bp <- which(apply(is.na(bp), MARGIN = 1, any))
-    if (length(missing_bp) > 0)
-      warning(
-        "No belief points sampled for policy graph node(s): ",
-        paste(missing_bp, collapse = ", "),
-        ". Increase the number for parameter belief (number of sampled points)."
-      )
-  }
-  
-  # producing a list containing arcs
-  l <- list()
-  list_of_arcs <- NULL
-  #observations <- colnames(pg)[-c(1,2)]
-  observations <- x$observations
-  number_of_observations <- length(observations)
-  l <- lapply(
-    1:number_of_observations,
-    FUN = function(i)
-      data.frame(
-        from = pg$node,
-        to = pg[[observations[i]]],
-        label = observations[i]
-      )
-  )
-  
-  l <- do.call(rbind, l)
-  l <- l[!is.na(l$to), ] # remove links to nowhere ('-' in pg)
-  
-  # creating graph
-  policy_graph <- graph.edgelist(as.matrix(l[, 1:2]))
-  edge.attributes(policy_graph) <- list(label = l$label)
-  
-  # mark the node for the initial belief
-  if (is.null(belief))
-    initial_pg_node <-  x$solution$initial_pg_node
-  else
-    initial_pg_node <- reward_node_action(x, belief = belief)$pg_node
-    
-  ### Note: the space helps with moving the id away from the pie cut.
-  init <- rep(":   ", nrow(pg))
-  init[initial_pg_node] <- ": initial belief"
-  
-  V(policy_graph)$label <- paste0(pg$node, init, "\n", pg$action)
-  
-  # add belief proportions
-  ### FIXME: Add gray for missing points instead of a uniform distribution
-  if (show_belief) {
-    pie_values <-
-      lapply(
-        seq_len(nrow(bp)),
-        FUN = function(i)
-          if (any(is.na(bp[i, ])))
-            structure(rep(1 / ncol(bp), times = ncol(bp)), names = colnames(bp))
-        else
-          bp[i, ]
-      )
-    
-    ### Set1 from Colorbrewer
-    number_of_states <- length(x$states)
-    col <- .get_colors_descrete(number_of_states, col)
-    
-    V(policy_graph)$shape <- "pie"
-    V(policy_graph)$pie = pie_values
-    V(policy_graph)$pie.color = list(col)
-  }
-  
-  V(policy_graph)$size <- 40
-  E(policy_graph)$arrow.size  <- .5
-  
-  policy_graph
-}
-
-policy_graph_unconverged <- function(x, belief = NULL, show_belief = TRUE, col = NULL, ...) {
-  
-  pg <- x$solution$pg
-  observations <- x$observations
-  epochs <- length(pg)
-  
-  # add episode to the node ids
-  for(i in seq(epochs)) pg[[i]] <- cbind(pg[[i]], epoch = i)
-  pg <- do.call(rbind, pg)
-  
-  pg[["node"]] <- paste0(pg[["epoch"]], "-", pg[["node"]])
-  for(o in observations) {
-    pg[[o]] <- paste0(pg[["epoch"]] + 1L, "-", pg[[o]])
-    
-    ## these should be NA. Make sure they are
-    pg[[o]][pg[["epoch"]] == epochs] <- NA
-  }
-  
-  # mark the node for the initial belief
-  if (is.null(belief))
-    initial_pg_node <-  x$solution$initial_pg_node
-  else
-    initial_pg_node <- reward_node_action(x, belief = belief)$pg_node
-  
-  ## remove unreached nodes
-  used <- paste0("1-", initial_pg_node)
-  for(i in seq(epochs)) {
-    used <- append(used, unlist(pg[pg[["epoch"]] == i & pg[["node"]] %in% used, observations]))
-  }
-  
-  used <- pg[["node"]] %in% used
-  pg <- pg[used,]
-  num_nodes <- nrow(pg)
-  
-  #pg[["node"]] <- factor(pg[["node"]])
-  #for(o in observations) 
-  #  pg[[o]] <- factor(pg[[o]], levels = levels(pg[["node"]]))
-  
-  
-  
-  # producing a list containing arcs
-  l <- list()
-  list_of_arcs <- NULL
-  #observations <- colnames(pg)[-c(1,2)]
-  observations <- x$observations
-  number_of_observations <- length(observations)
-  l <- lapply(
-    1:number_of_observations,
-    FUN = function(i)
-      data.frame(
-        from = pg[["node"]],
-        to = pg[[observations[i]]],
-        label = observations[i]
-      )
-  )
-  
-  l <- do.call(rbind, l)
-  l <- l[!is.na(l$to), ] # remove links to nowhere ('-' in pg)
-  num_edges <- nrow(l)
-  
-  # creating the initial graph
-  policy_graph <- graph_from_edgelist(as.matrix(l[, 1:2]))
-  edge_attr(policy_graph) <- list(label = l$label)
-  
-  ### Note: the space helps with moving the id away from the pie cut.
-  #init <- rep(":   ", nrow(pg))
-  #init[1] <- ": initial belief"
-  
-  m <- match(vertex_attr(policy_graph)$name, pg[["node"]]) 
-  vertex_attr(policy_graph)$name <- paste0(vertex_attr(policy_graph)$name, ":\n", pg[["action"]][m])
-  
-  # add belief proportions
-  ### FIXME: Add gray for missing points instead of a uniform distribution
-  if (show_belief) {
-    # FIXME: for pomdp-solve, we could seed with x$solution$belief_states
-    bp <-
-      lapply(
-        seq(epochs),
-        FUN = function(e)
-          estimate_belief_for_nodes(x, epoch = e, ...)
-      )
-    bp <- do.call(rbind, bp)
-    bp <- bp[used, ]
-    
-    # missing belief points?
-    missing_bp <- which(apply(is.na(bp), MARGIN = 1, any))
-    if (length(missing_bp) > 0)
-      warning(
-        "No belief points sampled for policy graph node(s): ",
-        paste(missing_bp, collapse = ", "),
-        ". Increase the number for parameter belief (number of sampled points)."
-      )
-    
-    pie_values <-
-      lapply(
-        seq_len(nrow(bp)),
-        FUN = function(i)
-          if (any(is.na(bp[i, ])))
-            structure(rep(1 / ncol(bp), times = ncol(bp)), names = colnames(bp))
-        else
-          bp[i, ]
-      )
-    
-    ### Set1 from Colorbrewer
-    number_of_states <- length(x$states)
-    col <- .get_colors_descrete(number_of_states, col)
-    
-    vertex_attr(policy_graph)$shape <- rep("pie", times = num_nodes)
-    vertex_attr(policy_graph)$pie = pie_values[m]
-    vertex_attr(policy_graph)$pie.color = rep(list(col), times = num_nodes)
-  }
-  
-  vertex_attr(policy_graph)$size <- rep(40, times = num_nodes)
-  edge_attr(policy_graph)$arrow.size  <- rep(.5, times = num_edges)
-  policy_graph <- add_layout_(policy_graph, as_tree()) 
-  
-  policy_graph
-}
-
-
-
-# estimate central beliefs for each alpha vector (infinite horizon)
-# sample points and then average over each alpha vector.
-# TODO: finite horizon
-# TODO: we could also calculate this with some linear algebra
-
-
-#' @rdname policy_graph
+#'
+#' # Plotting a larger graph (see ? igraph.plotting for plotting options)
+#' sol <- solve_POMDP(model = Tiger, horizon = 10, method = "incprune")
+#'
+#' plot_policy_graph(sol, vertex.size = 8, edge.arrow.size = .1,
+#'   vertex.label.cex = .5, edge.label.cex = .5)
 #' @export
 plot_policy_graph <- function(x,
   belief = NULL,
@@ -344,33 +119,53 @@ plot_policy_graph <- function(x,
   engine = c("igraph", "visNetwork"),
   col = NULL,
   ...) {
-  
   engine <- match.arg(engine)
   switch(
     engine,
-    igraph = .plot.igraph(x, belief, show_belief = show_belief, legend = legend, col = col, ...),
-    visNetwork = .plot.visNetwork(x, belief, show_belief = show_belief, legend = legend, col = col, ...)
+    igraph = .plot.igraph(
+      x,
+      belief,
+      show_belief = show_belief,
+      legend = legend,
+      col = col,
+      ...
+    ),
+    visNetwork = .plot.visNetwork(
+      x,
+      belief,
+      show_belief = show_belief,
+      legend = legend,
+      col = col,
+      ...
+    )
   )
 }
 
 
 .plot.igraph <-
-  function(x, belief = NULL, show_belief, legend, col, edge.curved = NULL, ...) {
-    pg <- policy_graph(x, belief, show_belief = show_belief, col = col, ...)
+  function(x,
+    belief = NULL,
+    show_belief,
+    legend,
+    col,
+    edge.curved = NULL,
+    ...) {
+    pg <-
+      policy_graph(x, belief, show_belief = show_belief, col = col, ...)
     
     if (is.null(edge.curved))
       edge.curved <- .curve_multiple_directed(pg)
     
     plot.igraph(pg, edge.curved = edge.curved, ...)
     
-    if (legend && show_belief && !is.null(V(pg)$pie)) {
+    if (legend && show_belief && !is.null(vertex_attr(pg)$pie)) {
       legend(
         "topright",
         legend = x$states,
         title = "Belief",
         #horiz = TRUE,
         bty = "n",
-        col = V(pg)$pie.color[[1]],
+        col = vertex_attr(pg)$pie.color[[1]],
         pch = 15
       )
     }
@@ -379,7 +174,7 @@ plot_policy_graph <- function(x,
 ### fix the broken curve_multiple for directed graphs (igraph_1.2.2)
 .curve_multiple_directed <- function(graph, start = 0.3) {
   el <-  as_edgelist(graph, names = FALSE)
-  o <- apply(el, 1, order)[1,]
+  o <- apply(el, 1, order)[1, ]
   el <-
     apply(
       el,
@@ -404,25 +199,67 @@ plot_policy_graph <- function(x,
   cu
 }
 
-#' @rdname policy_graph
-#' @param epoch estimate the belief for nodes in this epoch. Use 1 for converged policies.
-#' @export
-estimate_belief_for_nodes <-
+# plot policy graph using visNetwork
+
+# Note: legend is not used right now!
+.plot.visNetwork <-
   function(x,
-    epoch = 1,
+    belief = NULL,
+    show_belief = TRUE,
+    legend = NULL,
+    col = NULL,
+    smooth = list(type = "continuous"),
+    layout = NULL,
     ...) {
+    check_installed("visNetwork")
     
-    alpha <- x$solution$alpha[[epoch]]
+    unconverged <-
+      !x$solution$converged || length(x$solution$pg) > 1
+    if (is.null(layout))
+      layout <-
+      ifelse(unconverged, "layout_as_tree", "layout_nicely")
     
-    belief_points <- sample_belief_space(x, ...)
-    r <- reward_node_action(x, belief = belief_points, epoch = epoch)
-    belief <- t(sapply(
-      1:nrow(alpha),
-      FUN = function(i)
-        colMeans(r$belief[r$pg_node == i, , drop = FALSE])
-    ))
+    pg <-
+      policy_graph(x, belief, show_belief = show_belief, col = col)
     
-    belief
+    ### add tooltip
+    #V(pg)$title <- paste(htmltools::tags$b(V(pg)$label)
+    vertex_attr(pg, "title") <- paste(vertex_attr(pg, "label"),
+      lapply(
+        vertex_attr(pg, "pie"),
+        FUN = function(b) {
+          knitr::kable(cbind(belief = b), digits = 3, format = "html")
+        }
+      ))
+    
+    ### colors
+    if (show_belief) {
+      # winner
+      #V(pg)$color <- V(pg)$pie.color[[1]][sapply(V(pg)$pie, which.max)]
+      
+      # mixing in rgb space
+      vertex_attr(pg, "color") <- sapply(
+        seq(length(V(pg))),
+        FUN = function(i) {
+          mix <-
+            t(grDevices::col2rgb(vertex_attr(pg, "pie.color")[[1]]) %*% vertex_attr(pg, "pie")[[i]])
+          if(any(is.na(mix))) mix <- cbind(255, 255, 255)
+          grDevices::rgb(mix, maxColorValue = 255)
+        }
+      )
+      
+      # mixing in hsv space
+      #V(pg)$color <- sapply(seq(length(V(pg))), FUN = function(i)
+      #  do.call(hsv, as.list(rgb2hsv(col2rgb(V(pg)$pie.color[[1]])) %*% V(pg)$pie[[i]])))
+    }
+    
+    visNetwork::visIgraph(pg,
+      idToLabel = FALSE,
+      layout = layout,
+      smooth = smooth,
+      ...) %>%
+      visNetwork::visOptions(
+        highlightNearest = list(enabled = TRUE, degree = 0),
+        nodesIdSelection = TRUE
+      )
   }
-
-

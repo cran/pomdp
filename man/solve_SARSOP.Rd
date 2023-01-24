@@ -32,7 +32,7 @@ discount factor specified in \code{model} will be used.}
 \code{\link[=write_POMDP]{write_POMDP()}}).}
 
 \item{parameter}{a list with parameters passed on to
-the function \code{sarsop} in package \pkg{sarsop}.}
+the function \code{\link[sarsop:appl]{sarsop::pomdpsol()}} in package \pkg{sarsop}.}
 
 \item{verbose}{logical, if set to \code{TRUE}, the function provides the
 output of the solver in the R console.}
@@ -75,8 +75,8 @@ plot_policy_graph(sol)
 # reward of the optimal policy
 reward(sol)
 
-# Solve a problem specified as a POMDP file
-sol <- solve_SARSOP("http://www.pomdp.org/examples/cheese.95.POMDP")
+# Solve a problem specified as a POMDP file. The timeout is set to 10 seconds.
+sol <- solve_SARSOP("http://www.pomdp.org/examples/cheese.95.POMDP", parameter = list(timeout = 10))
 sol
 }
 
@@ -90,10 +90,13 @@ H. Kurniawati, D. Hsu, and W.S. Lee (2008). SARSOP: Efficient point-based POMDP 
 }
 \seealso{
 Other policy: 
+\code{\link{estimate_belief_for_nodes}()},
 \code{\link{optimal_action}()},
+\code{\link{plot_belief_space}()},
+\code{\link{plot_policy_graph}()},
 \code{\link{plot_value_function}()},
-\code{\link{policy_graph}()},
 \code{\link{policy}()},
+\code{\link{projection}()},
 \code{\link{reward}()},
 \code{\link{solve_POMDP}()}
 
@@ -102,12 +105,14 @@ Other solver:
 \code{\link{solve_POMDP}()}
 
 Other POMDP: 
+\code{\link{POMDP_accessors}},
 \code{\link{POMDP}()},
 \code{\link{plot_belief_space}()},
+\code{\link{plot_value_function}()},
+\code{\link{projection}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
 \code{\link{solve_POMDP}()},
-\code{\link{transition_matrix}()},
 \code{\link{update_belief}()},
 \code{\link{write_POMDP}()}
 }

@@ -1,7 +1,7 @@
 library("testthat")
 library("pomdp")
 
-context("solve_POMDP")
+## context("solve_POMDP")
 
 data("Tiger")
 sol <- solve_POMDP(Tiger)
@@ -15,7 +15,7 @@ reward(sol)
 reward(sol, belief = c(0,1))
 reward(sol, belief = c(0,1), epoch = 3)
 
-context("solve_POMDP with terminal values")
+## context("solve_POMDP with terminal values")
 
 # solve 10 epochs
 sol <- solve_POMDP(Tiger, discount = 1, horizon = 10, method = "enum")
@@ -34,7 +34,17 @@ expect_equal(alpha_horizon, alpha_stepwise)
 expect_equal(pg_horizon$action, pg_stepwise$action) # transitions do not work
 
 
-context("solve_POMDP and model files")
+## context("solve_POMDP and model files")
+
+sol <- solve_POMDP(system.file("examples/shuttle.95.POMDP", package = "pomdp"), 
+                   parameter = list(fg_points = 10))
+plot_policy_graph(sol, show_belief = FALSE)
+policy(sol)
+
+## test with some online problems from http://www.pomdp.org/examples/
+
+#problem <- read_POMDP("http://www.pomdp.org/examples/1d.POMDP", parse_matrices = "no")
+#sol <- solve_POMDP(problem)
 
 sol <- solve_POMDP("http://www.pomdp.org/examples/1d.POMDP")
 plot_policy_graph(sol, show_belief = FALSE)
@@ -44,12 +54,10 @@ sol <- solve_POMDP("http://www.pomdp.org/examples/cheese.95.POMDP")
 plot_policy_graph(sol, show_belief = FALSE)
 policy(sol)
 
-sol <- solve_POMDP("http://www.pomdp.org/examples/shuttle.95.POMDP", 
-                   parameter = list(fg_points = 10))
-plot_policy_graph(sol, show_belief = FALSE)
-policy(sol)
 
 sol <- solve_POMDP("http://www.pomdp.org/examples/stand-tiger.95.POMDP")
 plot_policy_graph(sol, show_belief = FALSE)
 policy(sol)
 
+## clean up
+unlink("Rplots.pdf")

@@ -9,9 +9,11 @@ simulate_MDP(
   n = 100,
   start = NULL,
   horizon = NULL,
-  visited_states = FALSE,
+  return_states = FALSE,
   epsilon = NULL,
-  verbose = FALSE
+  engine = "cpp",
+  verbose = FALSE,
+  ...
 )
 }
 \arguments{
@@ -20,22 +22,34 @@ simulate_MDP(
 \item{n}{number of trajectories.}
 
 \item{start}{probability distribution over the states for choosing the
-starting states for the trajectories.
-Defaults to "uniform".}
+starting states for the trajectories. Defaults to "uniform".}
 
 \item{horizon}{number of epochs for the simulation. If \code{NULL} then the
 horizon for the model is used.}
 
-\item{visited_states}{logical; Should all visited states on the
-trajectories be returned? If \code{FALSE} then only the final
-state is returned.}
+\item{return_states}{logical; return visited states.}
 
 \item{epsilon}{the probability of random actions  for using an epsilon-greedy policy.
 Default for solved models is 0 and for unsolved model 1.}
 
+\item{engine}{\code{'cpp'} or \code{'r'} to perform simulation using a faster C++
+or a native R implementation which supports sparse matrices.}
+
 \item{verbose}{report used parameters.}
+
+\item{...}{further arguments are ignored.}
 }
 \value{
+A list with elements:
+\itemize{
+\item \code{avg_reward}: The average discounted reward.
+\item \code{reward}: Reward for each trajectory.
+\item \code{action_cnt}: Action counts.
+\item \code{state_cnt}: State counts.
+\item \code{states}: a vector with state ids.
+Rows represent trajectories.
+}
+
 A vector with state ids (in the final epoch or all). Attributes containing action
 counts, and rewards  for each trajectory may be available.
 }
@@ -44,6 +58,17 @@ Simulate trajectories through a MDP. The start state for each
 trajectory is randomly chosen using the specified belief. The belief is used to choose actions
 from an epsilon-greedy policy and then update the state.
 }
+\details{
+A native R implementation is available (\code{engine = 'r'}) and the default is a
+faster C++ implementation (\code{engine = 'cpp'}).
+
+Both implementations support parallel execution using the package
+\pkg{foreach}. To enable parallel execution, a parallel backend like
+\pkg{doparallel} needs to be available needs to be registered (see
+\code{\link[doParallel:registerDoParallel]{doParallel::registerDoParallel()}}).
+Note that small simulations are slower using parallelization. Therefore, C++ simulations
+with n * horizon less than 100,000 are always executed using a single worker.
+}
 \examples{
 data(Maze)
 
@@ -51,27 +76,29 @@ data(Maze)
 sol <- solve_MDP(Maze, discount = 1)
 sol
 policy(sol)
+# U in the policy is and estimate of the utility of being in a state when using the optimal policy.
 
 ## Example 1: simulate 10 trajectories, only the final belief state is returned
-sim <- simulate_MDP(sol, n = 10, horizon = 10, verbose = TRUE)
-head(sim)
-
-# additional data is available as attributes
-names(attributes(sim))
-attr(sim, "avg_reward")
-colMeans(attr(sim, "action"))
-
-## Example 2: simulate starting always in state s_1
-sim <- simulate_MDP(sol, n = 100, start = "s_1", horizon = 10)
+sim <- simulate_MDP(sol, n = 100, horizon = 10, verbose = TRUE)
 sim
 
-# the average reward is an estimate of the utility in the optimal policy:
-policy(sol)[[1]][1,]
+# Calculate proportion of actions used
+round_stochastic(sim$action_cnt / sum(sim$action_cnt), 2)
 
+# reward distribution
+hist(sim$reward)
+
+## Example 2: simulate starting always in state s_1 and return all visited states
+sim <- simulate_MDP(sol, n = 100, start = "s_1", horizon = 10, return_states = TRUE)
+sim$avg_reward
+
+# how often was each state visited?
+table(sim$states)
 }
 \seealso{
 Other MDP: 
 \code{\link{MDP}()},
+\code{\link{POMDP_accessors}},
 \code{\link{solve_MDP}()}
 }
 \author{

@@ -59,13 +59,15 @@ update_belief(c(.15,.85), action = "listen", observation = "tiger-right", model 
 }
 \seealso{
 Other POMDP: 
+\code{\link{POMDP_accessors}},
 \code{\link{POMDP}()},
 \code{\link{plot_belief_space}()},
+\code{\link{plot_value_function}()},
+\code{\link{projection}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
 \code{\link{solve_POMDP}()},
 \code{\link{solve_SARSOP}()},
-\code{\link{transition_matrix}()},
 \code{\link{write_POMDP}()}
 }
 \author{

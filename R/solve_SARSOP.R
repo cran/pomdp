@@ -21,7 +21,7 @@
 #' @param digits precision used when writing POMDP files (see
 #' [write_POMDP()]).
 #' @param parameter a list with parameters passed on to
-#' the function `sarsop` in package \pkg{sarsop}.
+#' the function [sarsop::pomdpsol()] in package \pkg{sarsop}.
 #' @param verbose logical, if set to `TRUE`, the function provides the
 #' output of the solver in the R console.
 #' @return The solver returns an object of class POMDP which is a list with the
@@ -60,8 +60,8 @@
 #' # reward of the optimal policy
 #' reward(sol)
 #'
-#' # Solve a problem specified as a POMDP file
-#' sol <- solve_SARSOP("http://www.pomdp.org/examples/cheese.95.POMDP")
+#' # Solve a problem specified as a POMDP file. The timeout is set to 10 seconds.
+#' sol <- solve_SARSOP("http://www.pomdp.org/examples/cheese.95.POMDP", parameter = list(timeout = 10))
 #' sol
 #' }
 #'
@@ -85,7 +85,7 @@ solve_SARSOP <- function(model,
     stop("Only available method: 'sarsop'")
   
   # check parameters
-if (!is.null(terminal_values))
+  if (!is.null(terminal_values))
     stop("the SARSOP solver does not support terminal values.")
   
   # do we have a model POMDP file?
@@ -108,14 +108,13 @@ if (!is.null(terminal_values))
   if (!is.null(horizon))
     model$horizon <- horizon
   
-  
   if (!is.infinite(model$horizon))
     stop("the SARSOP solver only supports infinite time horizon problems.")
   
   if (!is.null(discount))
     model$discount <- discount
   
-  if (.timedependent_POMDP(model))
+  if (is_timedependent_POMDP(model))
     stop("the SARSOP solver does not support time dependent models.")
   
   # prepare temp files
@@ -137,7 +136,8 @@ if (!is.null(terminal_values))
       model = model_file,
       output = policy_file,
       stdout = log_file,
-      stderr = log_file
+      stderr = log_file,
+      spinner = FALSE
     ),
     parameter
   ))
@@ -149,8 +149,10 @@ if (!is.null(terminal_values))
   
   # package solution
   policy <- sarsop::read_policyx(policy_file)
-  pg <- data.frame(node = seq_along(policy$action),
-    action = factor(model$actions[policy$action], levels = model$actions))
+  pg <- data.frame(
+    node = seq_along(policy$action),
+    action = factor(model$actions[policy$action], levels = model$actions)
+  )
   alpha <- t(policy$vectors)
   colnames(alpha) = model$states
   

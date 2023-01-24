@@ -67,10 +67,13 @@ plot_value_function(sol, ylim = c(0, 10))
 }
 \seealso{
 Other policy: 
+\code{\link{estimate_belief_for_nodes}()},
 \code{\link{optimal_action}()},
+\code{\link{plot_belief_space}()},
+\code{\link{plot_policy_graph}()},
 \code{\link{plot_value_function}()},
-\code{\link{policy_graph}()},
 \code{\link{policy}()},
+\code{\link{projection}()},
 \code{\link{solve_POMDP}()},
 \code{\link{solve_SARSOP}()}
 }
