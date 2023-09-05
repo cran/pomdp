@@ -18,7 +18,8 @@ transition_matrix(
   action = NULL,
   episode = NULL,
   epoch = NULL,
-  sparse = TRUE
+  sparse = TRUE,
+  drop = TRUE
 )
 
 transition_val(x, action, start.state, end.state, episode = NULL, epoch = NULL)
@@ -28,7 +29,8 @@ observation_matrix(
   action = NULL,
   episode = NULL,
   epoch = NULL,
-  sparse = TRUE
+  sparse = TRUE,
+  drop = TRUE
 )
 
 observation_val(
@@ -46,15 +48,16 @@ reward_matrix(
   start.state = NULL,
   episode = NULL,
   epoch = NULL,
-  sparse = FALSE
+  sparse = FALSE,
+  drop = TRUE
 )
 
 reward_val(
   x,
   action,
   start.state,
-  end.state,
-  observation,
+  end.state = NA,
+  observation = NA,
   episode = NULL,
   epoch = NULL
 )
@@ -70,11 +73,14 @@ normalize_MDP(x, sparse = TRUE)
 
 \item{action}{name or index of an action.}
 
-\item{episode, epoch}{Episode or epoch used for time-dependent POMDPs. Epoch are internally converted
+\item{episode, epoch}{Episode or epoch used for time-dependent POMDPs. Epochs are internally converted
 to the episode using the model horizon.}
 
-\item{sparse}{logical; use sparse matrices when the density is below 50\% . \code{NULL} returns the
-representation stored in the problem description.}
+\item{sparse}{logical; use sparse matrices when the density is below 50\% and keeps data.frame representation
+for the reward field. \code{NULL} returns the
+representation stored in the problem description which saves the time for conversion.}
+
+\item{drop}{logical; drop the action list if a single action is requested?}
 
 \item{start.state, end.state}{name or index of the state.}
 
@@ -88,15 +94,45 @@ Functions to provide uniform access to different parts of the POMDP description.
 }
 \details{
 Several parts of the POMDP description can be defined in different ways. In particular,
-\code{transition_prob}, \code{observation_prob}, \code{reward}, and \code{start} can be defined using matrices, data frames or
+the fields \code{transition_prob}, \code{observation_prob}, \code{reward}, and \code{start} can be defined using matrices, data frames or
 keywords. See \link{POMDP} for details. The functions provided here, provide unified access to the data in these fields
 to make writing code easier.
-\itemize{
-\item \code{start_vector()} translates the initial probability vector into a vector.
-\item For \code{transition_prob}, \code{observation_prob}, \code{reward}, functions ending in \verb{_matrix()} and \verb{_val()} are
-provided to access the data as lists of matrices, a matrix or a scalar value. For \verb{_matrix()},
-matrices with a density below 50\% can be requested in sparse format (as a \link[Matrix:dgCMatrix-class]{Matrix::dgCMatrix}).
-\item \code{normalize_POMDP()} returns a new POMDP definition where \code{transition_prob},
+\subsection{Transition Probabilities \eqn{T(s'|s,a)}}{
+
+\code{transition_matrix()} returns a list with one element for each action. Each element contains a states x states matrix
+with \eqn{s} (\code{start.state}) as rows and \eqn{s'} (\code{end.state}) as columns.
+Matrices with a density below 50\% can be requested in sparse format (as a \link[Matrix:dgCMatrix-class]{Matrix::dgCMatrix})
+
+\code{transition_val()} retrieves a single entry more efficiently.
+}
+
+\subsection{Observation Probabilities \eqn{O(o|s',a)}}{
+
+\code{observation_matrix()} returns a list with one element for each action. Each element contains a states x states matrix
+with \eqn{s} (\code{start.state}) as rows and \eqn{s'} (\code{end.state}) as columns.
+Matrices with a density below 50\% can be requested in sparse format (as a \link[Matrix:dgCMatrix-class]{Matrix::dgCMatrix})
+
+\code{observation_val()} retrieves a single entry more efficiently.
+}
+
+\subsection{Reward \eqn{R(s,s',o,a)}}{
+
+\code{reward_matrix()} returns for the dense representation a list of lists. The list levels are \eqn{a} (\code{action})  and \eqn{s} (\code{start.state}).
+The list elements are matrices with rows representing the end state \eqn{s'}  and columns representing observations \eqn{o}.
+Many reward structures cannot be efficiently stored using a standard sparse matrix since there might be a fixed cost for each action
+resulting in no entries with 0. Therefore, the data.frame representation is used as a 'sparse' representation.
+
+\code{observation_val()} retrieves a single entry more efficiently.
+}
+
+\subsection{Initial Belief}{
+
+\code{start_vector()} translates the initial probability vector description into a numeric vector.
+}
+
+\subsection{Convert the Complete POMDP Description into a Consistent Form}{
+
+\code{normalize_POMDP()} returns a new POMDP definition where \code{transition_prob},
 \code{observations_prob}, \code{reward}, and \code{start} are normalized to (lists of) matrices and vectors to
 make direct access easy.  Also, \code{states}, \code{actions}, and \code{observations} are ordered as given in the problem
 definition to make safe access using numerical indices possible. Normalized POMDP descriptions are used for
@@ -107,7 +143,7 @@ called repeatedly.
 \examples{
 data("Tiger")
 
-# List of |A| transition matrices. One per action in the from states x states
+# List of |A| transition matrices. One per action in the from start.states x end.states
 Tiger$transition_prob
 transition_matrix(Tiger)
 transition_val(Tiger, action = "listen", start.state = "tiger-left", end.state = "tiger-left")
@@ -121,8 +157,12 @@ observation_val(Tiger, action = "listen", end.state = "tiger-left", observation 
 #  start state in the form end state x observation
 Tiger$reward
 reward_matrix(Tiger)
-reward_val(Tiger, action = "open-right", start.state = "tiger-left", end.state = "tiger-left", 
+reward_val(Tiger, action = "open-right", start.state = "tiger-left", end.state = "tiger-left",
   observation = "tiger-left")
+  
+# Note that the reward in the tiger problem only depends on the action and the start.state 
+# so we can use:
+reward_val(Tiger, action = "open-right", start.state = "tiger-left")
 
 # Translate the initial belief vector
 Tiger$start
@@ -160,19 +200,22 @@ transition_matrix(Tiger)
 Other POMDP: 
 \code{\link{POMDP}()},
 \code{\link{plot_belief_space}()},
-\code{\link{plot_value_function}()},
 \code{\link{projection}()},
+\code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
 \code{\link{solve_POMDP}()},
 \code{\link{solve_SARSOP}()},
+\code{\link{transition_graph}()},
 \code{\link{update_belief}()},
+\code{\link{value_function}()},
 \code{\link{write_POMDP}()}
 
 Other MDP: 
 \code{\link{MDP}()},
 \code{\link{simulate_MDP}()},
-\code{\link{solve_MDP}()}
+\code{\link{solve_MDP}()},
+\code{\link{transition_graph}()}
 }
 \author{
 Michael Hahsler

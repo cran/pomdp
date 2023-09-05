@@ -7,7 +7,7 @@
 \usage{
 write_POMDP(x, file, digits = 7)
 
-read_POMDP(file, parse = TRUE)
+read_POMDP(file, parse = TRUE, normalize = TRUE)
 }
 \arguments{
 \item{x}{an object of class \link{POMDP}.}
@@ -19,6 +19,8 @@ point).}
 
 \item{parse}{logical; try to parse the model matrices.
 Solvers still work with unparsed matrices, but helpers for simulation are not available.}
+
+\item{normalize}{logical; should the description be normalized for faster access (see \code{\link[=normalize_POMDP]{normalize_POMDP()}})?}
 }
 \value{
 \code{read_POMDP()} returns a \link{POMDP} object.
@@ -32,7 +34,8 @@ POMDP specification. \strong{The original specification is directly used by exte
 is parsed using an experimental POMDP file parser. The parsed information can be used with auxiliary functions
 in this package that use fields like the transition matrix, the observation matrix and the reward structure.
 
-\strong{Note:} The parser for POMDP files is experimental. Please report
+\strong{Notes:}
+The parser for POMDP files is experimental. Please report
 problems here: \url{https://github.com/mhahsler/pomdp/issues}.
 }
 \examples{
@@ -49,13 +52,15 @@ Other POMDP:
 \code{\link{POMDP_accessors}},
 \code{\link{POMDP}()},
 \code{\link{plot_belief_space}()},
-\code{\link{plot_value_function}()},
 \code{\link{projection}()},
+\code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
 \code{\link{solve_POMDP}()},
 \code{\link{solve_SARSOP}()},
-\code{\link{update_belief}()}
+\code{\link{transition_graph}()},
+\code{\link{update_belief}()},
+\code{\link{value_function}()}
 }
 \author{
 Hossein Kamalzadeh, Michael Hahsler

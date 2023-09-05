@@ -114,12 +114,14 @@ Other POMDP:
 \code{\link{POMDP_accessors}},
 \code{\link{POMDP}()},
 \code{\link{plot_belief_space}()},
-\code{\link{plot_value_function}()},
 \code{\link{projection}()},
+\code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{solve_POMDP}()},
 \code{\link{solve_SARSOP}()},
+\code{\link{transition_graph}()},
 \code{\link{update_belief}()},
+\code{\link{value_function}()},
 \code{\link{write_POMDP}()}
 }
 \author{

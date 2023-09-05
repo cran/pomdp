@@ -22,6 +22,7 @@ POMDP(
   horizon = Inf,
   terminal_values = NULL,
   start = "uniform",
+  normalize = TRUE,
   name = NA
 )
 
@@ -33,11 +34,11 @@ epoch_to_episode(x, epoch)
 
 is_converged_POMDP(x, stop = FALSE, message = "")
 
-O_(action = "*", end.state = "*", observation = "*", probability)
+O_(action = NA, end.state = NA, observation = NA, probability)
 
-T_(action = "*", start.state = "*", end.state = "*", probability)
+T_(action = NA, start.state = NA, end.state = NA, probability)
 
-R_(action = "*", start.state = "*", end.state = "*", observation = "*", value)
+R_(action = NA, start.state = NA, end.state = NA, observation = NA, value)
 }
 \arguments{
 \item{states}{a character vector specifying the names of the states. Note that
@@ -73,6 +74,8 @@ probability for each state is supplied. Also the string \code{'uniform'}
 (default) can be used.  The belief is used to calculate the total expected cumulative
 reward. It is also used by some solvers. See Details section for more
 information.}
+
+\item{normalize}{logical; should the description be normalized for faster access (see \code{\link[=normalize_POMDP]{normalize_POMDP()}})?}
 
 \item{name}{a string to identify the POMDP problem.}
 
@@ -115,6 +118,9 @@ represent a member of a set, e.g., \eqn{s} is a specific state. To refer to
 the size of a set we will use cardinality, e.g., the number of actions is
 \eqn{|A|}.
 
+Note that it is also common in the literature to use for the set of observations
+the letter \eqn{Z}.
+
 \strong{Names used for mathematical symbols in code}
 \itemize{
 \item \eqn{S, s, s'}: \verb{'states', start.state', 'end.state'}
@@ -124,9 +130,9 @@ the size of a set we will use cardinality, e.g., the number of actions is
 
 State names, actions and observations can be specified as strings or index numbers
 (e.g., \code{start.state} can be specified as the index of the state in \code{states}).
-For the specification as data.frames below, \code{'*'} or \code{NA} can be used to mean
-any  \code{start.state}, \code{end.state}, \code{action} or \code{observation}. Note that \code{'*'} is internally
-always represented as an \code{NA}.
+For the specification as data.frames below, \code{NA} can be used to mean
+any  \code{start.state}, \code{end.state}, \code{action} or \code{observation}. Note that some POMDP solvers and the POMDP
+file format use \code{'*'} for this purpose.
 
 The specification below map to the format used by pomdp-solve
 (see \url{http://www.pomdp.org}).
@@ -237,7 +243,7 @@ Tiger <- POMDP(
   ),
 
   # the reward helper expects: action, start.state, end.state, observation, value
-  # missing arguments default to '*' matching any value.
+  # missing arguments default to NA which matches any value (often denoted as * in POMDPs).
   reward = rbind(
     R_("listen",                    v =   -1),
     R_("open-left",  "tiger-left",  v = -100),
@@ -319,13 +325,15 @@ pomdp-solve website: \url{http://www.pomdp.org}
 Other POMDP: 
 \code{\link{POMDP_accessors}},
 \code{\link{plot_belief_space}()},
-\code{\link{plot_value_function}()},
 \code{\link{projection}()},
+\code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
 \code{\link{solve_POMDP}()},
 \code{\link{solve_SARSOP}()},
+\code{\link{transition_graph}()},
 \code{\link{update_belief}()},
+\code{\link{value_function}()},
 \code{\link{write_POMDP}()}
 }
 \author{

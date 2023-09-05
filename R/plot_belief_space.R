@@ -37,7 +37,7 @@
 #' plot_belief_space(sol, n = 100, sample = "random")
 #'
 #' # plot the belief points used by the grid-based solver
-#' plot_belief_space(sol, sample = sol$solution$belief_points_solver)
+#' plot_belief_space(sol, sample = sol $solution$belief_points_solver)
 #'
 #' # plot different measures
 #' plot_belief_space(sol, what = "pg_node")
@@ -49,6 +49,8 @@
 #' sol <- solve_POMDP(Three_doors)
 #' sol
 #'
+#' # plotting needs the suggested package Ternary
+#' if ("Ternary" %in% installed.packages()) {
 #' plot_belief_space(sol)
 #' plot_belief_space(sol, n = 10000)
 #' plot_belief_space(sol, what = "reward", sample = "random", n = 1000)
@@ -64,11 +66,13 @@
 #'
 #' # plot the belief points obtained using simulated trajectories with an epsilon-greedy policy.
 #' # Note that we only use n = 50 to save time.
-#' plot_belief_space(sol, sample = simulate_POMDP(sol, n = 50, horizon = 100,
-#'   epsilon = 0.1, return_beliefs = TRUE)$belief_states)
+#' plot_belief_space(sol, 
+#'   sample = simulate_POMDP(sol, n = 50, horizon = 100,
+#'     epsilon = 0.1, return_beliefs = TRUE)$belief_states)
+#' }
 #'
-#' \dontrun{
 #' # plot a 3-state belief space using ggtern (ggplot2)
+#' \dontrun{
 #' library(ggtern)
 #' samp <- sample_belief_space(sol, n = 1000)
 #' df <- cbind(as.data.frame(samp), reward_node_action(sol, belief = samp))
@@ -123,11 +127,11 @@ plot_belief_space <-
     # cols ... colors for all points
     if (is.factor(val)) {
       # actions and pg_node are factor
-      col <- .get_colors_descrete(length(levels(val)), col)
+      col <- colors_discrete(length(levels(val)), col)
       cols <- col[as.integer(val)]
     } else {
-      col <- .get_colors_cont(seq(0, 1, length.out = 11), col)
-      cols <- .get_colors_cont(val, col)
+      col <- colors_continuous(seq(0, 1, length.out = 11), col)
+      cols <- colors_continuous(val, col)
     }
     
     sample <- sample[, is.na(projection)]

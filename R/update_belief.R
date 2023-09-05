@@ -2,7 +2,7 @@
 # $$b'(s') = \eta O(o | s',a) \sum_{s \in S} T(s' | s,a) b(s)$$
 # $$\eta = 1/ \sum_{s' \in S}[ O(o | s',a) \sum_{s \in S} T(s' | s,a) b(s)]$$
 #
-# Impossbile beliefs are all NaN
+# Impossible beliefs are all NaN
 .update_belief <-
   function(belief,
     action,
@@ -31,8 +31,8 @@
 #' Update the belief given a taken action and observation.
 #'
 #' @details
-#' Update the belief state \eqn{b} (`belief`) with an action \eqn{a} and observation \eqn{o}. The new
-#' belief state \eqn{b'} is:
+#' Update the belief state \eqn{b} (`belief`) with an action \eqn{a} and observation \eqn{o} using the update
+#' \eqn{b' \leftarrow \tau(b, a, o)} defined so that
 #'
 #' \deqn{b'(s') = \eta O(o | s',a) \sum_{s \in S} T(s' | s,a) b(s)}
 #'
@@ -82,11 +82,12 @@ update_belief <-
     Tr <- transition_matrix(model, episode = episode)
     
     if (is.null(action))
-      action <- as.character(model$actions)
+      action <- factor(seq_along(model$actions), labels = model$actions)
     if (is.null(observation))
-      observation <- as.character(model$observations)
+      observation <- factor(seq_along(model$observations), labels = model$observations)
     
     g <- expand.grid(action, observation, stringsAsFactors = FALSE)
+    colnames(g) <- c("action", "observation")
     
     b <- t(.update_belief_vec(belief, g[, 1], g[, 2], Tr, Ob, digits))
     rownames(b) <- apply(g, MARGIN = 1, paste, collapse = "+")
@@ -94,6 +95,8 @@ update_belief <-
   
     if (drop)
       b <- drop(b)
+    
+    attr(b, "order") <- g
+    
     b
   }
-

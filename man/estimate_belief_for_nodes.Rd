@@ -4,7 +4,13 @@
 \alias{estimate_belief_for_nodes}
 \title{Estimate the Belief for Policy Graph Nodes}
 \usage{
-estimate_belief_for_nodes(x, method = "auto", verbose = FALSE, ...)
+estimate_belief_for_nodes(
+  x,
+  method = "auto",
+  belief = NULL,
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{object of class \link{POMDP} containing a solved and converged POMDP problem.}
@@ -13,6 +19,8 @@ estimate_belief_for_nodes(x, method = "auto", verbose = FALSE, ...)
 \code{"auto"}, reuse \code{"solver_points"}, follow \code{"trajectories"}, sample \code{"random_sample"}
 or \code{"regular_sample"}. Auto uses
 solver points if available and follows trajectories otherwise.}
+
+\item{belief}{start belief used for method trajectories. \code{NULL} uses the start belief specified in the model.}
 
 \item{verbose}{logical; show which method is used.}
 
@@ -53,15 +61,20 @@ then a vector with all \code{NaN}s will be returned with a warning.
 \examples{
 data("Tiger")
 
-## policy graphs for converged solutions
-sol <- solve_POMDP(model = Tiger)
+# Infinite horizon case with converged solution
+sol <- solve_POMDP(model = Tiger, method = "grid")
 sol
 
+# default method auto uses the belief points used in the algorithm (if available).
 estimate_belief_for_nodes(sol, verbose = TRUE)
+
+# use belief points obtained from trajectories  
 estimate_belief_for_nodes(sol, method = "trajectories", verbose = TRUE)
+
+# use a random uniform sample 
 estimate_belief_for_nodes(sol, method = "random", verbose = TRUE)
 
-# Finite horizon example with three epochs
+# Finite horizon example with three epochs. 
 sol <- solve_POMDP(model = Tiger, horizon = 3)
 sol
 estimate_belief_for_nodes(sol)
@@ -71,11 +84,12 @@ Other policy:
 \code{\link{optimal_action}()},
 \code{\link{plot_belief_space}()},
 \code{\link{plot_policy_graph}()},
-\code{\link{plot_value_function}()},
+\code{\link{policy_graph}()},
 \code{\link{policy}()},
 \code{\link{projection}()},
 \code{\link{reward}()},
 \code{\link{solve_POMDP}()},
-\code{\link{solve_SARSOP}()}
+\code{\link{solve_SARSOP}()},
+\code{\link{value_function}()}
 }
 \concept{policy}

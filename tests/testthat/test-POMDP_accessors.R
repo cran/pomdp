@@ -88,7 +88,8 @@ Tiger_func <- POMDP(
   
   transition_prob = trans_f,
   observation_prob = obs_f,
-  reward = rew_f
+  reward = rew_f,
+  normalize = FALSE
 )
 
 tm_func <- transition_matrix(Tiger_func)
@@ -173,7 +174,8 @@ objPOMDP <- POMDP(
     O_("End", "A-plus-2-state", "A-plus-1-state", 0.1), #(3, 2)
     O_("End", "A-plus-2-state", "A-plus-2-state", 0.9) #(3, 3)
     
-  )
+  ),
+  normalize = FALSE
 )
 
 #compare this
@@ -229,7 +231,8 @@ sparsePOMDP <- POMDP(
       c(.2, .2, .2, .2, .2), 
       c(.2, .2, .2, .2, .2) 
     )
-  )
+  ),
+  normalize = FALSE
 )
 
 densePOMDP <- normalize_POMDP(sparsePOMDP, sparse = FALSE)
@@ -279,13 +282,6 @@ expect_true(inherits(m[[1]], "matrix"))
 expect_true(inherits(m[[2]], "matrix"))
 expect_true(inherits(m[[3]], "matrix"))
 
-
 rm <- reward_matrix(sparsePOMDP, sparse = TRUE)
-expect_equal(names(rm), sparsePOMDP$actions)
-m <- rm[[1]]
-expect_equal(names(m), sparsePOMDP$states)
-#print(rm)
-expect_true(all(sapply(m, inherits, "matrix")))
-
-m <- rm[[2]]
-expect_true(inherits(m[[1]], "Matrix"))
+expect_is(rm, "data.frame")
+expect_equal(levels(rm[[1]]), sparsePOMDP$actions)

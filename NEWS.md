@@ -1,3 +1,22 @@
+# pomdp 1.1.1 09/04/2023)
+
+## Changes
+* plot_policy_graph(): The parameter order has slightly changed; belief_col is now called state_col; 
+    unreachable state are now suppressed.
+* policy() gained parameters alpha and action.
+* color palettes are now exported.
+* POMPD accessors gain parameter drop.
+* POMDP constructor and read_POMDP gained parameter normalize and by default normalize
+  the POMDP definition.
+
+## New Features
+* Large POMDP descriptions are now handled better by keeping the reward as a data.frame and
+  supporting sparse matrices in the C++ code.
+* New function value_function() to access alpha vectors.
+* New function regret() to calculate the regret of a policy.
+* transition_graph() to visualize the transition model.
+
+
 # pomdp 1.1.0 (01/23/2023)
 
 ## New Features

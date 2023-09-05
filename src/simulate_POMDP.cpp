@@ -8,7 +8,7 @@
 
 using namespace Rcpp;
 
-// NOTE: Episodes in time-dependent POMDPs are currently unsupported.
+// NOTE: Episodes in time-dependent POMDPs are currently not supported.
 // NOTE: all are 0-based integer indices
 
 // epsilon -1 means 0 for solved models and 1 for unsolved models
@@ -49,6 +49,13 @@ List simulate_POMDP_cpp(const List& model,
   int k = 0; // index in belief_states
   
   if (verbose) {
+    NumericVector print_belief = belief;
+    std::string more = "";
+    if (belief.size() > 10) {
+      print_belief = head(belief, 10);
+      more = " ...";
+    }
+    
     Rcout << "Simulating POMDP trajectories.\n"
           << "- method: " << "C++ (cpp)" << "\n"
           << "- n: " << n << "\n"
@@ -58,7 +65,7 @@ List simulate_POMDP_cpp(const List& model,
     //    cat("- time-dependent:", length(dt_horizon), "episodes", "\n")
     
     << "- discount factor: " << disc << "\n"
-    << "- starting belief: " << belief << "\n\n";
+    << "- starting belief: " << print_belief << more << "\n\n";
   }
   
   // start with converged values to be faster
@@ -91,6 +98,7 @@ List simulate_POMDP_cpp(const List& model,
     for (int j = 0; j < horizon; ++j) {
 #ifdef DEBUG 
       Rcout << "Epoch: " << j << "\n";
+      Rcout << "State: " << s << "\n";
 #endif
       // find action (if we have no solution then take a random action) and update state and sample obs
       
@@ -124,19 +132,29 @@ List simulate_POMDP_cpp(const List& model,
       NumericVector trans_v = transition_matrix(model, a).row(s);
       s = sample(nstates, 1, false, trans_v, false)[0];
       
+#ifdef DEBUG 
+      Rcout << "New state: " << s << "\n";
+#endif
+      
       //NumericVector obs_v = observation_matrix(model, a)(s, _ );
       NumericVector obs_v = observation_matrix(model, a).row(s);
       o = sample(nobs, 1, false, obs_v, false)[0];
+
+#ifdef DEBUG 
+      Rcout << "Observation: " << o << "\n";
+#endif
       
       action_cnt[a]++;
       state_cnt[s]++;
       obs_cnt[o]++;
       
 #ifdef DEBUG 
-      Rcout << "reward: " << reward_matrix(model, a, s_prev)(s, o) << " (disc_pow: " << disc_pow << ")\n\n";
+      //Rcout << "reward: " << reward_matrix(model, a, s_prev)(s, o) << " (disc_pow: " << disc_pow << ")\n\n";
+      Rcout << "reward: " << reward_val(model, a, s_prev, s, o) << " (disc_pow: " << disc_pow << ")\n\n";
 #endif
       //rews[i] += reward_matrix(model, a, s_prev)(s, o) * pow(disc, j);
-      rews[i] += reward_matrix(model, a, s_prev)(s, o) * disc_pow;
+      //rews[i] += reward_matrix(model, a, s_prev)(s, o) * disc_pow;
+      rews[i] += reward_val(model, a, s_prev, s, o) * disc_pow;
       disc_pow *= disc;
       
       b = update_belief_cpp(model, b, a, o, digits);

@@ -14,6 +14,7 @@ solve_POMDP(
   method = "grid",
   digits = 7,
   parameter = NULL,
+  timeout = Inf,
   verbose = FALSE
 )
 
@@ -51,6 +52,8 @@ The default is \code{"grid"} implementing the finite grid method.}
 \item{parameter}{a list with parameters passed on to the pomdp-solve
 program.}
 
+\item{timeout}{number of seconds for the solver to run.}
+
 \item{verbose}{logical, if set to \code{TRUE}, the function provides the
 output of the pomdp solver in the R console.}
 }
@@ -85,20 +88,25 @@ single policy graph. Finite-horizon POMDPs result in a policy tree of a
 depth equal to the smaller of the horizon or the number of epochs to
 convergence.  The policy (and the associated value function) are stored in a
 list by epoch. The policy for the first epoch is stored as the first
-element.
+element. Horizon can also be used to limit the number of epochs used
+for value iteration.
 
 \emph{Precision:}* The POMDP solver uses various epsilon values to control
 precision for comparing alpha vectors to check for convergence, and solving
 LPs. Overall precision can be changed using
 \code{parameter = list(epsilon = 1e-3)}.
 
-\strong{Methods:} Several algorithms for dynamic-programming updates are
+\strong{Methods:} Several algorithms using exact value iteration are
 available:
 \itemize{
 \item Enumeration (Sondik 1971).
 \item Two pass (Sondik 1971).
 \item Witness (Littman, Cassandra, Kaelbling, 1996).
 \item Incremental pruning (Zhang and Liu, 1996, Cassandra et al 1997).
+}
+
+In addition, the following approximate value iteration method is available:
+\itemize{
 \item Grid implements a variation of point-based value iteration
 to solve larger POMDPs (PBVI; see Pineau 2003) without dynamic belief set expansion.
 }
@@ -161,6 +169,11 @@ coefficients (alpha or V vector) of a hyperplane. It contains one
 value per state which is the value for the belief state that has a probability
 of 1 for that state and 0s for all others.
 }
+
+\subsection{Temporary Files}{
+
+All temporary solver files are stored in the directory returned by \code{tempdir()}.
+}
 }
 \examples{
 # display available solver options which can be passed on to pomdp-solve as parameters.
@@ -174,14 +187,12 @@ Tiger
 # look at the model as a list
 unclass(Tiger)
 
-# inspect an individual field of the model (e.g., the reward)
+# inspect an individual field of the model (e.g., the transition probabilities and the reward)
+Tiger$transition_prob
 Tiger$reward
 
 sol <- solve_POMDP(model = Tiger)
 sol
-
-# look at solver output
-sol$solution$solver_output
 
 # look at the solution
 sol$solution
@@ -197,12 +208,13 @@ plot_value_function(sol, ylim = c(0,20))
 
 ################################################################
 # Example 2: Solve a problem specified as a POMDP file
-#            using a grid of size 10
+#            using a grid of size 20
 sol <- solve_POMDP("http://www.pomdp.org/examples/cheese.95.POMDP",
-  method = "grid", parameter = list(fg_points = 10))
+  method = "grid", parameter = list(fg_points = 20))
 sol
 
 policy(sol)
+plot_policy_graph(sol)
 
 # Example 3: Solving a finite-horizon POMDP using the incremental
 #            pruning method (without discounting)
@@ -213,19 +225,20 @@ sol
 # look at the policy tree
 policy(sol)
 plot_policy_graph(sol)
-# note: it does not make sense to open the door in epochs 1 or 2 if you only have 3 epochs.
+# note: only open the door in epoch 3 if you get twice the same observation.
 
-# Expected reward for listen twice and then open the door or listen 3 times
+# Expected reward starting for the models initial belief (uniform):
+#   listen twice and then open the door or listen 3 times
 reward(sol)
 
 # Expected reward for listen twice (-2) and then open-left (-1 + (-1) + 10 = 8)
-reward(sol, belief = c(1,0)) 
+reward(sol, belief = c(1,0))
 
 # Expected reward for just opening the right door (10)
 reward(sol, belief = c(1,0), epoch = 3)
- 
+
 # Expected reward for just opening the right door (0.5 * -100 + 0.95 * 10 = 4.5)
-reward(sol, belief = c(.95,.05), epoch = 3) 
+reward(sol, belief = c(.95,.05), epoch = 3)
 
 ################################################################
 # Example 3: Using terminal values (state-dependent utilities after the final epoch)
@@ -269,11 +282,18 @@ Tiger_time_dependent$transition_prob <- list(
 
 # Tiger_time_dependent (a higher value for verbose will show more messages)
 
-sol <- solve_POMDP(model = Tiger_time_dependent, discount = 1,  
+sol <- solve_POMDP(model = Tiger_time_dependent, discount = 1,
   method = "incprune", verbose = 1)
 sol
 
 policy(sol)
+
+# note that the default method to estimate the belief for nodes is following a
+#  trajectory which uses only the first belief reached for each node. Random sampling
+#  can find a better estimate of the central belief of the segment (see nodes 4-1 to 6-3
+#  in the plots below).
+plot_policy_graph(sol)
+plot_policy_graph(sol, method = "random_sample")
 
 ################################################################
 # Example 5: Alternative method to solve time-dependent POMDPs
@@ -298,7 +318,7 @@ sol <- solve_POMDP(model = Tiger,
   terminal_values = sol_scared$solution$alpha[[1]])
 sol
 policy(sol)
-# Note: it is optimal to mostly listen till the Tiger gets in the scared mood. Only if 
+# Note: it is optimal to mostly listen till the Tiger gets in the scared mood. Only if
 #  we are extremely sure in the first epoch, then opening a door is optimal.
 
 ################################################################
@@ -307,7 +327,7 @@ policy(sol)
 # Create a search grid by sampling from the belief space in
 #   10 regular intervals
 custom_grid <- sample_belief_space(Tiger, n = 10, method = "regular")
-custom_grid
+head(custom_grid)
 
 # Visualize the search grid
 plot_belief_space(sol, sample = custom_grid)
@@ -315,6 +335,11 @@ plot_belief_space(sol, sample = custom_grid)
 # Solve the POMDP using the grid for approximation
 sol <- solve_POMDP(Tiger, method = "grid", parameter = list(grid = custom_grid))
 policy(sol)
+plot_policy_graph(sol)
+
+# note that plot_policy_graph() automatically remove nodes that are unreachable from the
+#  initial node. This behavior can be switched off.
+plot_policy_graph(sol, remove_unreachable_nodes = FALSE)
 }
 \references{
 Cassandra, A. (2015). pomdp-solve: POMDP Solver Software,
@@ -351,11 +376,12 @@ Other policy:
 \code{\link{optimal_action}()},
 \code{\link{plot_belief_space}()},
 \code{\link{plot_policy_graph}()},
-\code{\link{plot_value_function}()},
+\code{\link{policy_graph}()},
 \code{\link{policy}()},
 \code{\link{projection}()},
 \code{\link{reward}()},
-\code{\link{solve_SARSOP}()}
+\code{\link{solve_SARSOP}()},
+\code{\link{value_function}()}
 
 Other solver: 
 \code{\link{solve_MDP}()},
@@ -365,12 +391,14 @@ Other POMDP:
 \code{\link{POMDP_accessors}},
 \code{\link{POMDP}()},
 \code{\link{plot_belief_space}()},
-\code{\link{plot_value_function}()},
 \code{\link{projection}()},
+\code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
 \code{\link{solve_SARSOP}()},
+\code{\link{transition_graph}()},
 \code{\link{update_belief}()},
+\code{\link{value_function}()},
 \code{\link{write_POMDP}()}
 }
 \author{

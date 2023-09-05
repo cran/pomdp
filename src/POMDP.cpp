@@ -1,18 +1,26 @@
 #include <Rcpp.h>
 #include <numeric>
-#include "math.h"
-#include "model.h"
+
 #include "POMDP.h"
 
 //#define DEBUG
 
 using namespace Rcpp;
 
-// NOTE: Episodes in time-dependent POMDPs are currently unsupported.
-// NOTE: all are 0-based integer indices
-
+// R interface uses 1-based indices
 // [[Rcpp::export]]
-DataFrame reward_cpp(const NumericMatrix& belief, const NumericMatrix& alpha) {
+double reward_val_from_df_cpp(const List& model, int action, int start_state, int end_state, int observation){
+  return reward_val(model, action, start_state, end_state, observation, true); // true is for R_index
+}
+
+
+// NOTE: Episodes in time-dependent POMDPs are currently unsupported.
+// NOTE: this uses 0-based integer indices
+
+// Returns a data.frame with pg_node and reward for each belief(row)
+// One version accepts the model one alpha vectors
+// [[Rcpp::export]]
+DataFrame reward_alpha_cpp(const NumericMatrix& alpha, const NumericMatrix& belief) {
   NumericVector rew(belief.nrow());
   IntegerVector pg_node(belief.nrow());
   
@@ -27,6 +35,11 @@ DataFrame reward_cpp(const NumericMatrix& belief, const NumericMatrix& alpha) {
   return DataFrame::create( Named("reward") = rew , _["pg_node"] = pg_node + 1);
 }
 
+
+// [[Rcpp::export]]
+DataFrame reward_cpp(const List& model, const NumericMatrix& belief) {
+  return(reward_alpha_cpp(get_alpha(model), belief));
+}
 
 // Updating the belief state: update for a single belief vector, one action, and one observation.
 // $$b'(s') = \eta O(o | s',a) \sum_{s \in S} T(s' | s,a) b(s)$$

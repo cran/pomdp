@@ -67,7 +67,7 @@ plot_belief_space(sol, n = 10)
 plot_belief_space(sol, n = 100, sample = "random")
 
 # plot the belief points used by the grid-based solver
-plot_belief_space(sol, sample = sol$solution$belief_points_solver)
+plot_belief_space(sol, sample = sol $solution$belief_points_solver)
 
 # plot different measures
 plot_belief_space(sol, what = "pg_node")
@@ -79,6 +79,8 @@ data("Three_doors")
 sol <- solve_POMDP(Three_doors)
 sol
 
+# plotting needs the suggested package Ternary
+if ("Ternary" \%in\% installed.packages()) {
 plot_belief_space(sol)
 plot_belief_space(sol, n = 10000)
 plot_belief_space(sol, what = "reward", sample = "random", n = 1000)
@@ -94,11 +96,13 @@ plot_belief_space(sol, sample = sol$solution$belief_points_solver, what = "pg_no
 
 # plot the belief points obtained using simulated trajectories with an epsilon-greedy policy.
 # Note that we only use n = 50 to save time.
-plot_belief_space(sol, sample = simulate_POMDP(sol, n = 50, horizon = 100,
-  epsilon = 0.1, return_beliefs = TRUE)$belief_states)
+plot_belief_space(sol, 
+  sample = simulate_POMDP(sol, n = 50, horizon = 100,
+    epsilon = 0.1, return_beliefs = TRUE)$belief_states)
+}
 
-\dontrun{
 # plot a 3-state belief space using ggtern (ggplot2)
+\dontrun{
 library(ggtern)
 samp <- sample_belief_space(sol, n = 1000)
 df <- cbind(as.data.frame(samp), reward_node_action(sol, belief = samp))
@@ -119,23 +123,26 @@ Other policy:
 \code{\link{estimate_belief_for_nodes}()},
 \code{\link{optimal_action}()},
 \code{\link{plot_policy_graph}()},
-\code{\link{plot_value_function}()},
+\code{\link{policy_graph}()},
 \code{\link{policy}()},
 \code{\link{projection}()},
 \code{\link{reward}()},
 \code{\link{solve_POMDP}()},
-\code{\link{solve_SARSOP}()}
+\code{\link{solve_SARSOP}()},
+\code{\link{value_function}()}
 
 Other POMDP: 
 \code{\link{POMDP_accessors}},
 \code{\link{POMDP}()},
-\code{\link{plot_value_function}()},
 \code{\link{projection}()},
+\code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
 \code{\link{solve_POMDP}()},
 \code{\link{solve_SARSOP}()},
+\code{\link{transition_graph}()},
 \code{\link{update_belief}()},
+\code{\link{value_function}()},
 \code{\link{write_POMDP}()}
 }
 \author{

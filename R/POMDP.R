@@ -16,6 +16,9 @@
 #' represent a member of a set, e.g., \eqn{s} is a specific state. To refer to
 #' the size of a set we will use cardinality, e.g., the number of actions is
 #' \eqn{|A|}.
+#' 
+#' Note that it is also common in the literature to use for the set of observations 
+#' the letter \eqn{Z}.
 #'
 #' **Names used for mathematical symbols in code**
 #'
@@ -25,9 +28,9 @@
 #'
 #' State names, actions and observations can be specified as strings or index numbers
 #' (e.g., `start.state` can be specified as the index of the state in `states`).
-#' For the specification as data.frames below, `'*'` or `NA` can be used to mean
-#' any  `start.state`, `end.state`, `action` or `observation`. Note that `'*'` is internally
-#' always represented as an `NA`.
+#' For the specification as data.frames below, `NA` can be used to mean
+#' any  `start.state`, `end.state`, `action` or `observation`. Note that some POMDP solvers and the POMDP
+#' file format use `'*'` for this purpose.
 #'
 #' The specification below map to the format used by pomdp-solve
 #' (see \url{http://www.pomdp.org}).
@@ -142,6 +145,7 @@
 #' (default) can be used.  The belief is used to calculate the total expected cumulative
 #' reward. It is also used by some solvers. See Details section for more
 #' information.
+#' @param normalize logical; should the description be normalized for faster access (see [normalize_POMDP()])?
 #' @param name a string to identify the POMDP problem.
 #' @param action,start.state,end.state,observation,probability,value Values
 #' used in the helper functions `O_()`, `R_()`, and `T_()` to
@@ -180,7 +184,7 @@
 #'   ),
 #'
 #'   # the reward helper expects: action, start.state, end.state, observation, value
-#'   # missing arguments default to '*' matching any value.
+#'   # missing arguments default to NA which matches any value (often denoted as * in POMDPs).
 #'   reward = rbind(
 #'     R_("listen",                    v =   -1),
 #'     R_("open-left",  "tiger-left",  v = -100),
@@ -265,6 +269,7 @@ POMDP <- function(states,
   horizon = Inf,
   terminal_values = NULL,
   start = "uniform",
+  normalize = TRUE,
   name = NA) {
   ### unsolved pomdp model
   x <- list(
@@ -282,18 +287,22 @@ POMDP <- function(states,
   )
   
   class(x) <- c("POMDP", "list")
-  check_and_fix_MDP(x)
+  x <- check_and_fix_MDP(x)
+  
+  if(normalize)
+    x <- normalize_POMDP(x)
+  
+  x
 }
-
-
 
 
 # make sure the definition is complete and everything is in the right order and the right factors
 check_and_fix_MDP <- function(x) {
+  ### TODO: check terminal values
   ### TODO: check function needs to be used!
   ### TODO: keep functions. For now we expand functions into matrices
   check_func <- function(x, func, name) {
-    req_formals <- head(names(formals(func)), -1)
+    req_formals <- head(names(formals(func)),-1)
     if (!identical(names(formals(x)), req_formals))
       stop(name,
         " function needs formal arguments: ",
@@ -395,8 +404,6 @@ check_and_fix_MDP <- function(x) {
       "transition_prob, observation_prob or reward can only miss if the field problem is available!"
     )
   
-  
-  
   if (!is.null(x$transition_prob) &&
       !.is_timedependent_field(x, "transition_prob")) {
     # if we have matrices then check and add names
@@ -406,8 +413,13 @@ check_and_fix_MDP <- function(x) {
     else if (is.data.frame(x$transition_prob))
       x$transition_prob <- check_df(x, x$transition_prob, T_)
     else {
+      
+      # action names and order
       if (is.null(names(x$transition_prob)))
         names(x$transition_prob) <- x$actions
+      if (all(names(x$transition_prob) != x$actions))
+        x$transition_prob <- x$transition_prob[x$actions]
+      
       for (a in x$actions) {
         if (is.null(x$transition_prob[[a]]))
           stop("transition_prob for action ", a, " is missing!")
@@ -444,6 +456,9 @@ check_and_fix_MDP <- function(x) {
       else {
         if (is.null(names(x$transition_prob[[e]])))
           names(x$transition_prob[[e]]) <- x$actions
+        if (all(names(x$transition_prob[[e]]) != x$actions))
+          x$transition_prob[[e]] <- x$transition_prob[[e]][x$actions]
+        
         for (a in x$actions) {
           if (is.null(x$transition_prob[[e]][[a]]))
             stop("transition_prob for action ",
@@ -489,6 +504,9 @@ check_and_fix_MDP <- function(x) {
     else {
       if (is.null(names(x$reward)))
         names(x$reward) <- x$actions
+      if (all(names(x$reward) != x$actions))
+        x$reward <- x$reward[x$actions]
+      
       for (a in x$actions) {
         if (is.null(x$reward[[a]]))
           stop("reward for action ", a, " is missing!")
@@ -531,6 +549,9 @@ check_and_fix_MDP <- function(x) {
         else {
           if (is.null(names(x$reward[[e]])))
             names(x$reward[[e]]) <- x$actions
+          if (all(names(x$reward[[e]]) != x$actions))
+            x$reward[[e]] <- x$reward[[e]][x$actions]
+          
           for (a in x$actions) {
             if (is.null(x$reward[[e]][[a]]))
               stop("reward for action ", a, " in episode ", e, " is missing!")
@@ -564,51 +585,54 @@ check_and_fix_MDP <- function(x) {
           }
         }
       }
+    }
+    
+    if (inherits(x, "POMDP") &&
+        !is.null(x$observation_prob) &&
+        !.is_timedependent_field(x, "observation_prob")) {
+      #check_func(observation_prob, O_, "observation_prob")
+      if (is.function(x$observation_prob))
+        x$observation_prob <- observation_matrix(x)
       
-      if (inherits(x, "POMDP") &&
-          !is.null(x$observation_prob) &&
-          !.is_timedependent_field(x, "observation_prob")) {
-        #check_func(observation_prob, O_, "observation_prob")
-        if (is.function(x$observation_prob))
-          x$observation_prob <- observation_matrix(x)
+      if (is.data.frame(x$observation_prob))
+        x$observation_prob <-
+          check_df(x, x$observation_prob, O_)
+      else {
+        if (is.null(names(x$observation_prob)))
+          names(x$observation_prob) <- x$actions
+        if (all(names(x$observation_prob) != x$actions))
+          x$observation_prob <- x$observation_prob[x$actions]
         
-        if (is.data.frame(x$observation_prob))
-          x$observation_prob <-
-            check_df(x, x$observation_prob, O_)
-        else {
-          if (is.null(names(x$observation_prob)))
-            names(x$observation_prob) <- x$actions
-          for (a in x$actions) {
-            if (is.null(x$observation_prob[[a]]))
-              stop("observation_prob for action ",
+        for (a in x$actions) {
+          if (is.null(x$observation_prob[[a]]))
+            stop("observation_prob for action ",
+              a,
+              " in episode ",
+              e,
+              " is missing!")
+          if (is.matrix(x$observation_prob[[a]])) {
+            if (!identical(dim(x$observation_prob[[a]]), c(length(x$states), length(x$observations))))
+              stop(
+                "observation_prob matrix for action ",
                 a,
                 " in episode ",
                 e,
-                " is missing!")
-            if (is.matrix(x$observation_prob[[a]])) {
-              if (!identical(dim(x$observation_prob[[a]]), c(length(x$states), length(x$observations))))
-                stop(
-                  "observation_prob matrix for action ",
-                  a,
-                  " in episode ",
-                  e,
-                  ": has not the right dimensions!"
-                )
-              if (!all(rowSums(x$observation_prob[[a]]) == 1))
-                stop(
-                  "observation_prob matrix for action ",
-                  a,
-                  " in episode ",
-                  e,
-                  ": rows do not add up to 1!"
-                )
-              
-              if (is.null(dimnames(x$observation_prob[[a]])))
-                dimnames(x$observation_prob[[a]]) <-
-                  list(x$states, x$observations)
-              else
-                x$observation_prob[[a]][x$states, x$observations]
-            }
+                ": has not the right dimensions!"
+              )
+            if (!all(rowSums(x$observation_prob[[a]]) == 1))
+              stop(
+                "observation_prob matrix for action ",
+                a,
+                " in episode ",
+                e,
+                ": rows do not add up to 1!"
+              )
+            
+            if (is.null(dimnames(x$observation_prob[[a]])))
+              dimnames(x$observation_prob[[a]]) <-
+                list(x$states, x$observations)
+            else
+              x$observation_prob[[a]][x$states, x$observations]
           }
         }
       }
@@ -629,6 +653,9 @@ check_and_fix_MDP <- function(x) {
         else {
           if (is.null(names(x$observation_prob[[e]])))
             names(x$observation_prob[[e]]) <- x$actions
+          if (all(names(x$observation_prob[[e]]) != x$actions))
+            x$observation_prob[[e]] <- x$observation_prob[[e]][x$actions]
+          
           for (a in x$actions) {
             if (is.null(x$observation_prob[[e]][[a]]))
               stop("observation_prob for action ", a, " is missing!")
@@ -672,11 +699,16 @@ print.POMDP <- function(x, ...) {
       paste(x$horizon, collapse = " + ")))
   
   writeLines(sprintf(
-    "  Size: %d states / %d actions / %d obs.\n",
+    "  Size: %d states / %d actions / %d obs.",
     length(x$states),
     length(x$actions),
     length(x$observations)
   ))
+  
+  if (!is.null(x$normalized) && x$normalized)
+    writeLines(c("  Normalized: TRUE", ""))
+  else
+    writeLines(c("  Normalized: FALSE", ""))
   
   if (is_solved_POMDP(x))
     writeLines(c(
@@ -687,7 +719,7 @@ print.POMDP <- function(x, ...) {
         x$solution$converged),
       sprintf("    # of alpha vectors: %i",
         sum(sapply(
-          x$solution$alpha, length
+          x$solution$alpha, nrow
         ))),
       sprintf(
         "    Total expected reward: %f",
@@ -695,6 +727,10 @@ print.POMDP <- function(x, ...) {
       ),
       ""
     ))
+  else
+    writeLines(c(
+      "  Solved: FALSE\n"))
+  
   
   writeLines(strwrap(
     paste("List components:", paste(sQuote(names(
@@ -717,7 +753,9 @@ is_solved_POMDP <- function(x, stop = FALSE, message = "") {
   
   solved <- !is.null(x$solution)
   if (stop && !solved)
-    stop("x needs to be a solved POMDP. Use solve_POMDP() first.", message, call. = FALSE)
+    stop("x needs to be a solved POMDP. Use solve_POMDP() first.",
+      message,
+      call. = FALSE)
   
   solved
 }
@@ -775,7 +813,7 @@ epoch_to_episode <- function(x, epoch) {
 }
 
 #' @rdname POMDP
-#' @param message a error message to be displayed displayed 
+#' @param message a error message to be displayed displayed
 #' @export
 is_converged_POMDP <- function(x, stop = FALSE, message = "") {
   is_solved_POMDP(x, stop = stop)
@@ -821,9 +859,9 @@ is_converged_POMDP <- function(x, stop = FALSE, message = "") {
 #' @rdname POMDP
 #' @export
 O_ <-
-  function(action = "*",
-    end.state = "*",
-    observation = "*",
+  function(action = NA,
+    end.state = NA,
+    observation = NA,
     probability)
     data.frame(
       action = action,
@@ -836,9 +874,9 @@ O_ <-
 #' @rdname POMDP
 #' @export
 T_ <-
-  function(action = "*",
-    start.state = "*",
-    end.state = "*",
+  function(action = NA,
+    start.state = NA,
+    end.state = NA,
     probability)
     data.frame(
       action = action,
@@ -851,10 +889,10 @@ T_ <-
 #' @rdname POMDP
 #' @export
 R_ <-
-  function(action = "*",
-    start.state = "*",
-    end.state = "*",
-    observation = "*",
+  function(action = NA,
+    start.state = NA,
+    end.state = NA,
+    observation = NA,
     value)
     data.frame(
       action = action,

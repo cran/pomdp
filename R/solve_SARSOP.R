@@ -14,10 +14,10 @@
 #' @param model a POMDP problem specification created with [POMDP()].
 #' Alternatively, a POMDP file or the URL for a POMDP file can be specified.
 #' @param method string; there is only one method available called `"sarsop"`.
-#' @param horizon need to be `Inf`.
+#' @param horizon SARSOP only supports `Inf`.
 #' @param discount discount factor in range \eqn{[0, 1]}. If `NULL`, then the
 #' discount factor specified in `model` will be used.
-#' @param terminal_values needs to be `NULL`. SARSOP does not use terminal values.
+#' @param terminal_values `NULL`. SARSOP does not use terminal values.
 #' @param digits precision used when writing POMDP files (see
 #' [write_POMDP()]).
 #' @param parameter a list with parameters passed on to
@@ -124,11 +124,13 @@ solve_SARSOP <- function(model,
   log_file <- paste0(tmpf, '.log')
   
   # write model POMDP file
-  if (!is.null(model$problem))
-    writeLines(model$problem, con = model_file)
-  else
-    write_POMDP(model, model_file, digits = digits)
+  if (verbose)
+    cat("Writing POMDP file to", model_file, "\n")
+  write_POMDP(model, model_file, digits = digits)
   
+  
+  if (verbose)
+    cat("Starting Solver\n")
   
   # call SARSOP
   res <- do.call(sarsop::pomdpsol, c(
@@ -166,7 +168,7 @@ solve_SARSOP <- function(model,
       discount = model$discount,
       converged = length(grep("precision reached", res$end_condition)) == 1,
       total_expected_reward = NA,
-      initial_belief = NA,
+      initial_belief = model$start,
       initial_pg_node = NA,
       #  terminal_values = if(!is.null(terminal_values)) terminal_values else 0,
       #belief_states = belief,
@@ -178,6 +180,7 @@ solve_SARSOP <- function(model,
   )
   
   model$solution$total_expected_reward = reward(model, model$start)
+  model$solution$initial_pg_node <- reward_node_action(model)$pg_node
   
   model
 }

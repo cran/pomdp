@@ -41,7 +41,7 @@ model <- POMDP(
  actions = 2,
  observations = 2,
  transition_prob = list("identity","identity"),
- observation_prob = list("identity","identity"),
+ observation_prob = list("uniform","uniform"),
  reward = rbind(R_(value = 1))
 )
 
@@ -58,22 +58,25 @@ Other policy:
 \code{\link{optimal_action}()},
 \code{\link{plot_belief_space}()},
 \code{\link{plot_policy_graph}()},
-\code{\link{plot_value_function}()},
+\code{\link{policy_graph}()},
 \code{\link{policy}()},
 \code{\link{reward}()},
 \code{\link{solve_POMDP}()},
-\code{\link{solve_SARSOP}()}
+\code{\link{solve_SARSOP}()},
+\code{\link{value_function}()}
 
 Other POMDP: 
 \code{\link{POMDP_accessors}},
 \code{\link{POMDP}()},
 \code{\link{plot_belief_space}()},
-\code{\link{plot_value_function}()},
+\code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
 \code{\link{solve_POMDP}()},
 \code{\link{solve_SARSOP}()},
+\code{\link{transition_graph}()},
 \code{\link{update_belief}()},
+\code{\link{value_function}()},
 \code{\link{write_POMDP}()}
 }
 \author{
