@@ -1,6 +1,6 @@
-2ba67d7a025439aefd891e88f0264809 *DESCRIPTION
+e37f31243ee32f57be8b81c92d26ea47 *DESCRIPTION
 332ca0c555e6c75a1a9e1e2adfab7c17 *NAMESPACE
-814b183aa632a259083a95518a931e91 *NEWS.md
+ba89e2e04c2ff8916ea3cd18082db801 *NEWS.md
 0a995ad5e3c994b83b393e8c2695c40a *R/AAA_check_installed.R
 db27014ea5dd96a47bc3656279792084 *R/AAA_pomdp-package.R
 f80dc65436739dd9c6d767f4f7b730c0 *R/MDP.R
@@ -45,7 +45,7 @@ b6342a9d20c136cd67ec357c24addf3a *inst/README_files/policy_graph-1.png
 722e4193198c4d93f1644eb7c1eb4250 *inst/README_files/value_function-1.png
 9b3c9dd040e35d25fb023bc3c92e07b3 *inst/doc/POMDP.R
 140d44b7fbaaf95e60483b99ed610a1f *inst/doc/POMDP.Rmd
-d04cf89a00d826796fc33e8eaf3fe656 *inst/doc/POMDP.html
+5818350e2f0185e5c2231f6e80583e86 *inst/doc/POMDP.html
 0987b6c11162a30ac575319f663f56cc *inst/examples/shuttle.95.POMDP
 c93d8c73a784ad663747e1e1e7901fa9 *inst/examples/shuttle_names.95.POMDP
 81ce2282c6adcbd0e5656ff8d21599f2 *inst/examples/tiger.aaai.POMDP
@@ -83,11 +83,11 @@ a95e990c1a3f6a2fba5b330decf82aa0 *src/POMDP.cpp
 bc4a79f0a1d226f20603715b0b1bf064 *src/dgCMatrix.h
 18ebb896e0f8a3e0b81c0bce507fe619 *src/math.cpp
 9bd604f832b50df393fe209f0b5d4c56 *src/math.h
-2aea0b019ac539d8024388876b8ab7ce *src/model.h
+5352e9efda36e4b9a45b3c1d1b3897ed *src/model.h
 a47b55d7a6c1c86c128b9fffe4b206ba *src/sample_simplex.cpp
 22fa2f8ebdc466cdb10d7a378f6c7661 *src/simulate_MDP.cpp
-b7babcc90acdf20933a6d55b3fc1645b *src/simulate_POMDP.cpp
-f79bcd85e0bf06afc549caea28159916 *tests/testthat.R
+7fe56753191ca25c5a69d942f8e9cf4f *src/simulate_POMDP.cpp
+ed8bc5e48f56168171ac8908755673a4 *tests/testthat.R
 c11857d4c7dd50d9bc7aa4bad5c1ff2c *tests/testthat/test-POMDP_accessors.R
 14b4b57d333f1d53ed2611793b68b655 *tests/testthat/test-cpp.R
 d72ffbdc35239bd069fea3184f819bb7 *tests/testthat/test-read_write_POMDP.R
