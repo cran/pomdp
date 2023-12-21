@@ -66,7 +66,7 @@ horizon.}
 
 \item{terminal_values}{a vector with the terminal values for each state or a
 matrix specifying the terminal rewards via a terminal value function (e.g.,
-the alpha component produced by solve_POMDP).  A single 0 specifies that all
+the alpha component produced by \code{solve_POMDP()}).  A single 0 specifies that all
 terminal values are zero.}
 
 \item{start}{Specifies the initial belief state of the agent. A vector with the
@@ -118,8 +118,8 @@ represent a member of a set, e.g., \eqn{s} is a specific state. To refer to
 the size of a set we will use cardinality, e.g., the number of actions is
 \eqn{|A|}.
 
-Note that it is also common in the literature to use for the set of observations
-the letter \eqn{Z}.
+Note that the observation model is in the literature
+often also denoted by the letter \eqn{Z}.
 
 \strong{Names used for mathematical symbols in code}
 \itemize{
@@ -153,7 +153,7 @@ Instead of a matrix, also the strings \code{'identity'} or \code{'uniform'} can 
 that returns the transition probability.
 }
 
-\strong{Specification of observation probabilities: \eqn{O(o | s', a)}}
+\strong{Specification of observation probabilities: \eqn{O(o | a, s')}}
 
 The POMDP specifies the probability for each observation \eqn{o} given an
 action \eqn{a} and that the system transitioned to the end state
@@ -206,6 +206,14 @@ distribution over all states.
 
 The default initial belief is a uniform
 distribution over all states.
+
+\strong{Convergence}
+
+A infinite-horizon POMDP needs to converge to provide a valid value
+function and policy.
+
+A finite-horizon POMDP may also converging to a infinite horizon solution
+if the horizon is long enough.
 
 \strong{Time-dependent POMDPs}
 
@@ -324,6 +332,7 @@ pomdp-solve website: \url{http://www.pomdp.org}
 \seealso{
 Other POMDP: 
 \code{\link{POMDP_accessors}},
+\code{\link{add_policy}()},
 \code{\link{plot_belief_space}()},
 \code{\link{projection}()},
 \code{\link{regret}()},
