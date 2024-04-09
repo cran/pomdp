@@ -9,10 +9,11 @@ simulate_POMDP(
   n = 1000,
   belief = NULL,
   horizon = NULL,
-  return_beliefs = FALSE,
   epsilon = NULL,
   delta_horizon = 0.001,
   digits = 7L,
+  return_beliefs = FALSE,
+  return_trajectories = FALSE,
   engine = "cpp",
   verbose = FALSE,
   ...
@@ -31,14 +32,16 @@ Defaults to the start belief state specified in the model or "uniform".}
 horizon for finite-horizon model is used. For infinite-horizon problems, a horizon is
 calculated using the discount factor.}
 
-\item{return_beliefs}{logical; Return all visited belief states? This requires n x horizon memory.}
-
 \item{epsilon}{the probability of random actions for using an epsilon-greedy policy.
 Default for solved models is 0 and for unsolved model 1.}
 
 \item{delta_horizon}{precision used to determine the horizon for infinite-horizon problems.}
 
 \item{digits}{round probabilities for belief points.}
+
+\item{return_beliefs}{logical; Return all visited belief states? This requires n x horizon memory.}
+
+\item{return_trajectories}{logical; Return the simulated trajectories as a data.frame?}
 
 \item{engine}{\code{'cpp'}, \code{'r'} to perform simulation using a faster C++ or a
 native R implementation.}
@@ -51,10 +54,13 @@ native R implementation.}
 A list with elements:
 \itemize{
 \item \code{avg_reward}: The average discounted reward.
-\item \code{belief_states}: A matrix with belief states as rows.
 \item \code{action_cnt}: Action counts.
 \item \code{state_cnt}: State counts.
 \item \code{reward}: Reward for each trajectory.
+\item \code{belief_states}: A matrix with belief states as rows.
+\item \code{trajectories}: A data.frame with the \code{episode} id, \code{time}, the state of the
+simulation (\code{simulation_state}), the id of the used alpha vector given the current belief
+(see \code{belief_states} above), the action \code{a} and the reward \code{r}.
 }
 }
 \description{
@@ -64,9 +70,15 @@ from the the epsilon-greedy policy and then updated using observations.
 }
 \details{
 Simulates \code{n} trajectories.
-If no simulation horizon is specified the horizon of finite-horizon problems
+If no simulation horizon is specified, the horizon of finite-horizon problems
 is used. For infinite-horizon problems with \eqn{\gamma < 1}, the simulation
-horizon \eqn{T} is chosen such that \deqn{abs(\gamma^T R_\text{max}) \le \delta_\text{horizon}.}
+horizon \eqn{T} is chosen such that
+the worst-case error is no more than \eqn{\delta_\text{horizon}}. That is
+
+\deqn{\gamma^T \frac{R_\text{max}}{\gamma} \le \delta_\text{horizon},}
+
+where \eqn{R_\text{max}} is the largest possible absolute reward value used as a
+perpetuity starting after \eqn{T}.
 
 A native R implementation (\code{engine = 'r'}) and a faster C++ implementation
 (\code{engine = 'cpp'}) are available. Currently, only the R implementation supports
@@ -93,7 +105,7 @@ policy(sol)
 # doParallel::registerDoParallel()
 # foreach::getDoParWorkers()
 
-## Example 1: simulate 10 trajectories
+## Example 1: simulate 100 trajectories
 sim <- simulate_POMDP(sol, n = 100, verbose = TRUE)
 sim
 
@@ -103,9 +115,12 @@ round_stochastic(sim$action_cnt / sum(sim$action_cnt), 2)
 # reward distribution
 hist(sim$reward)
 
-## Example 2: look at all belief states in the trajectory starting with an initial start belief.
-sim <- simulate_POMDP(sol, n = 100, belief = c(.5, .5), return_beliefs = TRUE)
+## Example 2: look at the belief states and the trajectories starting with 
+#             an initial start belief.
+sim <- simulate_POMDP(sol, n = 100, belief = c(.5, .5), 
+  return_beliefs = TRUE, return_trajectories = TRUE)
 head(sim$belief_states)
+head(sim$trajectories)
 
 # plot with added density (the x-axis is the probability of the second belief state)
 plot_belief_space(sol, sample = sim$belief_states, jitter = 2, ylim = c(0, 6))
@@ -114,20 +129,25 @@ lines(density(sim$belief_states[, 2], bw = .02)); axis(2); title(ylab = "Density
 
 ## Example 3: simulate trajectories for an unsolved POMDP which uses an epsilon of 1
 #             (i.e., all actions are randomized). The simulation horizon for the 
-#             infinite-horizon Tiger problem is calculated. 
-sim <- simulate_POMDP(Tiger, n = 100, return_beliefs = TRUE, verbose = TRUE)
+#             infinite-horizon Tiger problem is calculated using delta_horizon. 
+sim <- simulate_POMDP(Tiger, return_beliefs = TRUE, verbose = TRUE)
 sim$avg_reward
+
+hist(sim$reward, breaks = 20)
 
 plot_belief_space(sol, sample = sim$belief_states, jitter = 2, ylim = c(0, 6))
 lines(density(sim$belief_states[, 1], bw = .05)); axis(2); title(ylab = "Density")
 }
 \seealso{
 Other POMDP: 
-\code{\link{POMDP_accessors}},
+\code{\link{MDP2POMDP}},
 \code{\link{POMDP}()},
+\code{\link{accessors}},
+\code{\link{actions}()},
 \code{\link{add_policy}()},
 \code{\link{plot_belief_space}()},
 \code{\link{projection}()},
+\code{\link{reachable_and_absorbing}},
 \code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{solve_POMDP}()},

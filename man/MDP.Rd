@@ -2,7 +2,6 @@
 % Please edit documentation in R/MDP.R
 \name{MDP}
 \alias{MDP}
-\alias{MDP2POMDP}
 \alias{is_solved_MDP}
 \title{Define an MDP Problem}
 \usage{
@@ -14,10 +13,9 @@ MDP(
   discount = 0.9,
   horizon = Inf,
   start = "uniform",
+  info = NULL,
   name = NA
 )
-
-MDP2POMDP(x)
 
 is_solved_MDP(x, stop = FALSE)
 }
@@ -40,6 +38,8 @@ horizon.}
 
 \item{start}{Specifies in which state the MDP starts.}
 
+\item{info}{A list with additional information.}
+
 \item{name}{a string to identify the MDP problem.}
 
 \item{x}{a \code{MDP} object.}
@@ -52,16 +52,18 @@ the model specification. \code{\link[=solve_MDP]{solve_MDP()}} reads the object 
 \code{'solution'}.
 }
 \description{
-Defines all the elements of a MDP problem.
+Defines all the elements of a finite state-space MDP problem.
 }
 \details{
-MDPs are similar to POMDPs, however, states are completely observable and
-observations are not necessary. The model is defined similar to \link{POMDP}
-models, but observations are not specified and the \code{'observations'} column in
-the the reward specification is always \code{'*'}.
+Markov decision processes (MDPs) are discrete-time stochastic control
+process with completely observable states. We implement here
+MDPs with a finite state space. similar to \link{POMDP}
+models, but without the observation model. The \code{'observations'} column in
+the the reward specification is always missing.
 
-\code{MDP2POMDP()} reformulates a MDP as a POMDP with one observation per state
-that reveals the current state. This is achieved by defining identity
+\code{\link[=make_partially_observable]{make_partially_observable()}} reformulates an MDP as a POMDP by adding an observation
+model with one observation per state
+that reveals the current state. This is achieved by adding identity
 observation probability matrices.
 
 More details on specifying the model components can be found in the documentation
@@ -98,28 +100,42 @@ STiger <- MDP(
 
 STiger
 
-sol <- solve_MDP(STiger, eps = 1e-7)
+sol <- solve_MDP(STiger)
 sol
 
 policy(sol)
 plot_value_function(sol)
 
 # convert the MDP into a POMDP and solve
-STiger_POMDP <- MDP2POMDP(STiger)
+STiger_POMDP <- make_partially_observable(STiger)
 sol2 <- solve_POMDP(STiger_POMDP)
-sol2 
+sol2
 
 policy(sol2)
-plot_value_function(sol2)
+plot_value_function(sol2, ylim = c(80, 120))
 }
 \seealso{
 Other MDP: 
-\code{\link{POMDP_accessors}},
+\code{\link{MDP2POMDP}},
+\code{\link{MDP_policy_functions}},
+\code{\link{accessors}},
+\code{\link{actions}()},
+\code{\link{add_policy}()},
+\code{\link{gridworld}},
+\code{\link{reachable_and_absorbing}},
+\code{\link{regret}()},
 \code{\link{simulate_MDP}()},
 \code{\link{solve_MDP}()},
-\code{\link{transition_graph}()}
+\code{\link{transition_graph}()},
+\code{\link{value_function}()}
+
+Other MDP_examples: 
+\code{\link{Cliff_walking}},
+\code{\link{Maze}},
+\code{\link{Windy_gridworld}}
 }
 \author{
 Michael Hahsler
 }
 \concept{MDP}
+\concept{MDP_examples}

@@ -13,26 +13,65 @@ using namespace Rcpp;
 
 // epsilon -1 means 0 for solved models and 1 for unsolved models
 
+/*** R
+library(pomdp)
+data(Tiger)
+Tiger_norm <- normalize_POMDP(Tiger, sparse = FALSE)
+Tiger_norm_sparse <- normalize_POMDP(Tiger, sparse = TRUE)
+
+# unsolved
+simulate_POMDP(Tiger, n = 2, horizon = 10, verbose = TRUE)
+simulate_POMDP(Tiger, n = 2, verbose = TRUE)
+simulate_POMDP(Tiger, n = 2, return_beliefs = TRUE, return_trajectories = TRUE, verbose = TRUE)
+
+# needs to be normalized for C++!
+pomdp:::simulate_POMDP_cpp(Tiger_norm, n = 2, belief = start_vector(Tiger), horizon = 10, 
+                         disc = .9, return_beliefs = TRUE, return_trajectories = FALSE, epsilon = 1, verbose = TRUE)
+
+pomdp:::simulate_POMDP_cpp(Tiger_norm_sparse, n = 2, belief = start_vector(Tiger), horizon = 10, 
+                         disc = .9, return_beliefs = TRUE, return_trajectories = TRUE, epsilon = 1, verbose = TRUE)
+
+# solve
+sol <- solve_POMDP(Tiger)
+sol
+policy(sol)
+
+sol <- normalize_POMDP(sol, sparse = TRUE)
+
+pomdp:::simulate_POMDP_cpp(sol, n = 2, belief = start_vector(Tiger), horizon = 10, 
+                           disc = .9, return_trajectories = TRUE, verbose = TRUE, epsilon = 0)
+*/
+
+
+
+
 // [[Rcpp::export]]
 List simulate_POMDP_cpp(const List& model,
-  int n,
+  const int n,
   const NumericVector& belief,
-  int horizon,
-  double disc = 1.0,
-  bool return_beliefs = false,
-  double epsilon = 1.0,
-  int digits = 7,
-  bool verbose = false
+  const int horizon,
+  const double disc = 1.0,
+  const bool return_beliefs = false,
+  const bool return_trajectories = false,
+  const double epsilon = 1.0,
+  const int digits = 7,
+  const bool verbose = false
 ) {
-  bool solved = is_solved(model);
-  bool converged = solved && is_converged(model);
+  const bool solved = is_solved(model);
+  const bool converged = solved && is_converged(model);
   
   //double disc = get_discount(model); 
-  int nstates = get_states(model).size();
-  int nactions = get_actions(model).size();
-  int nobs = get_obs(model).size();
+  const int nstates = get_states(model).size();
+  const int nactions = get_actions(model).size();
+  const int nobs = get_obs(model).size();
+ 
   
-  // define current belief b, action a, observation o, and state s
+  // absorbing states?
+  LogicalVector absorbing = absorbing_states(model);
+  // this is which (starting with 0)
+  IntegerVector abs_states = seq_along(absorbing) - 1;
+  abs_states = abs_states[absorbing];
+  
   
   // allocate output
   NumericVector rews(n);
@@ -43,10 +82,20 @@ List simulate_POMDP_cpp(const List& model,
   IntegerVector obs_cnt(nobs);
   obs_cnt.names() = get_obs(model);
   
+  // store belief states
   NumericMatrix belief_states(0, 0);
   if (return_beliefs)
     belief_states = NumericMatrix(n * horizon, nstates);
   int k = 0; // index in belief_states
+  
+  // store trajectories
+  std::vector<int> tr_episode;
+  std::vector<int> tr_time;
+  std::vector<int> tr_simulation_state;
+  std::vector<int> tr_alpha_vector_id;
+  std::vector<int> tr_a;
+  std::vector<int> tr_o;
+  std::vector<double> tr_r;
   
   if (verbose) {
     NumericVector print_belief = belief;
@@ -85,7 +134,8 @@ List simulate_POMDP_cpp(const List& model,
   for (int i = 0; i < n; ++i) {
     NumericVector b;
     int a, o, s, s_prev;
-    double disc_pow; // used for discounting
+    int alpha_vector_id = NA_INTEGER;
+    double r, disc_pow; // used for discounting
 #ifdef DEBUG 
     Rcout << "--- Replication " << i << " ---\n";
 #endif
@@ -120,11 +170,11 @@ List simulate_POMDP_cpp(const List& model,
               << "b: "<< b << "\n" 
               << "alpha %*% b: = " <<  vecprod(alpha, b) << "\n";
 #endif
-        
-        a = pg_actions[which_max(vecprod(alpha, b))];
+        alpha_vector_id = which_max(vecprod(alpha, b));
+        a = pg_actions[alpha_vector_id];
         
 #ifdef DEBUG 
-        Rcout << "a: " << a <<  " (idx: " << which_max(vecprod(alpha, b)) <<  ")\n";
+        Rcout << "a: " << a <<  " (idx: " << alpha_vector_id <<  ")\n";
 #endif
       }
       
@@ -149,13 +199,16 @@ List simulate_POMDP_cpp(const List& model,
       state_cnt[s]++;
       obs_cnt[o]++;
       
-#ifdef DEBUG 
-      //Rcout << "reward: " << reward_matrix(model, a, s_prev)(s, o) << " (disc_pow: " << disc_pow << ")\n\n";
-      Rcout << "reward: " << reward_val(model, a, s_prev, s, o) << " (disc_pow: " << disc_pow << ")\n\n";
-#endif
       //rews[i] += reward_matrix(model, a, s_prev)(s, o) * pow(disc, j);
       //rews[i] += reward_matrix(model, a, s_prev)(s, o) * disc_pow;  
-      rews[i] += reward_val(model, a, s_prev, s, o) * disc_pow;
+      r = reward_val(model, a, s_prev, s, o);
+      rews[i] += r * disc_pow;
+      
+#ifdef DEBUG 
+      //Rcout << "reward: " << reward_matrix(model, a, s_prev)(s, o) << " (disc_pow: " << disc_pow << ")\n\n";
+      Rcout << "reward: " << r << " (disc_pow: " << disc_pow << ")\n\n";
+#endif
+      
       disc_pow *= disc;
       
       b = update_belief_cpp(model, b, a, o, digits);
@@ -168,6 +221,23 @@ List simulate_POMDP_cpp(const List& model,
       if (return_beliefs) {
         belief_states(k++, _ ) = b;
       }
+      
+      if (return_trajectories) {
+        tr_episode.push_back(i + 1);
+        tr_time.push_back(j);
+        tr_simulation_state.push_back(s_prev + 1);
+        if (alpha_vector_id == NA_INTEGER)
+          tr_alpha_vector_id.push_back(NA_INTEGER);
+        else 
+          tr_alpha_vector_id.push_back(alpha_vector_id + 1);
+        tr_a.push_back(a + 1);
+        tr_o.push_back(o + 1);
+        tr_r.push_back(r);
+      }
+      
+      if (contains(abs_states, s))
+        break;
+      
     }
     
     // add terminal reward
@@ -182,14 +252,42 @@ List simulate_POMDP_cpp(const List& model,
   
   if (return_beliefs)
     colnames(belief_states) = get_states(model);
-  
+ 
+  DataFrame trajectories;
+ 
+  if (return_trajectories) {
+   IntegerVector simulation_state_v = IntegerVector(tr_simulation_state.begin(), tr_simulation_state.end());
+   simulation_state_v.attr("class") = "factor";
+   simulation_state_v.attr("levels") = get_states(model);
+   
+   IntegerVector a_v = IntegerVector(tr_a.begin(), tr_a.end());
+   a_v.attr("class") = "factor";
+   a_v.attr("levels") = get_actions(model);
+   
+   IntegerVector o_v = IntegerVector(tr_o.begin(), tr_o.end());
+   o_v.attr("class") = "factor";
+   o_v.attr("levels") = get_obs(model);
+   
+   trajectories = DataFrame::create(
+     _["episode"] = tr_episode,
+     _["time"] = tr_time,
+     _["simulation_state"] = simulation_state_v,
+     _["alpha_vector_id"] = tr_alpha_vector_id,
+     _["a"] = a_v,
+     _["o"] = o_v,
+     _["r"] = tr_r
+   );
+  }
+ 
   double m = mean(rews);
+  
   List L = List::create(Named("avg_reward") = m,
     _["reward"] = rews,
     _["action_cnt"] = action_cnt,
     _["state_cnt"] = state_cnt,
     _["obs_cnt"] = obs_cnt,
-    _["belief_states"] = belief_states
+    _["belief_states"] = belief_states,
+    _["trajectories"] = trajectories
   );
   
   return L;

@@ -5,9 +5,9 @@
 \alias{read_POMDP}
 \title{Read and write a POMDP Model to a File in POMDP Format}
 \usage{
-write_POMDP(x, file, digits = 7)
+write_POMDP(x, file, digits = 7, labels = FALSE)
 
-read_POMDP(file, parse = TRUE, normalize = TRUE)
+read_POMDP(file, parse = TRUE, normalize = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{x}{an object of class \link{POMDP}.}
@@ -17,10 +17,15 @@ read_POMDP(file, parse = TRUE, normalize = TRUE)
 \item{digits}{precision for writing numbers (digits after the decimal
 point).}
 
-\item{parse}{logical; try to parse the model matrices.
+\item{labels}{logical; write original labels or use index numbers? Labels are
+restricted to \verb{[a-zA-Z0-9_-]} and the first character has to be a letter.}
+
+\item{parse}{logical; try to parse the model maotrices.
 Solvers still work with unparsed matrices, but helpers for simulation are not available.}
 
 \item{normalize}{logical; should the description be normalized for faster access (see \code{\link[=normalize_POMDP]{normalize_POMDP()}})?}
+
+\item{verbose}{logical; report parsed lines. This is useful for debugging a POMDP file.}
 }
 \value{
 \code{read_POMDP()} returns a \link{POMDP} object.
@@ -33,6 +38,11 @@ Reads and write a POMDP file suitable for the \code{pomdp-solve} program.
 POMDP specification. \strong{The original specification is directly used by external solvers.} In addition, the file
 is parsed using an experimental POMDP file parser. The parsed information can be used with auxiliary functions
 in this package that use fields like the transition matrix, the observation matrix and the reward structure.
+
+The range of useful rewards is restricted by the solver. Here the values are restricted to the range
+\verb{[-1e10, 1e10]}.
+Unavailable actions have a reward of \code{-Inf} which is translated to -2 times the maximum
+absolute reward value used in the model.
 
 \strong{Notes:}
 The parser for POMDP files is experimental. Please report
@@ -49,11 +59,14 @@ POMDP solver website: https://www.pomdp.org
 }
 \seealso{
 Other POMDP: 
-\code{\link{POMDP_accessors}},
+\code{\link{MDP2POMDP}},
 \code{\link{POMDP}()},
+\code{\link{accessors}},
+\code{\link{actions}()},
 \code{\link{add_policy}()},
 \code{\link{plot_belief_space}()},
 \code{\link{projection}()},
+\code{\link{reachable_and_absorbing}},
 \code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},

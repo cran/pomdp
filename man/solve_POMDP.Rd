@@ -121,10 +121,11 @@ needs to simplify the problem description (fewer states, actions and observation
 and choose an approximate algorithm with an acceptable level of
 approximation to make the problem tractable.
 
-\strong{Note on method grid:} The grid method implements a version of Point
+\strong{Note on method grid:} The finite grid method implements a version of Point
 Based Value Iteration (PBVI). The used belief points are by default created
 using points that are reachable from the initial belief (\code{start}) by
-following all combinations of actions and observations. The size of the grid
+following all combinations of actions and observations. The size of the grid is
+by default 10,000 and
 can be set via \code{parameter = list(fg_points = 100)}. Alternatively,
 different strategies can be chosen using the parameter \code{fg_type}. In
 this implementation, the user can also specify manually a grid of belief
@@ -384,8 +385,8 @@ Other policy:
 \code{\link{optimal_action}()},
 \code{\link{plot_belief_space}()},
 \code{\link{plot_policy_graph}()},
-\code{\link{policy_graph}()},
 \code{\link{policy}()},
+\code{\link{policy_graph}()},
 \code{\link{projection}()},
 \code{\link{reward}()},
 \code{\link{solve_SARSOP}()},
@@ -396,11 +397,14 @@ Other solver:
 \code{\link{solve_SARSOP}()}
 
 Other POMDP: 
-\code{\link{POMDP_accessors}},
+\code{\link{MDP2POMDP}},
 \code{\link{POMDP}()},
+\code{\link{accessors}},
+\code{\link{actions}()},
 \code{\link{add_policy}()},
 \code{\link{plot_belief_space}()},
 \code{\link{projection}()},
+\code{\link{reachable_and_absorbing}},
 \code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},

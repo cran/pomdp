@@ -7,12 +7,12 @@
 add_policy(model, policy)
 }
 \arguments{
-\item{model}{a POMDP model description.}
+\item{model}{a POMDP or MDP model description.}
 
-\item{policy}{a POMDP policy as a solved POMDP or a policy data.frame.}
+\item{policy}{a policy data.frame.}
 }
 \value{
-The POMDP model description with the added policy.
+The model description with the added policy.
 }
 \description{
 Add a policy to a POMDP problem description allows the user to
@@ -30,7 +30,8 @@ sol
 
 perfect_Tiger <- Tiger
 perfect_Tiger$observation_prob <- list(
-  listen = "identity", 
+  listen = diag(1, length(perfect_Tiger$states), 
+    length(perfect_Tiger$observations)), 
   `open-left` = "uniform",
   `open-right` = "uniform"
 )
@@ -70,10 +71,13 @@ simulate_POMDP(custom_sol, n = 1000)$avg_reward
 }
 \seealso{
 Other POMDP: 
-\code{\link{POMDP_accessors}},
+\code{\link{MDP2POMDP}},
 \code{\link{POMDP}()},
+\code{\link{accessors}},
+\code{\link{actions}()},
 \code{\link{plot_belief_space}()},
 \code{\link{projection}()},
+\code{\link{reachable_and_absorbing}},
 \code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
@@ -83,8 +87,23 @@ Other POMDP:
 \code{\link{update_belief}()},
 \code{\link{value_function}()},
 \code{\link{write_POMDP}()}
+
+Other MDP: 
+\code{\link{MDP}()},
+\code{\link{MDP2POMDP}},
+\code{\link{MDP_policy_functions}},
+\code{\link{accessors}},
+\code{\link{actions}()},
+\code{\link{gridworld}},
+\code{\link{reachable_and_absorbing}},
+\code{\link{regret}()},
+\code{\link{simulate_MDP}()},
+\code{\link{solve_MDP}()},
+\code{\link{transition_graph}()},
+\code{\link{value_function}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{MDP}
 \concept{POMDP}

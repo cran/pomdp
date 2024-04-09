@@ -37,7 +37,7 @@
 #' it also adds curvature to parallel edges that point in opposite directions.
 #' @family policy
 #'
-#' @import igraph
+#' @importFrom igraph as_edgelist vertex_attr edge_attr vertex_attr<- edge_attr<- plot.igraph
 #'
 #' @param x object of class [POMDP] containing a solved and converged POMDP problem.
 #' @param belief the initial belief is used to mark the initial belief state in the
@@ -82,7 +82,7 @@
 #'
 #' ## custom larger vertex labels (A, B, ...)
 #' plot_policy_graph(sol,
-#'   vertex.label = LETTERS[1:nrow(policy(sol)[[1]])],
+#'   vertex.label = LETTERS[1:nrow(policy(sol))],
 #'   vertex.size = 60,
 #'   vertex.label.cex = 2,
 #'   edge.label.cex = .7,

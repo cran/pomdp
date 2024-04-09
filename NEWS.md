@@ -1,3 +1,53 @@
+# pomdp 1.2.1 (04/08/2024)
+
+## New Features
+* read_POMDP gained parameter verbose to debug reading.
+* solve_x check now that the model is of type x.
+* Added some POMDP file examples.
+
+## Bugfixes
+* Improved read_POMDP and write_POMDP.
+* old LaTeX version on the CRAN master cannot deal with underscores 
+  in filenames. Rename the files cliff_walking_gridworld.png and  
+  windy_gridworld.png
+
+# pomdp 1.2.0 (04/02/2024)
+
+## New Features
+* Added functions to work with MDP policies (see ? MDP_policy_functions).
+* Added MDP solver functions: Q-learning, Sarsa, and expected Sarsa.
+* simulate_MDP() and simulate_POMDP() gained parameter return_trajectories.
+* New functions `absorbing_states()` and `reachable_states()` for MDPs and POMDPs.
+* Support for gridworlds (see ? gridworld).
+* New datasets: Cliff_walking, Windy_gridworld, RussianTiger
+* plot_transition_graph() now hides unavailable actions.
+* Added actions() to find available actions (unavailable actions have a reward
+  of -Inf).
+* Added make_partially_observable() and make_fully_observable() to convert 
+  between MDPs and POMDPs.
+
+## Changes
+* simulate_POMDP(): Better calculation of T for infinite-horizon problems.
+* several functions are now generics with methods for POMDP and MDP.
+* policy() lost the parameters alpha and action.
+* policy() and value_function() and gained the parameter drop.
+* regret(): renamed parameter belief to start. Regret is now available for MDPs.
+* simulate_MDP() stops now at absorbing states.
+* simulate_MDP_cpp() works now with sparse model representation.
+* POMDP and MDP gained field for additional info.
+* approx_MDP_policy_evaluation() is now called MDP_policy_evaluation() and gained
+  parameter theta as an additional stopping criterion.
+* rewrote all accessor code reward_matrix, transition_matrix, observation_matrix
+  for better and faster access.
+* normalize() gained parameters for more detailed normalization.
+* POMDP() and MDP() lost normalize.
+* model.h has now support for keywords in transition_prob and observation_prob.
+* MDP2POMDP is now make_partially_observable().
+
+## Bugfixes
+* q_values_MDP(), solve_MDP(): Fixed reward representation issue.
+* reward_val_cpp(): fixed observation matching bug.
+
 # pomdp 1.1.3 (12/20/2023)
 
 ## New Features
@@ -7,7 +57,9 @@
 
 ## Changes
 * Changed the action names for the Maze example to the names used in Russell 
-  and Norvig's AIMA book.
+  and Norvig's AIMA book. 
+* POMDP lost the parameter max. Costs need to be specified as negative 
+  rewards.
 
 ## Bugfixes
 * simulate_POMDP() now adds terminal values.

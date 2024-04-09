@@ -8,6 +8,8 @@
 # Backin up while docked has no effect (except to change LRV to MRV)
 # Turning around while docked, leaves you in front of station, facing it
 
+# Names for states, actions and observations were added by Michael Hahsler
+
 # Description from 
 #
 # Chrisman L., (1992) “Reinforcement Learning with Perceptual Aliasing: The Perceptual Distinctions Approach.” AAAI 1992: 183-188.

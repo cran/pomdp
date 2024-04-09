@@ -22,7 +22,7 @@ POMDP(
   horizon = Inf,
   terminal_values = NULL,
   start = "uniform",
-  normalize = TRUE,
+  info = NULL,
   name = NA
 )
 
@@ -75,7 +75,7 @@ probability for each state is supplied. Also the string \code{'uniform'}
 reward. It is also used by some solvers. See Details section for more
 information.}
 
-\item{normalize}{logical; should the description be normalized for faster access (see \code{\link[=normalize_POMDP]{normalize_POMDP()}})?}
+\item{info}{A list with additional information.}
 
 \item{name}{a string to identify the POMDP problem.}
 
@@ -85,8 +85,8 @@ information.}
 
 \item{message}{a error message to be displayed displayed}
 
-\item{epoch}{integer; an epoch that should be converted to the corresponding episode in a time-dependent
-POMDP.}
+\item{epoch}{integer; an epoch that should be converted to the
+corresponding episode in a time-dependent POMDP.}
 
 \item{action, start.state, end.state, observation, probability, value}{Values
 used in the helper functions \code{O_()}, \code{R_()}, and \code{T_()} to
@@ -145,7 +145,8 @@ specified in the following ways:
 \itemize{
 \item A data.frame with columns exactly like the arguments of \code{T_()}.
 You can use \code{rbind()} with helper function \code{T_()} to create this data
-frame.
+frame. Probabilities can be specified multiple times and the definition that
+appears last in the data.frame will take affect.
 \item A named list of matrices, one for each action. Each matrix is square with
 rows representing start states \eqn{s} and columns representing end states \eqn{s'}.
 Instead of a matrix, also the strings \code{'identity'} or \code{'uniform'} can be specified.
@@ -162,28 +163,38 @@ following ways:
 \itemize{
 \item A data frame with columns named exactly like the arguments of \code{O_()}.
 You can use \code{rbind()}
-with helper function \code{O_()} to create this data frame.
+with helper function \code{O_()} to create this data frame. Probabilities can be
+specified multiple times and the definition that
+appears last in the data.frame will take affect.
 \item A named list of matrices, one for each action. Each matrix has
 rows representing end states \eqn{s'} and columns representing an observation \eqn{o}.
-Instead of a matrix, also the strings \code{'identity'} or \code{'uniform'} can be specified.
+Instead of a matrix, also the string \code{'uniform'} can be specified.
 \item A function with the same arguments are \code{O_()}, but no default values
 that returns the observation probability.
 }
 
-\strong{Specification of the reward function: \eqn{R(s, s', o, a)}}
+\strong{Specification of the reward function: \eqn{R(a, s, s', o)}}
 
 The reward function can be specified in the following
 ways:
 \itemize{
 \item A data frame with columns named exactly like the arguments of \code{R_()}.
 You can use \code{rbind()}
-with helper function \code{R_()} to create this data frame.
+with helper function \code{R_()} to create this data frame. Rewards can be specified
+multiple times and the definition that
+appears last in the data.frame will take affect.
 \item A list of lists. The list levels are \code{'action'} and \code{'start.state'}. The list elements
 are matrices with
 rows representing end states \eqn{s'} and columns representing an observation \eqn{o}.
 \item A function with the same arguments are \code{R_()}, but no default values
 that returns the reward.
 }
+
+To avoid overflow problems with rewards, reward values should stay well within the
+range of
+\verb{[-1e10, +1e10]}. \code{-Inf} can be used as the reward for unavailable actions and
+will be translated into a large negative reward for solvers that only support
+finite reward values.
 
 \strong{Start Belief}
 
@@ -331,10 +342,13 @@ pomdp-solve website: \url{http://www.pomdp.org}
 }
 \seealso{
 Other POMDP: 
-\code{\link{POMDP_accessors}},
+\code{\link{MDP2POMDP}},
+\code{\link{accessors}},
+\code{\link{actions}()},
 \code{\link{add_policy}()},
 \code{\link{plot_belief_space}()},
 \code{\link{projection}()},
+\code{\link{reachable_and_absorbing}},
 \code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
@@ -344,8 +358,14 @@ Other POMDP:
 \code{\link{update_belief}()},
 \code{\link{value_function}()},
 \code{\link{write_POMDP}()}
+
+Other POMDP_examples: 
+\code{\link{POMDP_example_files}},
+\code{\link{RussianTiger}},
+\code{\link{Tiger}}
 }
 \author{
 Hossein Kamalzadeh, Michael Hahsler
 }
 \concept{POMDP}
+\concept{POMDP_examples}

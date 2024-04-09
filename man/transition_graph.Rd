@@ -2,6 +2,7 @@
 % Please edit documentation in R/transition_graph.R
 \name{transition_graph}
 \alias{transition_graph}
+\alias{plot_transition_graph}
 \title{Transition Graph}
 \usage{
 transition_graph(
@@ -10,7 +11,19 @@ transition_graph(
   episode = NULL,
   epoch = NULL,
   state_col = NULL,
-  simplify_transitions = TRUE
+  simplify_transitions = TRUE,
+  remove_unavailable_actions = TRUE
+)
+
+plot_transition_graph(
+  x,
+  action = NULL,
+  episode = NULL,
+  epoch = NULL,
+  state_col = NULL,
+  simplify_transitions = TRUE,
+  main = NULL,
+  ...
 )
 }
 \arguments{
@@ -23,6 +36,12 @@ transition_graph(
 \item{state_col}{colors used to represent the states.}
 
 \item{simplify_transitions}{logical; combine parallel transition arcs into a single arc.}
+
+\item{remove_unavailable_actions}{logical; don't show arrows for unavailable actions.}
+
+\item{main}{a main title for the plot.}
+
+\item{...}{further arguments are passed on to \code{igraph::plot.igraph()}.}
 }
 \value{
 returns the transition model as an igraph object.
@@ -40,6 +59,21 @@ data("Tiger")
 g <- transition_graph(Tiger)
 g
 
+plot_transition_graph(Tiger)
+plot_transition_graph(Tiger, vertex.size = 20, 
+                      edge.label.cex = .5, edge.arrow.size = .5, margin = .5)
+plot_transition_graph(Tiger, vertex.size = 60, 
+                      edge.label = NA, edge.arrow.size = .5, 
+                      layout = rbind(c(-1,0), c(+1,0)), rescale = FALSE)
+
+## Plot an individual graph for each actions and use a manual layout.
+for (a in Tiger$actions) {
+ plot_transition_graph(Tiger, action = a, 
+                        layout = rbind(c(-1,0), c(+1,0)), rescale = FALSE,
+                        main = paste("action:", a))
+}
+
+## Plot using the igraph library
 library(igraph)
 plot(g)
 
@@ -62,30 +96,21 @@ edges <- g_vn$edges
 nodes$x <- c(-1, 1) * 200
 nodes$y <- 0
 
-visNetwork(nodes, edges)  \%>\%  
-  visNodes(physics = FALSE) \%>\% 
+visNetwork(nodes, edges)  \%>\%
+  visNodes(physics = FALSE) \%>\%
   visEdges(smooth = list(type = "curvedCW", roundness = .6), arrows = "to")
-} 
- 
-## Plot an individual graph for each actions
-for (a in Tiger$actions) {
- g <- transition_graph(Tiger, action = a)
-
- plot(g,
-  layout = rbind(c(-1, 0), c(1, 0)), rescale = FALSE,  
-  edge.curved = curve_multiple_directed(g, .8),
-  edge.loop.angle = cumsum(which_loop(g)) *  (-pi / 8),
-  vertex.size = 60
- )
 }
 }
 \seealso{
 Other POMDP: 
-\code{\link{POMDP_accessors}},
+\code{\link{MDP2POMDP}},
 \code{\link{POMDP}()},
+\code{\link{accessors}},
+\code{\link{actions}()},
 \code{\link{add_policy}()},
 \code{\link{plot_belief_space}()},
 \code{\link{projection}()},
+\code{\link{reachable_and_absorbing}},
 \code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
@@ -97,9 +122,17 @@ Other POMDP:
 
 Other MDP: 
 \code{\link{MDP}()},
-\code{\link{POMDP_accessors}},
+\code{\link{MDP2POMDP}},
+\code{\link{MDP_policy_functions}},
+\code{\link{accessors}},
+\code{\link{actions}()},
+\code{\link{add_policy}()},
+\code{\link{gridworld}},
+\code{\link{reachable_and_absorbing}},
+\code{\link{regret}()},
 \code{\link{simulate_MDP}()},
-\code{\link{solve_MDP}()}
+\code{\link{solve_MDP}()},
+\code{\link{value_function}()}
 }
 \concept{MDP}
 \concept{POMDP}

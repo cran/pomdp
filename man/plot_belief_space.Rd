@@ -123,8 +123,8 @@ Other policy:
 \code{\link{estimate_belief_for_nodes}()},
 \code{\link{optimal_action}()},
 \code{\link{plot_policy_graph}()},
-\code{\link{policy_graph}()},
 \code{\link{policy}()},
+\code{\link{policy_graph}()},
 \code{\link{projection}()},
 \code{\link{reward}()},
 \code{\link{solve_POMDP}()},
@@ -132,10 +132,13 @@ Other policy:
 \code{\link{value_function}()}
 
 Other POMDP: 
-\code{\link{POMDP_accessors}},
+\code{\link{MDP2POMDP}},
 \code{\link{POMDP}()},
+\code{\link{accessors}},
+\code{\link{actions}()},
 \code{\link{add_policy}()},
 \code{\link{projection}()},
+\code{\link{reachable_and_absorbing}},
 \code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},

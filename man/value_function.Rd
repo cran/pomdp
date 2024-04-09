@@ -5,7 +5,7 @@
 \alias{plot_value_function}
 \title{Value Function}
 \usage{
-value_function(model)
+value_function(model, drop = TRUE)
 
 plot_value_function(
   model,
@@ -16,11 +16,14 @@ plot_value_function(
   col = NULL,
   lwd = 1,
   lty = 1,
+  ylab = "Value",
   ...
 )
 }
 \arguments{
 \item{model}{a solved \link{POMDP} or \link{MDP}.}
+
+\item{drop}{logical; drop the list for converged converged, epoch-independent value functions.}
 
 \item{projection}{Sample in a projected belief space. See \code{\link[=projection]{projection()}} for details.}
 
@@ -29,7 +32,7 @@ converged policies.}
 
 \item{ylim}{the y limits of the plot.}
 
-\item{legend}{logical; add a legend?}
+\item{legend}{logical; show the actions in the visualization?}
 
 \item{col}{potting colors.}
 
@@ -37,7 +40,10 @@ converged policies.}
 
 \item{lty}{line type.}
 
-\item{...}{additional arguments are passed on to \code{\link[stats:line]{stats::line()}}`.}
+\item{ylab}{label for the y-axis.}
+
+\item{...}{additional arguments are passed on to \code{\link[stats:line]{stats::line()}}
+or \code{\link[graphics:barplot]{graphics::barplot()}}`.}
 }
 \value{
 the function as a matrix with alpha vectors as rows.
@@ -54,7 +60,7 @@ constant at zero). The value function can also be visualized using \code{\link[=
 }
 \examples{
 data("Tiger")
-sol <- solve_POMDP(model = Tiger)
+sol <- solve_POMDP(Tiger)
 sol
 
 # value function for the converged solution
@@ -77,10 +83,10 @@ plot_value_function(sol, epoch = 3, ylim = c(-5, 25))
 \dontrun{
 # using ggplot2 to plot the value function for epoch 3
 library(ggplot2)
-pol <- policy(sol)[[3]]
-ggplot(pol) +
+pol <- policy(sol)
+ggplot(pol[[3]]) +
  geom_segment(aes(x = 0, y = `tiger-left`, xend = 1, yend = `tiger-right`, color = action)) +
- coord_cartesian(ylim = c(-5, 15)) + ylab("Reward") + xlab("Belief")
+ coord_cartesian(ylim = c(-5, 15)) + ylab("Value") + xlab("Belief space")
 }
 }
 \seealso{
@@ -89,19 +95,22 @@ Other policy:
 \code{\link{optimal_action}()},
 \code{\link{plot_belief_space}()},
 \code{\link{plot_policy_graph}()},
-\code{\link{policy_graph}()},
 \code{\link{policy}()},
+\code{\link{policy_graph}()},
 \code{\link{projection}()},
 \code{\link{reward}()},
 \code{\link{solve_POMDP}()},
 \code{\link{solve_SARSOP}()}
 
 Other POMDP: 
-\code{\link{POMDP_accessors}},
+\code{\link{MDP2POMDP}},
 \code{\link{POMDP}()},
+\code{\link{accessors}},
+\code{\link{actions}()},
 \code{\link{add_policy}()},
 \code{\link{plot_belief_space}()},
 \code{\link{projection}()},
+\code{\link{reachable_and_absorbing}},
 \code{\link{regret}()},
 \code{\link{sample_belief_space}()},
 \code{\link{simulate_POMDP}()},
@@ -110,10 +119,25 @@ Other POMDP:
 \code{\link{transition_graph}()},
 \code{\link{update_belief}()},
 \code{\link{write_POMDP}()}
+
+Other MDP: 
+\code{\link{MDP}()},
+\code{\link{MDP2POMDP}},
+\code{\link{MDP_policy_functions}},
+\code{\link{accessors}},
+\code{\link{actions}()},
+\code{\link{add_policy}()},
+\code{\link{gridworld}},
+\code{\link{reachable_and_absorbing}},
+\code{\link{regret}()},
+\code{\link{simulate_MDP}()},
+\code{\link{solve_MDP}()},
+\code{\link{transition_graph}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{MDP}
 \concept{POMDP}
 \concept{policy}
 \keyword{hplot}
