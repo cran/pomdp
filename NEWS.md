@@ -1,9 +1,8 @@
-# pomdp 1.2.2 (04/22/2024)
+# pomdp 1.2.3 (05/04/2024)
 
 ## Bugfixes
-* Check for out-of-bounds error for Rcpp `operator*` for vectors in 
-  update_belief_cpp(). `operator*` seems to take the length of the first 
-  operator and does not check the length of the second.
+* Fixed possible memory violation in observation_matrix() and 
+  transition_matrix().
 
 # pomdp 1.2.1 (04/08/2024)
 
