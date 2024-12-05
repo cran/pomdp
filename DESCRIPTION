@@ -1,8 +1,8 @@
 Package: pomdp
 Title: Infrastructure for Partially Observable Markov Decision
         Processes (POMDP)
-Version: 1.2.3
-Date: 2024-05-01
+Version: 1.2.4
+Date: 2024-12-05
 Authors@R: c(
     person(given = "Michael",
        family = "Hahsler",
@@ -27,13 +27,13 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 License: GPL (>= 3)
 Copyright: Copyright (C) Michael Hahsler and Hossein Kamalzadeh.
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Collate: 'AAA_check_installed.R' 'AAA_pomdp-package.R' 'AAA_shorten.R'
-        'Cliff_walking.R' 'POMDP.R' 'MDP.R' 'MDP_policy_functions.R'
-        'Maze.R' 'POMDP_file_examples.R' 'RcppExports.R'
-        'RussianTiger.R' 'Tiger.R' 'Windy_gridworld.R' 'accessors.R'
-        'accessors_reward.R' 'accessors_trans_obs.R' 'actions.R'
-        'add_policy.R' 'check_and_fix_MDP.R' 'colors.R'
+        'Cliff_walking.R' 'DynaMaze.R' 'POMDP.R' 'MDP.R'
+        'MDP_policy_functions.R' 'Maze.R' 'POMDP_file_examples.R'
+        'RcppExports.R' 'RussianTiger.R' 'Tiger.R' 'Windy_gridworld.R'
+        'accessors.R' 'accessors_reward.R' 'accessors_trans_obs.R'
+        'actions.R' 'add_policy.R' 'check_and_fix_MDP.R' 'colors.R'
         'estimate_belief_for_nodes.R' 'foreach_helper.R' 'gridworld.R'
         'make_partially_observable.R' 'optimal_action.R'
         'plot_belief_space.R' 'plot_policy_graph.R' 'policy.R'
@@ -45,10 +45,10 @@ Collate: 'AAA_check_installed.R' 'AAA_pomdp-package.R' 'AAA_shorten.R'
         'solve_SARSOP.R' 'stack.R' 'transition_graph.R'
         'update_belief.R' 'value_function.R' 'which_max_random.R'
 NeedsCompilation: yes
-Packaged: 2024-05-05 00:33:18 UTC; hahsler
+Packaged: 2024-12-05 01:00:24 UTC; hahsler
 Author: Michael Hahsler [aut, cph, cre]
     (<https://orcid.org/0000-0003-2716-1405>),
   Hossein Kamalzadeh [ctb]
 Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>
 Repository: CRAN
-Date/Publication: 2024-05-05 21:10:06 UTC
+Date/Publication: 2024-12-05 16:50:02 UTC

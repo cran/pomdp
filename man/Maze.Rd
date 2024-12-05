@@ -141,11 +141,13 @@ A modern approach. 4rd ed.
 \seealso{
 Other MDP_examples: 
 \code{\link{Cliff_walking}},
+\code{\link{DynaMaze}},
 \code{\link{MDP}()},
 \code{\link{Windy_gridworld}}
 
 Other gridworld: 
 \code{\link{Cliff_walking}},
+\code{\link{DynaMaze}},
 \code{\link{Windy_gridworld}},
 \code{\link{gridworld}}
 }
