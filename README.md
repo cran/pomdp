@@ -1,10 +1,10 @@
 
 # <img src="man/figures/logo.svg" align="right" height="139" /> R package pomdp - Infrastructure for Partially Observable Markov Decision Processes (POMDP)
 
-[![CRAN
-version](https://www.r-pkg.org/badges/version/pomdp)](https://CRAN.R-project.org/package=pomdp)
-[![stream r-universe
+[![r-universe
 status](https://mhahsler.r-universe.dev/badges/pomdp)](https://mhahsler.r-universe.dev/pomdp)
+[![Package on
+CRAN](https://www.r-pkg.org/badges/version/pomdp)](https://CRAN.R-project.org/package=pomdp)
 [![CRAN RStudio mirror
 downloads](https://cranlogs.r-pkg.org/badges/pomdp)](https://CRAN.R-project.org/package=pomdp)
 
@@ -15,11 +15,12 @@ decision process where the agent cannot directly observe the
 environment’s state, but has to rely on observations. The goal is to
 find an optimal policy to guide the agent’s actions.
 
-The `pomdp` package provides the infrastructure to define and analyze
-the solutions of optimal control problems formulated as Partially
-Observable Markov Decision Processes (POMDP). The package uses the
-solvers from [pomdp-solve](http://www.pomdp.org/code/) (Cassandra, 2015)
-available in the companion R package
+The `pomdp` package (Hahsler and Cassandra 2025) provides the
+infrastructure to define and analyze the solutions of optimal control
+problems formulated as Partially Observable Markov Decision Processes
+(POMDP). The package uses the solvers from
+[pomdp-solve](http://www.pomdp.org/code/) (Cassandra 2015) available in
+the companion R package
 [**pomdpSolve**](https://github.com/mhahsler/pomdpSolve) to solve POMDPs
 using a variety of exact and approximate algorithms.
 
@@ -50,17 +51,21 @@ Tutorial](https://pomdp.org/tutorial/).
 
 To cite package ‘pomdp’ in publications use:
 
-> Hahsler M (2023). *pomdp: Infrastructure for Partially Observable
-> Markov Decision Processes (POMDP)*. R package version 1.1.2,
-> <https://CRAN.R-project.org/package=pomdp>.
+> Hahsler M, Cassandra AR (2025). “Pomdp: A computational infrastructure
+> for partially observable Markov decision processes.” *The R Journal*,
+> *16*(2), 1-18. ISSN 2073-4859, <doi:10.32614/RJ-2024-021>
+> <https://doi.org/10.32614/RJ-2024-021>.
 
-    @Manual{,
-      title = {pomdp: Infrastructure for Partially Observable Markov Decision
-    Processes (POMDP)},
-      author = {Michael Hahsler},
-      year = {2023},
-      note = {R package version 1.1.2},
-      url = {https://CRAN.R-project.org/package=pomdp},
+    @Article{,
+      title = {Pomdp: A computational infrastructure for partially observable Markov decision processes},
+      author = {Michael Hahsler and Anthony R. Cassandra},
+      year = {2025},
+      journal = {The R Journal},
+      volume = {16},
+      number = {2},
+      pages = {1--18},
+      doi = {10.32614/RJ-2024-021},
+      issn = {2073-4859},
     }
 
 ## Installation
@@ -76,7 +81,8 @@ install.packages("pomdp")
 
 ``` r
 install.packages("pomdp",
-    repos = c("https://mhahsler.r-universe.dev". "https://cloud.r-project.org/"))
+    repos = c("https://mhahsler.r-universe.dev",
+              "https://cloud.r-project.org/"))
 ```
 
 ## Usage
@@ -93,13 +99,12 @@ Tiger
     ##   Discount factor: 0.75
     ##   Horizon: Inf epochs
     ##   Size: 2 states / 3 actions / 2 obs.
-    ##   Normalized: FALSE
-    ## 
+    ##   Start: uniform
     ##   Solved: FALSE
     ## 
     ##   List components: 'name', 'discount', 'horizon', 'states', 'actions',
     ##     'observations', 'transition_prob', 'observation_prob', 'reward',
-    ##     'start', 'terminal_values'
+    ##     'start', 'terminal_values', 'info'
 
 ``` r
 sol <- solve_POMDP(model = Tiger)
@@ -110,17 +115,16 @@ sol
     ##   Discount factor: 0.75
     ##   Horizon: Inf epochs
     ##   Size: 2 states / 3 actions / 2 obs.
-    ##   Normalized: FALSE
-    ## 
+    ##   Start: uniform
     ##   Solved:
-    ##     Method: grid
+    ##     Method: 'grid'
     ##     Solution converged: TRUE
     ##     # of alpha vectors: 5
     ##     Total expected reward: 1.933439
     ## 
     ##   List components: 'name', 'discount', 'horizon', 'states', 'actions',
     ##     'observations', 'transition_prob', 'observation_prob', 'reward',
-    ##     'start', 'solution'
+    ##     'start', 'info', 'solution'
 
 Display the value function.
 
@@ -146,7 +150,8 @@ of Standards and Technology (NIST) under grant number
 
 ## References
 
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent"
+entry-spacing="0">
 
 <div id="ref-Cassandra2015" class="csl-entry">
 
@@ -161,6 +166,15 @@ Cassandra, Anthony R., Michael L. Littman, and Nevin Lianwen Zhang.
 Observable Markov Decision Processes.” In *UAI’97: Proceedings of the
 Thirteenth Conference on Uncertainty in Artificial Intelligence*,
 54--61.
+
+</div>
+
+<div id="ref-Hahsler2025" class="csl-entry">
+
+Hahsler, Michael, and Anthony R. Cassandra. 2025. “Pomdp: A
+Computational Infrastructure for Partially Observable Markov Decision
+Processes.” *The R Journal* 16 (2): 116–33.
+<https://doi.org/10.32614/RJ-2024-021>.
 
 </div>
 
