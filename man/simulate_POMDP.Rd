@@ -29,11 +29,11 @@ starting states for the trajectories.
 Defaults to the start belief state specified in the model or "uniform".}
 
 \item{horizon}{number of epochs for the simulation. If \code{NULL} then the
-horizon for finite-horizon model is used. For infinite-horizon problems, a horizon is
+horizon for a finite-horizon model is used. For infinite-horizon problems, a horizon is
 calculated using the discount factor.}
 
 \item{epsilon}{the probability of random actions for using an epsilon-greedy policy.
-Default for solved models is 0 and for unsolved model 1.}
+The default for solved models is 0 and for unsolved models is 1.}
 
 \item{delta_horizon}{precision used to determine the horizon for infinite-horizon problems.}
 
@@ -66,7 +66,7 @@ simulation (\code{simulation_state}), the id of the used alpha vector given the 
 \description{
 Simulate trajectories through a POMDP. The start state for each
 trajectory is randomly chosen using the specified belief. The belief is used to choose actions
-from the the epsilon-greedy policy and then updated using observations.
+from the epsilon-greedy policy and then updated using observations.
 }
 \details{
 Simulates \code{n} trajectories.
@@ -140,23 +140,23 @@ plot_belief_space(sol, sample = sim$belief_states, jitter = 2, ylim = c(0, 6))
 lines(density(sim$belief_states[, 1], bw = .05)); axis(2); title(ylab = "Density")
 }
 \seealso{
-Other POMDP: 
+Other POMDP:
 \code{\link{MDP2POMDP}},
-\code{\link{POMDP}()},
+\code{\link[=POMDP]{POMDP()}},
 \code{\link{accessors}},
-\code{\link{actions}()},
-\code{\link{add_policy}()},
-\code{\link{plot_belief_space}()},
-\code{\link{projection}()},
+\code{\link[=actions]{actions()}},
+\code{\link[=add_policy]{add_policy()}},
+\code{\link[=plot_belief_space]{plot_belief_space()}},
+\code{\link[=projection]{projection()}},
 \code{\link{reachable_and_absorbing}},
-\code{\link{regret}()},
-\code{\link{sample_belief_space}()},
-\code{\link{solve_POMDP}()},
-\code{\link{solve_SARSOP}()},
-\code{\link{transition_graph}()},
-\code{\link{update_belief}()},
-\code{\link{value_function}()},
-\code{\link{write_POMDP}()}
+\code{\link[=regret]{regret()}},
+\code{\link[=sample_belief_space]{sample_belief_space()}},
+\code{\link[=solve_POMDP]{solve_POMDP()}},
+\code{\link[=solve_SARSOP]{solve_SARSOP()}},
+\code{\link[=transition_graph]{transition_graph()}},
+\code{\link[=update_belief]{update_belief()}},
+\code{\link[=value_function]{value_function()}},
+\code{\link[=write_POMDP]{write_POMDP()}}
 }
 \author{
 Michael Hahsler

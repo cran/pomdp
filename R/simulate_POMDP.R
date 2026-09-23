@@ -2,7 +2,7 @@
 #'
 #' Simulate trajectories through a POMDP. The start state for each
 #' trajectory is randomly chosen using the specified belief. The belief is used to choose actions
-#' from the the epsilon-greedy policy and then updated using observations.
+#' from the epsilon-greedy policy and then updated using observations.
 #'
 #' Simulates `n` trajectories.
 #' If no simulation horizon is specified, the horizon of finite-horizon problems 
@@ -35,10 +35,10 @@
 #'  starting states for the trajectories.
 #'  Defaults to the start belief state specified in the model or "uniform".
 #' @param horizon number of epochs for the simulation. If `NULL` then the
-#'  horizon for finite-horizon model is used. For infinite-horizon problems, a horizon is 
+#'  horizon for a finite-horizon model is used. For infinite-horizon problems, a horizon is
 #'  calculated using the discount factor.
 #' @param epsilon the probability of random actions for using an epsilon-greedy policy.
-#'  Default for solved models is 0 and for unsolved model 1.
+#'  The default for solved models is 0 and for unsolved models is 1.
 #' @param delta_horizon precision used to determine the horizon for infinite-horizon problems.
 #' @param digits round probabilities for belief points.
 #' @param return_beliefs logical; Return all visited belief states? This requires n x horizon memory.
@@ -127,7 +127,7 @@ simulate_POMDP <-
        is.function(model$observation_prob) ||
        is.function(model$reward))) {
       
-      warning("Some elements of the POMDP are defined as R funciton. The CPP engine is very slow with R function calls.\n",
+      warning("Some elements of the POMDP are defined as R functions. The C++ engine is very slow with R function calls.\n",
               "Falling back to R. Normalize the model first to use CPP.", immediate. = TRUE
               )
       engine <- 'r'
@@ -138,11 +138,12 @@ simulate_POMDP <-
     
     if (is.null(belief))
       belief <- start_vector(model)
-    
-    if (!is.numeric(belief) || length(belief) != length(model$states) || 
-        !sum1(belief))
-      stop("Initial belief is misspecified!")
-    
+
+    belief <- .translate_belief(belief, model)
+    if (is.matrix(belief) || length(belief) != length(model$states))
+      stop("Initial belief must specify one probability distribution.", call. = FALSE)
+
+    .validate_positive_integer(n, "n")
     n <- as.integer(n)
     digits <- as.integer(digits)
     
@@ -160,6 +161,7 @@ simulate_POMDP <-
       max_abs_R <- .max_abs_reward(model)
       horizon <- ceiling(log(delta_horizon/max_abs_R)/log(model$discount)) + 1
     }
+    .validate_positive_integer(horizon, "horizon")
     horizon <- as.integer(horizon)
     
     # eps-greedy?
@@ -293,13 +295,13 @@ simulate_POMDP <-
         lapply(
           1:length(dt_horizon),
           FUN = function(ep)
-            transition_matrix(model, ep)
+            transition_matrix(model, episode = ep)
         )
       dt_obs_m <-
         lapply(
           1:length(dt_horizon),
           FUN = function(ep)
-            observation_matrix(model, ep)
+            observation_matrix(model, episode = ep)
         )
       ## we keep the reward matrix as is to save memory.
       # dt_rew_m <-
@@ -378,7 +380,7 @@ simulate_POMDP <-
           r = NA_real_
         )
       else
-        trajectory <- NULL
+        trajectory <- data.frame()
       
       for (j in 1:horizon) {
         # change matrices for time-dependent POMDPs
@@ -476,7 +478,7 @@ simulate_POMDP <-
     
     rew <- Reduce(c,  lapply(sim, "[[", "reward"))
     
-    trajectories <- NULL
+    trajectories <- data.frame()
     if (return_trajectories) {
       trajectories <- Reduce(rbind, lapply(sim, "[[", "trajectory"))
        trajectories$simulation_state <-
@@ -491,7 +493,7 @@ simulate_POMDP <-
     
     list(
       avg_reward = mean(rew, na.rm = TRUE),
-      action_cnt = Reduce('+', lapply(sim, "[[" , "state_cnt")),
+      action_cnt = Reduce('+', lapply(sim, "[[" , "action_cnt")),
       state_cnt =  Reduce('+', lapply(sim, "[[", "state_cnt")),
       obs_cnt =    Reduce('+', lapply(sim, "[[", "obs_cnt")),
       reward = rew,

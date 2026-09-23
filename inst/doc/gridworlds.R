@@ -1,10 +1,16 @@
 ## ----include = FALSE----------------------------------------------------------
-knitr::opts_chunk$set(
+has_gifski <- requireNamespace("gifski", quietly = TRUE)
+animation_display <- if (has_gifski) "animate" else "last"
+
+chunk_options <- list(
   collapse = TRUE,
   comment = "#>",
-  warning = TRUE,
-  animation.hook = knitr::hook_gifski
+  warning = TRUE
 )
+if (has_gifski) {
+  chunk_options$animation.hook <- knitr::hook_gifski
+}
+do.call(knitr::opts_chunk$set, chunk_options)
 
 ## ----setup--------------------------------------------------------------------
 library(pomdp)
@@ -54,18 +60,18 @@ gridworld_plot_policy(sol, zlim = c(0, 2), sub = "Iteration 5")
 ## -----------------------------------------------------------------------------
 gridworld_animate(x, "value_iteration", n = 5, zlim = c(0, 2))
 
-## ----fig.show='animate'-------------------------------------------------------
+## ----fig.show=animation_display-----------------------------------------------
 gridworld_animate(x, "value_iteration", n = 20, zlim = c(0, 2))
 
-## ----fig.show='animate'-------------------------------------------------------
+## ----fig.show=animation_display-----------------------------------------------
 gridworld_animate(x, "policy_iteration", n = 20, zlim = c(0, 2))
 
-## ----fig.show='animate'-------------------------------------------------------
+## ----fig.show=animation_display-----------------------------------------------
 gridworld_animate(x, "q_learning", n = 20, zlim = c(0, 2),  horizon = 100)
 
-## ----fig.show='animate'-------------------------------------------------------
+## ----fig.show=animation_display-----------------------------------------------
 gridworld_animate(x, "sarsa", n = 20, zlim = c(0, 2), horizon = 100)
 
-## ----fig.show='animate'-------------------------------------------------------
+## ----fig.show=animation_display-----------------------------------------------
 gridworld_animate(x, "expected_sarsa", n = 20, zlim = c(0, 2), horizon = 100, alpha = 1)
 

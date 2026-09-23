@@ -1,3 +1,46 @@
+# pomdp 1.2.7 (09/22/1026)
+
+## Bugfixes
+
+* `remove_unreachable_states()` now handles transition, observation, and reward
+  specifications stored as data frames, normalized dense or sparse structures,
+  distribution keywords, or functions. It also preserves observation names and
+  consistently subsets terminal values and solved-model data.
+* Expanding an MDP reward function into a dense reward representation no longer
+  passes the POMDP-only `observation` argument.
+* Time-dependent dense reward specifications are now validated per episode,
+  including dense MDP rewards with their single reward column.
+* The R POMDP simulator now loads episode-specific transition and observation
+  matrices correctly when simulating time-dependent models.
+* The R POMDP simulator now reports action counts from the action counter rather
+  than incorrectly copying state counts.
+
+## Changes
+
+* `transition_val()`, `observation_val()`, and `reward_val()` are deprecated in
+  favor of the corresponding matrix accessors with `drop = TRUE`.
+* Model constructors and public accessors now consistently validate state,
+  action, observation, belief, episode, epoch, discount, and horizon arguments.
+* Matrix accessors gained `drop`, matching `policy()` and `value_function()`;
+  `drop = FALSE` preserves matrix or list dimensions across model
+  representations. Simulation result containers are now consistent between
+  the R and C++ engines when optional results are not requested.
+* Package examples now use bundled POMDP files instead of downloading models
+  from the internet.
+* Building the gridworld vignette no longer requires `gifski`. Animations are
+  created when it is available; otherwise, a static final frame is shown.
+
+## Testing
+
+* Updated the test suite to testthat edition 3, removed network dependencies,
+  made stochastic tests reproducible, and isolated temporary files.
+* Increased test coverage.
+
+# pomdp 1.2.6 (08/08/2025)
+
+## Changes
+* Fixed partial argument matches.
+
 # pomdp 1.2.5 (05/29/2025)
 
 ## Changes
@@ -97,7 +140,7 @@
     unreachable states are  now suppressed.
 * policy() gained parameters alpha and action.
 * color palettes are now exported.
-* POMPD accessors gain parameter drop.
+* POMDP accessors gain parameter drop.
 * POMDP constructor and read_POMDP gained parameter normalize and, by default, normalize
   the POMDP definition.
 

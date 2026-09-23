@@ -47,7 +47,7 @@ horizon.}
 \item{stop}{logical; stop with an error.}
 }
 \value{
-The function returns an object of class MDP which is list with
+An object of class MDP containing
 the model specification. \code{\link[=solve_MDP]{solve_MDP()}} reads the object and adds a list element called
 \code{'solution'}.
 }
@@ -56,10 +56,10 @@ Defines all the elements of a finite state-space MDP problem.
 }
 \details{
 Markov decision processes (MDPs) are discrete-time stochastic control
-process with completely observable states. We implement here
-MDPs with a finite state space. similar to \link{POMDP}
+processes with completely observable states. Here, we implement
+MDPs with a finite state space, similar to \link{POMDP}
 models, but without the observation model. The \code{'observations'} column in
-the the reward specification is always missing.
+the reward specification is always missing.
 
 \code{\link[=make_partially_observable]{make_partially_observable()}} reformulates an MDP as a POMDP by adding an observation
 model with one observation per state
@@ -90,11 +90,11 @@ STiger <- MDP(
 
   # the reward helper R_() expects: action, start.state, end.state, observation, value
   reward = rbind(
-    R_("open-left",  "tiger-left",  v = -100),
-    R_("open-left",  "tiger-right", v =   10),
-    R_("open-right", "tiger-left",  v =   10),
-    R_("open-right", "tiger-right", v = -100),
-    R_("do-nothing",                v =    0)
+    R_("open-left",  "tiger-left",  value = -100),
+    R_("open-left",  "tiger-right", value =   10),
+    R_("open-right", "tiger-left",  value =   10),
+    R_("open-right", "tiger-right", value = -100),
+    R_("do-nothing",                value =    0)
   )
 )
 
@@ -115,21 +115,21 @@ policy(sol2)
 plot_value_function(sol2, ylim = c(80, 120))
 }
 \seealso{
-Other MDP: 
+Other MDP:
 \code{\link{MDP2POMDP}},
 \code{\link{MDP_policy_functions}},
 \code{\link{accessors}},
-\code{\link{actions}()},
-\code{\link{add_policy}()},
+\code{\link[=actions]{actions()}},
+\code{\link[=add_policy]{add_policy()}},
 \code{\link{gridworld}},
 \code{\link{reachable_and_absorbing}},
-\code{\link{regret}()},
-\code{\link{simulate_MDP}()},
-\code{\link{solve_MDP}()},
-\code{\link{transition_graph}()},
-\code{\link{value_function}()}
+\code{\link[=regret]{regret()}},
+\code{\link[=simulate_MDP]{simulate_MDP()}},
+\code{\link[=solve_MDP]{solve_MDP()}},
+\code{\link[=transition_graph]{transition_graph()}},
+\code{\link[=value_function]{value_function()}}
 
-Other MDP_examples: 
+Other MDP_examples:
 \code{\link{Cliff_walking}},
 \code{\link{DynaMaze}},
 \code{\link{Maze}},

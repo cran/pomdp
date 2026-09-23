@@ -144,7 +144,7 @@
 #' - `solver_output` output of the solver program.
 #' - `converged` did the solution converge?
 #' - `initial_belief` used initial belief used.
-#' - `total_expected_reward` total expected reward starting from the the initial belief.
+#' - `total_expected_reward` total expected reward starting from the initial belief.
 #' - `pg`, `initial_pg_node` the policy graph (see Details section).
 #' - `alpha` value function as hyperplanes representing the nodes in the policy graph (see Details section).
 #' - `belief_points_solver` optional; belief points used by the solver.
@@ -211,8 +211,9 @@
 #' ################################################################
 #' # Example 2: Solve a problem specified as a POMDP file
 #' #            using a grid of size 20
-#' sol <- solve_POMDP("http://www.pomdp.org/examples/cheese.95.POMDP",
-#'   method = "grid", parameter = list(fg_points = 20))
+#' file <- system.file("examples/shuttle_95.POMDP", package = "pomdp")
+#' sol <- solve_POMDP(file, method = "grid",
+#'   parameter = list(fg_points = 20))
 #' sol
 #'
 #' policy(sol)
@@ -365,16 +366,19 @@ solve_POMDP <- function(model,
   if (is.character(model))
     model <- read_POMDP(model)
   
-  if (!inherits(model, "POMDP"))
-    stop("x needs to be a POMDP!") 
+  .validate_class(model, "model", "POMDP")
   
   if (is.null(horizon))
     horizon <- model$horizon
   if (is.null(horizon))
     horizon <- Inf
+  .validate_positive_integer(
+    horizon, "horizon", allow_inf = TRUE, allow_vector = TRUE
+  )
   model$horizon <- horizon
   
   if (!is.null(initial_belief)) {
+    .validate_belief(initial_belief, model, allow_matrix = FALSE)
     model$start <- initial_belief
   }
   
@@ -396,12 +400,6 @@ solve_POMDP <- function(model,
     )
   
   # horizon should now be length 1
-  if (horizon < 1)
-    horizon <- Inf
-  else
-    if (horizon != floor(horizon))
-      stop("'horizon' needs to be an integer.")
-  
   if (is.null(terminal_values))
     terminal_values <- model$terminal_values
   if (!is.null(terminal_values) &&
@@ -416,7 +414,7 @@ solve_POMDP <- function(model,
     message("No discount rate specified. Using .9!")
     discount <- .9
   }
-  model$discount <- discount
+  model$discount <- .validate_discount(discount)
   
   ### temp file names
   file_prefix <- tempfile(pattern = "pomdp_")

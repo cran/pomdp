@@ -60,8 +60,9 @@
 #' # reward of the optimal policy
 #' reward(sol)
 #'
-#' # Solve a problem specified as a POMDP file. The timeout is set to 10 seconds.
-#' sol <- solve_SARSOP("http://www.pomdp.org/examples/cheese.95.POMDP", parameter = list(timeout = 10))
+#' # Solve a bundled POMDP file. The timeout is set to 10 seconds.
+#' file <- system.file("examples/shuttle_95.POMDP", package = "pomdp")
+#' sol <- solve_SARSOP(file, parameter = list(timeout = 10))
 #' sol
 #' }
 #'
@@ -92,8 +93,7 @@ solve_SARSOP <- function(model,
   if (is.character(model))
     model <- read_POMDP(model)
   
-  if (!inherits(model, "POMDP"))
-    stop("x needs to be a POMDP!") 
+  .validate_class(model, "model", "POMDP")
   
   if (!is.null(model$horizon) &&
       !is.infinite(model$horizon))

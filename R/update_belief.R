@@ -52,8 +52,8 @@
 #' @param drop logical; drop the result to a vector if only a single belief
 #' state is returned.
 #' 
-#' @returns returns the updated belief state as a named vector. 
-#'   If `action` or `observations` is a vector with multiple elements ot missing, then a matrix with all
+#' @returns The updated belief state as a named vector.
+#'   If `action` or `observations` is a vector with multiple elements or is missing, then a matrix with all
 #'   resulting belief states is returned.
 #' 
 #' @author Michael Hahsler
@@ -73,18 +73,24 @@ update_belief <-
     episode = 1,
     digits = 7,
     drop = TRUE) {
+    .validate_scalar_logical(drop, "drop")
     # belief has to be a single row vector
     belief <- .translate_belief(belief, model = model)
-    if (!is.vector(belief))
-      stop("belief has to be specified as a numeric vector.")
+    if (!is.numeric(belief) || is.matrix(belief))
+      stop("belief has to be specified as a single numeric vector.")
+
+    action <- .match_model_values(action, model$actions, "action")
+    observation <- .match_model_values(
+      observation, model$observations, "observation"
+    )
     
     Ob <- observation_matrix(model, episode = episode)
     Tr <- transition_matrix(model, episode = episode)
     
     if (is.null(action))
-      action <- factor(seq_along(model$actions), labels = model$actions)
+      action <- model$actions
     if (is.null(observation))
-      observation <- factor(seq_along(model$observations), labels = model$observations)
+      observation <- model$observations
     
     g <- expand.grid(action, observation, stringsAsFactors = FALSE)
     colnames(g) <- c("action", "observation")

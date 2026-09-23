@@ -40,14 +40,14 @@ If \code{NULL} then the belief is taken from the model definition.}
 
 \item{...}{parameters are passed on to \code{policy_graph()}, \code{\link[=estimate_belief_for_nodes]{estimate_belief_for_nodes()}} and the functions
 they use. Also, plotting options are passed on to the plotting engine \code{\link[igraph:plot.igraph]{igraph::plot.igraph()}}
-or \code{\link[visNetwork:visNetwork-igraph]{visNetwork::visIgraph()}}.}
+or \code{\link[visNetwork:visIgraph]{visNetwork::visIgraph()}}.}
 
 \item{graph}{The input graph.}
 
 \item{start}{The curvature at the two extreme edges.}
 }
 \value{
-returns invisibly what the plotting engine returns.
+Invisibly returns what the plotting engine returns.
 }
 \description{
 The function plots the POMDP policy graph for converged POMDP solution and the
@@ -57,14 +57,14 @@ policy tree for a finite-horizon solution.
 The policy graph returned by \code{\link[=policy_graph]{policy_graph()}} can be directly plotted. \code{plot_policy_graph()}
 uses \code{policy_graph()} to get the policy graph and produces an
 improved visualization (a legend, tree layout for finite-horizon solutions, better edge curving, etc.).
-It also offers an interactive visualization using \code{\link[visNetwork:visNetwork-igraph]{visNetwork::visIgraph()}}.
+It also offers an interactive visualization using \code{\link[visNetwork:visIgraph]{visNetwork::visIgraph()}}.
 
-Each policy graph node is represented by an alpha vector specifying a hyper plane segment. The convex hull of
-the set of hyperplanes represents the the value function.
+Each policy graph node is represented by an alpha vector specifying a hyperplane segment. The convex hull of
+the set of hyperplanes represents the value function.
 The policy specifies for each node an optimal action which is printed together with the node ID inside the node.
 The arcs are labeled with observations.
-Infinite-horizon converged solutions from a single policy graph.
-For finite-horizon solution a policy tree is produced.
+Infinite-horizon converged solutions form a single policy graph.
+For a finite-horizon solution, a policy tree is produced.
 The levels of the tree and the first number in the node label represent the epochs.
 
 For better visualization, we provide a few features:
@@ -181,17 +181,17 @@ plot_policy_graph(sol, edge.arrow.size = .1,
 plot_policy_graph(sol, engine = "visNetwork")
 }
 \seealso{
-Other policy: 
-\code{\link{estimate_belief_for_nodes}()},
-\code{\link{optimal_action}()},
-\code{\link{plot_belief_space}()},
-\code{\link{policy}()},
-\code{\link{policy_graph}()},
-\code{\link{projection}()},
-\code{\link{reward}()},
-\code{\link{solve_POMDP}()},
-\code{\link{solve_SARSOP}()},
-\code{\link{value_function}()}
+Other policy:
+\code{\link[=estimate_belief_for_nodes]{estimate_belief_for_nodes()}},
+\code{\link[=optimal_action]{optimal_action()}},
+\code{\link[=plot_belief_space]{plot_belief_space()}},
+\code{\link[=policy]{policy()}},
+\code{\link[=policy_graph]{policy_graph()}},
+\code{\link[=projection]{projection()}},
+\code{\link[=reward]{reward()}},
+\code{\link[=solve_POMDP]{solve_POMDP()}},
+\code{\link[=solve_SARSOP]{solve_SARSOP()}},
+\code{\link[=value_function]{value_function()}}
 }
 \concept{policy}
 \keyword{graphs}

@@ -20,7 +20,7 @@ point).}
 \item{labels}{logical; write original labels or use index numbers? Labels are
 restricted to \verb{[a-zA-Z0-9_-]} and the first character has to be a letter.}
 
-\item{parse}{logical; try to parse the model maotrices.
+\item{parse}{logical; try to parse the model matrices.
 Solvers still work with unparsed matrices, but helpers for simulation are not available.}
 
 \item{normalize}{logical; should the description be normalized for faster access (see \code{\link[=normalize_POMDP]{normalize_POMDP()}})?}
@@ -31,7 +31,7 @@ Solvers still work with unparsed matrices, but helpers for simulation are not av
 \code{read_POMDP()} returns a \link{POMDP} object.
 }
 \description{
-Reads and write a POMDP file suitable for the \code{pomdp-solve} program.
+Reads and writes a POMDP file suitable for the \code{pomdp-solve} program.
 }
 \details{
 \link{POMDP} objects read from a POMDP file have an extra element called \code{problem} which contains the original
@@ -58,23 +58,23 @@ write_POMDP(Tiger, file = stdout())
 POMDP solver website: https://www.pomdp.org
 }
 \seealso{
-Other POMDP: 
+Other POMDP:
 \code{\link{MDP2POMDP}},
-\code{\link{POMDP}()},
+\code{\link[=POMDP]{POMDP()}},
 \code{\link{accessors}},
-\code{\link{actions}()},
-\code{\link{add_policy}()},
-\code{\link{plot_belief_space}()},
-\code{\link{projection}()},
+\code{\link[=actions]{actions()}},
+\code{\link[=add_policy]{add_policy()}},
+\code{\link[=plot_belief_space]{plot_belief_space()}},
+\code{\link[=projection]{projection()}},
 \code{\link{reachable_and_absorbing}},
-\code{\link{regret}()},
-\code{\link{sample_belief_space}()},
-\code{\link{simulate_POMDP}()},
-\code{\link{solve_POMDP}()},
-\code{\link{solve_SARSOP}()},
-\code{\link{transition_graph}()},
-\code{\link{update_belief}()},
-\code{\link{value_function}()}
+\code{\link[=regret]{regret()}},
+\code{\link[=sample_belief_space]{sample_belief_space()}},
+\code{\link[=simulate_POMDP]{simulate_POMDP()}},
+\code{\link[=solve_POMDP]{solve_POMDP()}},
+\code{\link[=solve_SARSOP]{solve_SARSOP()}},
+\code{\link[=transition_graph]{transition_graph()}},
+\code{\link[=update_belief]{update_belief()}},
+\code{\link[=value_function]{value_function()}}
 }
 \author{
 Hossein Kamalzadeh, Michael Hahsler

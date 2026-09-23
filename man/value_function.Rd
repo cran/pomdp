@@ -23,18 +23,18 @@ plot_value_function(
 \arguments{
 \item{model}{a solved \link{POMDP} or \link{MDP}.}
 
-\item{drop}{logical; drop the list for converged converged, epoch-independent value functions.}
+\item{drop}{logical; drop the list for converged, epoch-independent value functions.}
 
 \item{projection}{Sample in a projected belief space. See \code{\link[=projection]{projection()}} for details.}
 
-\item{epoch}{the value function of what epoch should be plotted? Use 1 for
+\item{epoch}{the epoch whose value function should be plotted. Use 1 for
 converged policies.}
 
 \item{ylim}{the y limits of the plot.}
 
 \item{legend}{logical; show the actions in the visualization?}
 
-\item{col}{potting colors.}
+\item{col}{plotting colors.}
 
 \item{lwd}{line width.}
 
@@ -42,7 +42,7 @@ converged policies.}
 
 \item{ylab}{label for the y-axis.}
 
-\item{...}{additional arguments are passed on to \code{\link[stats:line]{stats::line()}}
+\item{...}{additional arguments passed on to \code{\link[graphics:plot]{graphics::plot()}},
 or \code{\link[graphics:barplot]{graphics::barplot()}}`.}
 }
 \value{
@@ -90,49 +90,49 @@ ggplot(pol[[3]]) +
 }
 }
 \seealso{
-Other policy: 
-\code{\link{estimate_belief_for_nodes}()},
-\code{\link{optimal_action}()},
-\code{\link{plot_belief_space}()},
-\code{\link{plot_policy_graph}()},
-\code{\link{policy}()},
-\code{\link{policy_graph}()},
-\code{\link{projection}()},
-\code{\link{reward}()},
-\code{\link{solve_POMDP}()},
-\code{\link{solve_SARSOP}()}
+Other policy:
+\code{\link[=estimate_belief_for_nodes]{estimate_belief_for_nodes()}},
+\code{\link[=optimal_action]{optimal_action()}},
+\code{\link[=plot_belief_space]{plot_belief_space()}},
+\code{\link[=plot_policy_graph]{plot_policy_graph()}},
+\code{\link[=policy]{policy()}},
+\code{\link[=policy_graph]{policy_graph()}},
+\code{\link[=projection]{projection()}},
+\code{\link[=reward]{reward()}},
+\code{\link[=solve_POMDP]{solve_POMDP()}},
+\code{\link[=solve_SARSOP]{solve_SARSOP()}}
 
-Other POMDP: 
+Other POMDP:
 \code{\link{MDP2POMDP}},
-\code{\link{POMDP}()},
+\code{\link[=POMDP]{POMDP()}},
 \code{\link{accessors}},
-\code{\link{actions}()},
-\code{\link{add_policy}()},
-\code{\link{plot_belief_space}()},
-\code{\link{projection}()},
+\code{\link[=actions]{actions()}},
+\code{\link[=add_policy]{add_policy()}},
+\code{\link[=plot_belief_space]{plot_belief_space()}},
+\code{\link[=projection]{projection()}},
 \code{\link{reachable_and_absorbing}},
-\code{\link{regret}()},
-\code{\link{sample_belief_space}()},
-\code{\link{simulate_POMDP}()},
-\code{\link{solve_POMDP}()},
-\code{\link{solve_SARSOP}()},
-\code{\link{transition_graph}()},
-\code{\link{update_belief}()},
-\code{\link{write_POMDP}()}
+\code{\link[=regret]{regret()}},
+\code{\link[=sample_belief_space]{sample_belief_space()}},
+\code{\link[=simulate_POMDP]{simulate_POMDP()}},
+\code{\link[=solve_POMDP]{solve_POMDP()}},
+\code{\link[=solve_SARSOP]{solve_SARSOP()}},
+\code{\link[=transition_graph]{transition_graph()}},
+\code{\link[=update_belief]{update_belief()}},
+\code{\link[=write_POMDP]{write_POMDP()}}
 
-Other MDP: 
-\code{\link{MDP}()},
+Other MDP:
+\code{\link[=MDP]{MDP()}},
 \code{\link{MDP2POMDP}},
 \code{\link{MDP_policy_functions}},
 \code{\link{accessors}},
-\code{\link{actions}()},
-\code{\link{add_policy}()},
+\code{\link[=actions]{actions()}},
+\code{\link[=add_policy]{add_policy()}},
 \code{\link{gridworld}},
 \code{\link{reachable_and_absorbing}},
-\code{\link{regret}()},
-\code{\link{simulate_MDP}()},
-\code{\link{solve_MDP}()},
-\code{\link{transition_graph}()}
+\code{\link[=regret]{regret()}},
+\code{\link[=simulate_MDP]{simulate_MDP()}},
+\code{\link[=solve_MDP]{solve_MDP()}},
+\code{\link[=transition_graph]{transition_graph()}}
 }
 \author{
 Michael Hahsler

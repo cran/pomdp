@@ -49,7 +49,7 @@
 #' (`horizon`) needs to 
 #' be specified. To make sure that the algorithm does finish in a reasonable amount of time,
 #' episodes are stopped after 10,000 actions with a warning. For models without absorbing states,
-#' a episode length has to be specified via `horizon`. 
+#' an episode length has to be specified via `horizon`.
 #' 
 #' * **Q-Learning** is an off-policy temporal difference method that uses
 #'    an \eqn{\epsilon}-greedy behavior policy and learns a greedy target
@@ -135,8 +135,8 @@
 #' #  policy found by the solver.
 #' maze_solved <- solve_MDP(Maze)
 #'
-#' MDP_policy_evaluation(pi, Maze, k_backup = 100)
-#' MDP_policy_evaluation(policy(maze_solved), Maze, k_backup = 100)
+#' MDP_policy_evaluation(pi, Maze, k_backups = 100)
+#' MDP_policy_evaluation(policy(maze_solved), Maze, k_backups = 100)
 #'
 #' # Note that the solver already calculates the utility function and returns it with the policy
 #' policy(maze_solved)
@@ -154,8 +154,7 @@ solve_MDP <- function(model, method = "value", ...) {
   methods_DP <- c("value_iteration", "policy_iteration")
   methods_TD <-  c("sarsa", "q_learning", "expected_sarsa")
   
-  if (!inherits(model, "MDP"))
-    stop("x needs to be a MDP!")
+  .validate_class(model, "model", "MDP")
   
   method <- match.arg(method, c(methods_DP, methods_TD))
   
@@ -188,8 +187,7 @@ solve_MDP_DP <- function(model,
                          k_backups = 10,
                          U = NULL,
                          verbose = FALSE) {
-  if (!inherits(model, "MDP"))
-    stop("'model' needs to be of class 'MDP'.")
+  .validate_class(model, "model", "MDP")
   
   methods <- c("value_iteration", "policy_iteration")
   method <- match.arg(method, methods)
@@ -199,6 +197,7 @@ solve_MDP_DP <- function(model,
     model$horizon <- horizon
   if (is.null(model$horizon))
     model$horizon <- Inf
+  .validate_positive_integer(model$horizon, "horizon", allow_inf = TRUE)
   
   if (!is.null(discount))
     model$discount <- discount
@@ -206,6 +205,7 @@ solve_MDP_DP <- function(model,
     message("No discount rate specified. Using .9!")
     model$discount <- .9
   }
+  model$discount <- .validate_discount(model$discount)
   
   switch(method,
          value_iteration = {
@@ -247,8 +247,7 @@ MDP_value_iteration_finite_horizon <-
            horizon,
            U = NULL,
            verbose = FALSE) {
-    if (!inherits(model, "MDP"))
-      stop("'model' needs to be of class 'MDP'.")
+    .validate_class(model, "model", "MDP")
     
     S <- model$states
     A <- model$actions
@@ -457,11 +456,13 @@ solve_MDP_TD <-
       warn_horizon <- TRUE
       horizon <- 10000
     }
+    .validate_positive_integer(horizon, "horizon", allow_inf = TRUE)
       
     if (is.null(discount))
       discount <- model$discount
     if (is.null(discount))
       discount <- 1
+    discount <- .validate_discount(discount)
     gamma <- discount
     model$discount <- discount
     

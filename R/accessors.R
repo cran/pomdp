@@ -5,7 +5,7 @@
 #'
 #' Several parts of the POMDP/MDP description can be defined in different ways. In particular,
 #' the fields `transition_prob`, `observation_prob`, `reward`, and `start` can be defined using matrices, data frames,
-#' keywords, or functions. See [POMDP] for details. The functions provided here, provide unified access to the data in these fields
+#' keywords, or functions. See [POMDP] for details. The functions provided here offer unified access to the data in these fields
 #' to make writing code easier.
 #'
 #' ## Transition Probabilities \eqn{T(s'|s,a)}
@@ -38,6 +38,11 @@
 #' ## Initial Belief
 #' `start_vector()` translates the initial probability vector description into a numeric vector.
 #'
+#' ## Deprecated scalar accessors
+#' `transition_val()`, `observation_val()`, and `reward_val()` are deprecated.
+#' Use the corresponding `*_matrix()` accessor with the same selection arguments
+#' and `drop = TRUE` instead.
+#'
 #' ## Convert the Complete POMDP Description into a consistent form
 #' `normalize_POMDP()` returns a new POMDP definition where `transition_prob`,
 #' `observations_prob`, `reward`, and `start` are normalized. 
@@ -62,6 +67,8 @@
 #' @param trans_function logical; convert functions into matrices?
 #' @param trans_keyword logical; convert distribution keywords (uniform and identity) 
 #'  in `transition_prob` or `observation_prob` to matrices?
+#' @param drop logical; simplify a selection to a vector or scalar. Use
+#'  `drop = FALSE` to preserve matrix dimensions.
 #'   
 #' @return A list or a list of lists of matrices.
 #' @author Michael Hahsler
@@ -71,12 +78,14 @@
 #' # List of |A| transition matrices. One per action in the from start.states x end.states
 #' Tiger$transition_prob
 #' transition_matrix(Tiger)
-#' transition_val(Tiger, action = "listen", start.state = "tiger-left", end.state = "tiger-left")
+#' transition_matrix(Tiger, action = "listen", start.state = "tiger-left",
+#'   end.state = "tiger-left")
 #'
 #' # List of |A| observation matrices. One per action in the from states x observations
 #' Tiger$observation_prob
 #' observation_matrix(Tiger)
-#' observation_val(Tiger, action = "listen", end.state = "tiger-left", observation = "tiger-left")
+#' observation_matrix(Tiger, action = "listen", end.state = "tiger-left",
+#'   observation = "tiger-left")
 #'
 #' # List of list of reward matrices. 1st level is action and second level is the
 #' #  start state in the form end state x observation
@@ -127,8 +136,7 @@ normalize_POMDP <- function(x,
                             trans_start = FALSE,
                             trans_function = TRUE,
                             trans_keyword = FALSE) {
-  if (!inherits(x, "POMDP"))
-    stop("x is not an POMDP object!")
+  .validate_class(x, "x", "POMDP")
   
   if (trans_start)
     x$start <- start_vector(x)
@@ -212,8 +220,7 @@ normalize_MDP <- function(x,
                           trans_start = FALSE,
                           trans_function = TRUE,
                           trans_keyword = FALSE) {
-  if (!inherits(x, "MDP"))
-    stop("x is not an MDP object!")
+  .validate_class(x, "x", "MDP")
   
   if (trans_start)
     x$start <- start_vector(x)

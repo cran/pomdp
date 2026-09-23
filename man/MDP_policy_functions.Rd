@@ -80,7 +80,7 @@ the probability for each action is returned.
 \code{greedy_MDP_policy()} returns the greedy policy given \code{Q}.
 }
 \description{
-Implementation several functions useful to deal with MDP policies.
+Implements several functions useful for working with MDP policies.
 }
 \details{
 Implemented functions are:
@@ -175,19 +175,19 @@ Sutton, R. S., Barto, A. G. (2020). Reinforcement Learning: An Introduction.
 Second edition. The MIT Press.
 }
 \seealso{
-Other MDP: 
-\code{\link{MDP}()},
+Other MDP:
+\code{\link[=MDP]{MDP()}},
 \code{\link{MDP2POMDP}},
 \code{\link{accessors}},
-\code{\link{actions}()},
-\code{\link{add_policy}()},
+\code{\link[=actions]{actions()}},
+\code{\link[=add_policy]{add_policy()}},
 \code{\link{gridworld}},
 \code{\link{reachable_and_absorbing}},
-\code{\link{regret}()},
-\code{\link{simulate_MDP}()},
-\code{\link{solve_MDP}()},
-\code{\link{transition_graph}()},
-\code{\link{value_function}()}
+\code{\link[=regret]{regret()}},
+\code{\link[=simulate_MDP]{simulate_MDP()}},
+\code{\link[=solve_MDP]{solve_MDP()}},
+\code{\link[=transition_graph]{transition_graph()}},
+\code{\link[=value_function]{value_function()}}
 }
 \author{
 Michael Hahsler

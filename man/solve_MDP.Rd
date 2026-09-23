@@ -132,7 +132,7 @@ If the model has absorbing states to terminate episodes, then no maximal episode
 (\code{horizon}) needs to
 be specified. To make sure that the algorithm does finish in a reasonable amount of time,
 episodes are stopped after 10,000 actions with a warning. For models without absorbing states,
-a episode length has to be specified via \code{horizon}.
+an episode length has to be specified via \code{horizon}.
 \itemize{
 \item \strong{Q-Learning} is an off-policy temporal difference method that uses
 an \eqn{\epsilon}-greedy behavior policy and learns a greedy target
@@ -185,8 +185,8 @@ pi
 #  policy found by the solver.
 maze_solved <- solve_MDP(Maze)
 
-MDP_policy_evaluation(pi, Maze, k_backup = 100)
-MDP_policy_evaluation(policy(maze_solved), Maze, k_backup = 100)
+MDP_policy_evaluation(pi, Maze, k_backups = 100)
+MDP_policy_evaluation(policy(maze_solved), Maze, k_backups = 100)
 
 # Note that the solver already calculates the utility function and returns it with the policy
 policy(maze_solved)
@@ -208,23 +208,23 @@ Sutton, R. S., Barto, A. G. (2020). Reinforcement Learning: An Introduction.
 Second edition. The MIT Press.
 }
 \seealso{
-Other solver: 
-\code{\link{solve_POMDP}()},
-\code{\link{solve_SARSOP}()}
+Other solver:
+\code{\link[=solve_POMDP]{solve_POMDP()}},
+\code{\link[=solve_SARSOP]{solve_SARSOP()}}
 
-Other MDP: 
-\code{\link{MDP}()},
+Other MDP:
+\code{\link[=MDP]{MDP()}},
 \code{\link{MDP2POMDP}},
 \code{\link{MDP_policy_functions}},
 \code{\link{accessors}},
-\code{\link{actions}()},
-\code{\link{add_policy}()},
+\code{\link[=actions]{actions()}},
+\code{\link[=add_policy]{add_policy()}},
 \code{\link{gridworld}},
 \code{\link{reachable_and_absorbing}},
-\code{\link{regret}()},
-\code{\link{simulate_MDP}()},
-\code{\link{transition_graph}()},
-\code{\link{value_function}()}
+\code{\link[=regret]{regret()}},
+\code{\link[=simulate_MDP]{simulate_MDP()}},
+\code{\link[=transition_graph]{transition_graph()}},
+\code{\link[=value_function]{value_function()}}
 }
 \author{
 Michael Hahsler

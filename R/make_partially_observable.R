@@ -1,7 +1,7 @@
 #' Convert between MDPs and POMDPs
 #'
-#' Convert a MDP into POMDP by adding an observation model or
-#' a POMDP into a MDP by making the states observable.
+#' Convert an MDP into a POMDP by adding an observation model or
+#' a POMDP into an MDP by making the states observable.
 #'
 #' `make_partially_observable()` adds an observation model to an MDP. If no observations and
 #' observation probabilities are provided, then an observation for each state is created
@@ -52,8 +52,7 @@
 make_partially_observable <- function(x,
                                       observations = NULL,
                                       observation_prob = NULL) {
-  if (!inherits(x, "MDP"))
-    stop("'x' needs to be of class 'MDP'.")
+  .validate_class(x, "x", "MDP")
   
   if (is.null(observations))
     observations <- x$states
@@ -84,7 +83,7 @@ make_partially_observable <- function(x,
       value = x$reward$value
     )
   else
-    stop("Reward needs to be a data.frame!")
+    .validate_class(x$reward, "x$reward", "data.frame")
   
   class(x) <- c("POMDP", "list")
   check_and_fix_MDP(x)
@@ -93,8 +92,7 @@ make_partially_observable <- function(x,
 #' @rdname MDP2POMDP
 #' @export
 make_fully_observable <- function(x) {
-  if (!inherits(x, "POMDP"))
-    stop("'x' needs to be of class 'POMDP'.")
+  .validate_class(x, "x", "POMDP")
   
   x$observations <- NULL
   x$observation_prob <- NULL
@@ -103,7 +101,7 @@ make_fully_observable <- function(x) {
   if (is.data.frame(x$reward))
     x$reward$observation <- NULL
   else
-    stop("Reward needs to be a data.frame!")
+    .validate_class(x$reward, "x$reward", "data.frame")
   
   class(x) <- c("MDP", "list")
   check_and_fix_MDP(x)

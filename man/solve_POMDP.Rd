@@ -66,7 +66,7 @@ solver output (\code{solver_output}). The solution is a list that contains eleme
 \item \code{solver_output} output of the solver program.
 \item \code{converged} did the solution converge?
 \item \code{initial_belief} used initial belief used.
-\item \code{total_expected_reward} total expected reward starting from the the initial belief.
+\item \code{total_expected_reward} total expected reward starting from the initial belief.
 \item \code{pg}, \code{initial_pg_node} the policy graph (see Details section).
 \item \code{alpha} value function as hyperplanes representing the nodes in the policy graph (see Details section).
 \item \code{belief_points_solver} optional; belief points used by the solver.
@@ -223,8 +223,9 @@ plot_value_function(sol, ylim = c(0,20))
 ################################################################
 # Example 2: Solve a problem specified as a POMDP file
 #            using a grid of size 20
-sol <- solve_POMDP("http://www.pomdp.org/examples/cheese.95.POMDP",
-  method = "grid", parameter = list(fg_points = 20))
+file <- system.file("examples/shuttle_95.POMDP", package = "pomdp")
+sol <- solve_POMDP(file, method = "grid",
+  parameter = list(fg_points = 20))
 sol
 
 policy(sol)
@@ -385,39 +386,39 @@ iteration: an anytime algorithm for POMDPs. IJCAI'03: Proceedings of the
 1025-1030.
 }
 \seealso{
-Other policy: 
-\code{\link{estimate_belief_for_nodes}()},
-\code{\link{optimal_action}()},
-\code{\link{plot_belief_space}()},
-\code{\link{plot_policy_graph}()},
-\code{\link{policy}()},
-\code{\link{policy_graph}()},
-\code{\link{projection}()},
-\code{\link{reward}()},
-\code{\link{solve_SARSOP}()},
-\code{\link{value_function}()}
+Other policy:
+\code{\link[=estimate_belief_for_nodes]{estimate_belief_for_nodes()}},
+\code{\link[=optimal_action]{optimal_action()}},
+\code{\link[=plot_belief_space]{plot_belief_space()}},
+\code{\link[=plot_policy_graph]{plot_policy_graph()}},
+\code{\link[=policy]{policy()}},
+\code{\link[=policy_graph]{policy_graph()}},
+\code{\link[=projection]{projection()}},
+\code{\link[=reward]{reward()}},
+\code{\link[=solve_SARSOP]{solve_SARSOP()}},
+\code{\link[=value_function]{value_function()}}
 
-Other solver: 
-\code{\link{solve_MDP}()},
-\code{\link{solve_SARSOP}()}
+Other solver:
+\code{\link[=solve_MDP]{solve_MDP()}},
+\code{\link[=solve_SARSOP]{solve_SARSOP()}}
 
-Other POMDP: 
+Other POMDP:
 \code{\link{MDP2POMDP}},
-\code{\link{POMDP}()},
+\code{\link[=POMDP]{POMDP()}},
 \code{\link{accessors}},
-\code{\link{actions}()},
-\code{\link{add_policy}()},
-\code{\link{plot_belief_space}()},
-\code{\link{projection}()},
+\code{\link[=actions]{actions()}},
+\code{\link[=add_policy]{add_policy()}},
+\code{\link[=plot_belief_space]{plot_belief_space()}},
+\code{\link[=projection]{projection()}},
 \code{\link{reachable_and_absorbing}},
-\code{\link{regret}()},
-\code{\link{sample_belief_space}()},
-\code{\link{simulate_POMDP}()},
-\code{\link{solve_SARSOP}()},
-\code{\link{transition_graph}()},
-\code{\link{update_belief}()},
-\code{\link{value_function}()},
-\code{\link{write_POMDP}()}
+\code{\link[=regret]{regret()}},
+\code{\link[=sample_belief_space]{sample_belief_space()}},
+\code{\link[=simulate_POMDP]{simulate_POMDP()}},
+\code{\link[=solve_SARSOP]{solve_SARSOP()}},
+\code{\link[=transition_graph]{transition_graph()}},
+\code{\link[=update_belief]{update_belief()}},
+\code{\link[=value_function]{value_function()}},
+\code{\link[=write_POMDP]{write_POMDP()}}
 }
 \author{
 Hossein Kamalzadeh, Michael Hahsler

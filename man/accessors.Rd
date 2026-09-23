@@ -40,7 +40,8 @@ reward_matrix(
   observation = NULL,
   episode = NULL,
   epoch = NULL,
-  sparse = FALSE
+  sparse = FALSE,
+  drop = TRUE
 )
 
 reward_val(
@@ -61,7 +62,8 @@ transition_matrix(
   episode = NULL,
   epoch = NULL,
   sparse = FALSE,
-  trans_keyword = TRUE
+  trans_keyword = TRUE,
+  drop = TRUE
 )
 
 transition_val(x, action, start.state, end.state, episode = NULL, epoch = NULL)
@@ -74,7 +76,8 @@ observation_matrix(
   episode = NULL,
   epoch = NULL,
   sparse = FALSE,
-  trans_keyword = TRUE
+  trans_keyword = TRUE,
+  drop = TRUE
 )
 
 observation_val(
@@ -108,6 +111,9 @@ in \code{transition_prob} or \code{observation_prob} to matrices?}
 
 \item{episode, epoch}{Episode or epoch used for time-dependent POMDPs. Epochs are internally converted
 to the episode using the model horizon.}
+
+\item{drop}{logical; simplify a selection to a vector or scalar. Use
+\code{drop = FALSE} to preserve matrix dimensions.}
 }
 \value{
 A list or a list of lists of matrices.
@@ -119,7 +125,7 @@ problem description.
 \details{
 Several parts of the POMDP/MDP description can be defined in different ways. In particular,
 the fields \code{transition_prob}, \code{observation_prob}, \code{reward}, and \code{start} can be defined using matrices, data frames,
-keywords, or functions. See \link{POMDP} for details. The functions provided here, provide unified access to the data in these fields
+keywords, or functions. See \link{POMDP} for details. The functions provided here offer unified access to the data in these fields
 to make writing code easier.
 \subsection{Transition Probabilities \eqn{T(s'|s,a)}}{
 
@@ -159,6 +165,13 @@ resulting in no entries with 0.
 \code{start_vector()} translates the initial probability vector description into a numeric vector.
 }
 
+\subsection{Deprecated scalar accessors}{
+
+\code{transition_val()}, \code{observation_val()}, and \code{reward_val()} are deprecated.
+Use the corresponding \verb{*_matrix()} accessor with the same selection arguments
+and \code{drop = TRUE} instead.
+}
+
 \subsection{Convert the Complete POMDP Description into a consistent form}{
 
 \code{normalize_POMDP()} returns a new POMDP definition where \code{transition_prob},
@@ -175,12 +188,14 @@ data("Tiger")
 # List of |A| transition matrices. One per action in the from start.states x end.states
 Tiger$transition_prob
 transition_matrix(Tiger)
-transition_val(Tiger, action = "listen", start.state = "tiger-left", end.state = "tiger-left")
+transition_matrix(Tiger, action = "listen", start.state = "tiger-left",
+  end.state = "tiger-left")
 
 # List of |A| observation matrices. One per action in the from states x observations
 Tiger$observation_prob
 observation_matrix(Tiger)
-observation_val(Tiger, action = "listen", end.state = "tiger-left", observation = "tiger-left")
+observation_matrix(Tiger, action = "listen", end.state = "tiger-left",
+  observation = "tiger-left")
 
 # List of list of reward matrices. 1st level is action and second level is the
 #  start state in the form end state x observation
@@ -218,37 +233,37 @@ Tiger$transition_prob <- trans
 transition_matrix(Tiger)
 }
 \seealso{
-Other POMDP: 
+Other POMDP:
 \code{\link{MDP2POMDP}},
-\code{\link{POMDP}()},
-\code{\link{actions}()},
-\code{\link{add_policy}()},
-\code{\link{plot_belief_space}()},
-\code{\link{projection}()},
+\code{\link[=POMDP]{POMDP()}},
+\code{\link[=actions]{actions()}},
+\code{\link[=add_policy]{add_policy()}},
+\code{\link[=plot_belief_space]{plot_belief_space()}},
+\code{\link[=projection]{projection()}},
 \code{\link{reachable_and_absorbing}},
-\code{\link{regret}()},
-\code{\link{sample_belief_space}()},
-\code{\link{simulate_POMDP}()},
-\code{\link{solve_POMDP}()},
-\code{\link{solve_SARSOP}()},
-\code{\link{transition_graph}()},
-\code{\link{update_belief}()},
-\code{\link{value_function}()},
-\code{\link{write_POMDP}()}
+\code{\link[=regret]{regret()}},
+\code{\link[=sample_belief_space]{sample_belief_space()}},
+\code{\link[=simulate_POMDP]{simulate_POMDP()}},
+\code{\link[=solve_POMDP]{solve_POMDP()}},
+\code{\link[=solve_SARSOP]{solve_SARSOP()}},
+\code{\link[=transition_graph]{transition_graph()}},
+\code{\link[=update_belief]{update_belief()}},
+\code{\link[=value_function]{value_function()}},
+\code{\link[=write_POMDP]{write_POMDP()}}
 
-Other MDP: 
-\code{\link{MDP}()},
+Other MDP:
+\code{\link[=MDP]{MDP()}},
 \code{\link{MDP2POMDP}},
 \code{\link{MDP_policy_functions}},
-\code{\link{actions}()},
-\code{\link{add_policy}()},
+\code{\link[=actions]{actions()}},
+\code{\link[=add_policy]{add_policy()}},
 \code{\link{gridworld}},
 \code{\link{reachable_and_absorbing}},
-\code{\link{regret}()},
-\code{\link{simulate_MDP}()},
-\code{\link{solve_MDP}()},
-\code{\link{transition_graph}()},
-\code{\link{value_function}()}
+\code{\link[=regret]{regret()}},
+\code{\link[=simulate_MDP]{simulate_MDP()}},
+\code{\link[=solve_MDP]{solve_MDP()}},
+\code{\link[=transition_graph]{transition_graph()}},
+\code{\link[=value_function]{value_function()}}
 }
 \author{
 Michael Hahsler

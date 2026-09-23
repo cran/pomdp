@@ -1,6 +1,6 @@
-#' Simulate Trajectories in a MDP
+#' Simulate Trajectories in an MDP
 #'
-#' Simulate trajectories through a MDP. The start state for each
+#' Simulate trajectories through an MDP. The start state for each
 #' trajectory is randomly chosen using the specified belief. The belief is used to choose actions
 #' from an epsilon-greedy policy and then update the state.
 #'
@@ -9,14 +9,14 @@
 #'
 #' Both implementations support parallel execution using the package
 #' \pkg{foreach}. To enable parallel execution, a parallel backend like
-#' \pkg{doparallel} needs to be available needs to be registered (see
+#' a parallel backend such as \pkg{doparallel} needs to be registered (see
 #' [doParallel::registerDoParallel()]).
 #' Note that small simulations are slower using parallelization. Therefore, C++ simulations
 #' with n * horizon less than 100,000 are always executed using a single worker.
 #' @family MDP
 #' @importFrom stats runif
 #'
-#' @param model a MDP model.
+#' @param model an MDP model.
 #' @param n number of trajectories.
 #' @param start probability distribution over the states for choosing the
 #'  starting states for the trajectories. Defaults to "uniform".
@@ -96,7 +96,7 @@ simulate_MDP <-
        (is.function(model$transition_prob) ||
         is.function(model$reward))) {
       
-      warning("Some elements of the MDP are defined as R funciton. The CPP engine is very slow with R function calls.\n",
+      warning("Some elements of the MDP are defined as R functions. The C++ engine is very slow with R function calls.\n",
               "Falling back to R. Normalize the model first to use CPP.", immediate. = TRUE
       )
       engine <- 'r'
@@ -104,8 +104,11 @@ simulate_MDP <-
     
     
     start <- .translate_belief(start, model = model)
+    if (is.matrix(start))
+      stop("start must specify one probability distribution.", call. = FALSE)
     solved <- is_solved_MDP(model)
     
+    .validate_positive_integer(n, "n")
     n <- as.integer(n)
     
     if (is.null(horizon))
@@ -121,6 +124,7 @@ simulate_MDP <-
       horizon <-
         ceiling(log(delta_horizon / max_abs_R) / log(model$discount))
     }
+    .validate_positive_integer(horizon, "horizon")
     horizon <- as.integer(horizon)
     
     if (is.null(epsilon)) {
@@ -253,7 +257,7 @@ simulate_MDP <-
           s_prime = NA_integer_
         )
       else
-        trajectory <- NULL
+        trajectory <- data.frame()
       
       for (j in seq_len(horizon)) {
         if (runif(1) < epsilon) {
@@ -305,7 +309,7 @@ simulate_MDP <-
     rew <- Reduce(c, lapply(sim, "[[", "reward"))
     rew <- unname(rew)
     
-    trajectories <- NULL
+    trajectories <- data.frame()
     if (return_trajectories) {
       trajectories <- Reduce(rbind, lapply(sim, "[[", "trajectory"))
       trajectories$s <-

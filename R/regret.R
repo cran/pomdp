@@ -39,11 +39,13 @@ regret <- function(policy, benchmark, start = NULL) {
 
 #' @export
 regret.POMDP <- function(policy, benchmark, start = NULL) {
-  if (!inherits(benchmark, "POMDP") || !is_solved_POMDP(benchmark))
-    stop("benchmark needs to be a solved POMDP.")
+  .validate_class(benchmark, "benchmark", "POMDP")
+  if (!is_solved_POMDP(benchmark))
+    stop("`benchmark` must be a solved object of class \"POMDP\".", call. = FALSE)
   
-  if (!inherits(policy, "POMDP") || !is_solved_POMDP(policy))
-    stop("policy needs to be a solved POMDP.")
+  .validate_class(policy, "policy", "POMDP")
+  if (!is_solved_POMDP(policy))
+    stop("`policy` must be a solved object of class \"POMDP\".", call. = FALSE)
   
   start <- .translate_belief(start, benchmark)
   if (is.null(start))
@@ -57,17 +59,21 @@ regret.POMDP <- function(policy, benchmark, start = NULL) {
 
 #' @export
 regret.MDP <- function(policy, benchmark, start = NULL) {
-  if (!inherits(benchmark, "MDP") || !is_solved_MDP(benchmark))
-    stop("benchmark needs to be a solved MDP.")
+  .validate_class(benchmark, "benchmark", "MDP")
+  if (!is_solved_MDP(benchmark))
+    stop("`benchmark` must be a solved object of class \"MDP\".", call. = FALSE)
   
-  if (!inherits(policy, "MDP") || !is_solved_MDP(policy))
-    stop("policy needs to be a solved MDP.")
+  .validate_class(policy, "policy", "MDP")
+  if (!is_solved_MDP(policy))
+    stop("`policy` must be a solved object of class \"MDP\".", call. = FALSE)
   
   if (is.null(start))
     start <- which(start_vector(benchmark) == 1) 
-  
-  if(is.character(start))
-    start <- which(benchmark$states == start)
+
+  if (!is.null(start)) {
+    start <- .match_model_value(start, benchmark$states, "start state")
+    start <- match(start, benchmark$states)
+  }
   
   if (length(start) != 1L)
     stop("A single start state needs to be specified!")

@@ -44,13 +44,13 @@
 #' * A data.frame with columns exactly like the arguments of `T_()`.
 #'   You can use `rbind()` with helper function `T_()` to create this data
 #'   frame. Probabilities can be specified multiple times and the definition that
-#'   appears last in the data.frame will take affect.
+#'   appears last in the data.frame will take effect.
 #'
 #' * A named list of matrices, one for each action. Each matrix is square with
 #'   rows representing start states \eqn{s} and columns representing end states \eqn{s'}.
 #'   Instead of a matrix, also the strings `'identity'` or `'uniform'` can be specified.
 #'
-#' * A function with the same arguments are `T_()`, but no default values
+#' * A function with the same arguments as `T_()`, but no default values
 #'   that returns the transition probability.
 #'
 #' **Specification of observation probabilities: \eqn{O(o | a, s')}**
@@ -64,13 +64,13 @@
 #'   You can use `rbind()`
 #'   with helper function `O_()` to create this data frame. Probabilities can be
 #'   specified multiple times and the definition that
-#'   appears last in the data.frame will take affect.
+#'   appears last in the data.frame will take effect.
 #'
 #' * A named list of matrices, one for each action. Each matrix has
 #'   rows representing end states \eqn{s'} and columns representing an observation \eqn{o}.
 #'   Instead of a matrix, also the string `'uniform'` can be specified.
 #'
-#' * A function with the same arguments are `O_()`, but no default values
+#' * A function with the same arguments as `O_()`, but no default values
 #'   that returns the observation probability.
 #'
 #' **Specification of the reward function: \eqn{R(a, s, s', o)}**
@@ -82,13 +82,13 @@
 #'   You can use `rbind()`
 #'   with helper function `R_()` to create this data frame. Rewards can be specified
 #'   multiple times and the definition that
-#'   appears last in the data.frame will take affect.
+#'   appears last in the data.frame will take effect.
 #'
 #' * A list of lists. The list levels are `'action'` and `'start.state'`. The list elements
 #'   are matrices with
 #'   rows representing end states \eqn{s'} and columns representing an observation \eqn{o}.
 #'
-#' * A function with the same arguments are `R_()`, but no default values
+#' * A function with the same arguments as `R_()`, but no default values
 #'   that returns the reward.
 #'   
 #' To avoid overflow problems with rewards, reward values should stay well within the 
@@ -174,7 +174,7 @@
 #' `transition_prob` above, respectively. The default value `'*"'`
 #' matches any action/state/observation.
 #'
-#' @return The function returns an object of class POMDP which is list of the model specification.
+#' @return An object of class POMDP containing the model specification.
 #' [solve_POMDP()] reads the object and adds a list element named
 #' `'solution'`.
 #' @author Hossein Kamalzadeh, Michael Hahsler
@@ -207,11 +207,11 @@
 #'   # the reward helper expects: action, start.state, end.state, observation, value
 #'   # missing arguments default to NA which matches any value (often denoted as * in POMDPs).
 #'   reward = rbind(
-#'     R_("listen",                    v =   -1),
-#'     R_("open-left",  "tiger-left",  v = -100),
-#'     R_("open-left",  "tiger-right", v =   10),
-#'     R_("open-right", "tiger-left",  v =   10),
-#'     R_("open-right", "tiger-right", v = -100)
+#'     R_("listen",                    value =   -1),
+#'     R_("open-left",  "tiger-left",  value = -100),
+#'     R_("open-left",  "tiger-right", value =   10),
+#'     R_("open-right", "tiger-left",  value =   10),
+#'     R_("open-right", "tiger-right", value = -100)
 #'   )
 #' )
 #'
@@ -375,12 +375,11 @@ print.POMDP <- function(x, ...) {
 #' @param stop logical; stop with an error.
 #' @export
 is_solved_POMDP <- function(x, stop = FALSE, message = "") {
-  if (!inherits(x, "POMDP"))
-    stop("x needs to be a POMDP object!")
+  .validate_class(x, "x", "POMDP")
   
   solved <- !is.null(x$solution)
   if (stop && !solved)
-    stop("x needs to be a solved POMDP. Use solve_POMDP() first.",
+    stop("`x` must be a solved object of class \"POMDP\". Use solve_POMDP() first.",
          message,
          call. = FALSE)
   
@@ -429,6 +428,10 @@ is_timedependent_POMDP <- function(x)
 epoch_to_episode <- function(x, epoch) {
   if (is.null(epoch))
     return(1L)
+
+  .validate_positive_integer(epoch, "epoch")
+  if (!is_timedependent_POMDP(x) && is.finite(sum(x$horizon)) && epoch > sum(x$horizon))
+    stop("Epoch does not exist", call. = FALSE)
   
   episode <- which(epoch <= cumsum(x$horizon))[1]
   if (is.na(episode))
@@ -455,9 +458,8 @@ is_converged_POMDP <- function(x, stop = FALSE, message = "") {
 .get_pg_index <- function(model, epoch) {
   #is_solved_POMDP(model, stop = TRUE)
   
+  .validate_positive_integer(epoch, "epoch")
   epoch <- as.integer(epoch)
-  if (epoch < 1L)
-    stop("Epoch has to be >= 1")
   
   ### (converged) infinite horizon POMDPs. We ignore epoch.
   if (length(model$solution$pg) == 1L)

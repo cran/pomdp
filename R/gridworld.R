@@ -10,7 +10,7 @@
 #' `gridworld_init()` initializes a new gridworld creating a matrix
 #' of states with the given dimensions. Other action names
 #' can be specified, but they must have the same effects in the same order
-#' as above. Unreachable states (walls) and absorbing state can be defined.
+#' as above. Unreachable states (walls) and absorbing states can be defined.
 #' This information can be used to build a custom gridworld MDP.
 #'
 #' Several helper functions are provided
@@ -472,7 +472,7 @@ gridworld_plot_policy <-
       text(
         g$x,
         g$y,
-        g$label,
+        g$labels,
         pos = 1,
         offset = offset,
         cex = .5 * cex
@@ -489,7 +489,7 @@ gridworld_plot_policy <-
         levels = c("up", "right", "down", "left"),
         labels = c("\U2191", "\U2192", "\U2193", "\U2190"))),
       
-      label = g$actions,
+      labels = g$actions,
       
       none = NA
       )
@@ -561,7 +561,7 @@ gridworld_plot_transition_graph <-
 
 #' @rdname gridworld
 #' @param n number of iterations to animate.
-#' @param method a MDP solution method for [solve_MDP()].
+#' @param method an MDP solution method for [solve_MDP()].
 #' @param zlim limits for visualizing the state value.
 #' @export
 gridworld_animate <- function(x,
